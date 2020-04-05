@@ -1,3 +1,9 @@
 [submodule "nanoemoji"]
 	path = nanoemoji
 	url = git@github.com:rsheeter/nanoemoji.git
+[submodule "font-srcs/noto-emoji"]
+	path = font-srcs/noto-emoji
+	url = git@github.com:googlefonts/noto-emoji.git
+[submodule "font-srcs/twemoji"]
+	path = font-srcs/twemoji
+	url = git@github.com:twitter/twemoji.git
