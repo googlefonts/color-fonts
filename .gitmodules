@@ -1,0 +1,3 @@
+[submodule "nanoemoji"]
+	path = nanoemoji
+	url = git@github.com:rsheeter/nanoemoji.git
