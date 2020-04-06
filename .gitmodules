@@ -7,3 +7,6 @@
 [submodule "font-srcs/twemoji"]
 	path = font-srcs/twemoji
 	url = git@github.com:twitter/twemoji.git
+[submodule "nanosvg"]
+	path = nanosvg
+	url = git@github.com:rsheeter/nanosvg.git
