@@ -25,8 +25,9 @@ nanoemoji --color_format colr_1 \
 
 # Twemoji Smileys, these but twemoji:
 # https://rsheeter.github.io/android_fonts/emoji.html?q=note:smi
-nanoemoji --color_format colr_1 \
-	--output_file fonts/twemoji-smiley-colr_1.ttf \
+# Use COLRv0 since these don't use any gradiants
+nanoemoji --color_format colr_0 \
+	--output_file fonts/twemoji-smiley-colr_0.ttf \
 	font-srcs/twemoji/assets/svg/263a.svg \
 	font-srcs/twemoji/assets/svg/1f60{1,3,4,5,6,7,8,a,d,e,f}.svg \
 	font-srcs/twemoji/assets/svg/1f619.svg \
