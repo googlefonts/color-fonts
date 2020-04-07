@@ -17,20 +17,41 @@ pip install -e nanosvg/
 
 which nanoemoji  # sanity check
 
+# Sample sets
+noto_handwriting_svgs=$(find font-srcs/noto-emoji/svg -name 'emoji_u270d*.svg')
+
+twemoji_smiley_svgs="$(echo font-srcs/twemoji/assets/svg/{263a,1f619,1f642,1f970}.svg)"
+twemoji_smiley_svgs="$twemoji_smiley_svgs $(echo font-srcs/twemoji/assets/svg/1f60{1,3,4,5,6,7,8,a,d,e,f}.svg)"
+twemoji_smiley_svgs="$twemoji_smiley_svgs $(echo font-srcs/twemoji/assets/svg/1f63{8,a,b,c}.svg)"
+
+
+
 # Noto Emoji Handwriting
 # https://rsheeter.github.io/android_fonts/emoji.html?q=u:270d
 nanoemoji --color_format colr_1 \
 	--output_file fonts/noto-handwriting-colr_1.ttf \
-	$(find font-srcs/noto-emoji/svg -name 'emoji_u270d*.svg')
+	$noto_handwriting_svgs
+
+nanoemoji --color_format svg \
+	--output_file fonts/noto-handwriting-svg.ttf \
+	$noto_handwriting_svgs
+
+nanoemoji --color_format svgz \
+	--output_file fonts/noto-handwriting-svgz.ttf \
+	$noto_handwriting_svgs
+
 
 # Twemoji Smileys, these but twemoji:
 # https://rsheeter.github.io/android_fonts/emoji.html?q=note:smi
 # Use COLRv0 since these don't use any gradiants
 nanoemoji --color_format colr_0 \
 	--output_file fonts/twemoji-smiley-colr_0.ttf \
-	font-srcs/twemoji/assets/svg/263a.svg \
-	font-srcs/twemoji/assets/svg/1f60{1,3,4,5,6,7,8,a,d,e,f}.svg \
-	font-srcs/twemoji/assets/svg/1f619.svg \
-	font-srcs/twemoji/assets/svg/1f63{8,a,b,c}.svg \
-	font-srcs/twemoji/assets/svg/1f642.svg \
-	font-srcs/twemoji/assets/svg/1f970.svg
+	$twemoji_smiley_svgs
+
+nanoemoji --color_format svg \
+	--output_file fonts/twemoji-smiley-svg.ttf \
+	$twemoji_smiley_svgs
+
+nanoemoji --color_format svgz \
+	--output_file fonts/twemoji-smiley-svgz.ttf \
+	$twemoji_smiley_svgs
