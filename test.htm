@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Color Font Test</title>
+	<style>
+		@font-face {
+			font-family: 'samples-svg';
+			src: url(fonts/samples-svg.ttf);
+		}
+		@font-face {
+			font-family: 'samples-colr_0';
+			src: url(fonts/samples-colr_0.ttf);
+		}
+		@font-face {
+			font-family: 'samples-colr_1';
+			src: url(fonts/samples-colr_1.ttf);
+		}
+		colr0_sample {
+			font-family: 'samples-colr_0';
+			font-size: 4em;
+		}
+		colr1_sample {
+			font-family: 'samples-colr_1';
+			font-size: 4em;
+		}
+		svg_sample {
+			font-family: 'samples-svg';
+			font-size: 4em;
+		}
+	</style>
+</head>
+
+<body>
+	<pre>Intended to be run locally, such as with python -m http.server 8001</pre>
+	<div>
+		<h2>COLRv0</h2>
+		<colr0_sample>simple_linear</colr0_sample>
+		<colr0_sample>simple_radial</colr0_sample>
+	</div>
+	<div>
+		<h2>COLRv1</h2>
+		<colr1_sample>simple_linear</colr1_sample>
+		<colr1_sample>simple_radial</colr1_sample>
+	</div>
+	<div>
+		<h2>SVG</h2>
+		<svg_sample>simple_linear</svg_sample>
+		<svg_sample>simple_radial</svg_sample>
+	</div>
+</body>
+
+</html>
