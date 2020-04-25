@@ -16,18 +16,11 @@
 
 set -e
 
-# git submodule init
-# git submodule update
+[ ! -d "venv" ] && python3 -m venv venv
 
-# git submodule foreach git pull origin master
+source venv/bin/activate
 
-# [ ! -d "venv" ] && python3 -m venv venv
-
-# source venv/bin/activate
-
-# # # don't have pip + versions currently; just grab latest
-# pip install -e nanoemoji/
-# pip install -e nanosvg/
+pip install --upgrade nanoemoji
 
 which nanoemoji  # sanity check
 
