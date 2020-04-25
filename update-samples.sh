@@ -20,7 +20,9 @@ set -e
 
 source venv/bin/activate
 
-pip install --upgrade nanoemoji
+# upgrade eagerly so that all dependencies are updated regardless of whether
+# the currently installed version satisfies the requirement of the upgraded package.
+pip install --upgrade --upgrade-strategy "eager" nanoemoji
 
 which nanoemoji  # sanity check
 
