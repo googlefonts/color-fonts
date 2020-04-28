@@ -3,5 +3,5 @@ Experimental color font builds. Intended to help verify font toolchain builds th
 
 Related:
 
-*   [nanoemoji](https://github.com/rsheeter/nanoemoji), compiles a set of nanosvgs into a color font 
-*   [nanosvg](https://github.com/rsheeter/nanosvg), simplifies svgs to use only a small subset of the full spec
+*   [nanoemoji](https://github.com/googlefonts/nanoemoji), compiles a set of nanosvgs into a color font 
+*   [nanosvg](https://github.com/googlefonts/nanosvg), simplifies svgs to use only a small subset of the full spec
