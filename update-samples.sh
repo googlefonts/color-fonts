@@ -35,32 +35,38 @@ twemoji_smiley_svgs="$twemoji_smiley_svgs $(echo font-srcs/twemoji/assets/svg/1f
 
 # Noto Emoji Handwriting
 # https://rsheeter.github.io/android_fonts/emoji.html?q=u:270d
-nanoemoji --color_format colr_1 \
-	--output_file fonts/noto-handwriting-colr_1.ttf \
+nanoemoji --color_format glyf_colr_1 \
+	--output_dir fonts \
+	--output_file noto-handwriting-colr_1.ttf \
 	$noto_handwriting_svgs
 
 nanoemoji --color_format svg \
-	--output_file fonts/noto-handwriting-svg.ttf \
+	--output_dir fonts \
+	--output_file noto-handwriting-svg.ttf \
 	$noto_handwriting_svgs
 
 nanoemoji --color_format svgz \
-	--output_file fonts/noto-handwriting-svgz.ttf \
+	--output_dir fonts \
+	--output_file noto-handwriting-svgz.ttf \
 	$noto_handwriting_svgs
 
 
 # Twemoji Smileys, these but twemoji:
 # https://rsheeter.github.io/android_fonts/emoji.html?q=note:smi
 # Use COLRv0 since these don't use any gradiants
-nanoemoji --color_format colr_0 \
-	--output_file fonts/twemoji-smiley-colr_0.ttf \
+nanoemoji --color_format glyf_colr_0 \
+	--output_dir fonts \
+	--output_file twemoji-smiley-colr_0.ttf \
 	$twemoji_smiley_svgs
 
 nanoemoji --color_format svg \
-	--output_file fonts/twemoji-smiley-svg.ttf \
+	--output_dir fonts \
+	--output_file twemoji-smiley-svg.ttf \
 	$twemoji_smiley_svgs
 
 nanoemoji --color_format svgz \
-	--output_file fonts/twemoji-smiley-svgz.ttf \
+	--output_dir fonts \
+	--output_file twemoji-smiley-svgz.ttf \
 	$twemoji_smiley_svgs
 
 # SVG files from repo
@@ -74,18 +80,22 @@ ls $tmp_dir
 python rename.py "$tmp_dir"
 samples_svgs=$(find "$tmp_dir" -name '*.svg')
 
-nanoemoji --color_format colr_0 \
-	--output_file fonts/samples-colr_0.ttf \
+nanoemoji --color_format glyf_colr_0 \
+	--output_dir fonts \
+	--output_file samples-colr_0.ttf \
 	$samples_svgs
 
-nanoemoji --color_format colr_1 \
-	--output_file fonts/samples-colr_1.ttf \
+nanoemoji --color_format glyf_colr_1 \
+	--output_dir fonts \
+	--output_file samples-colr_1.ttf \
 	$samples_svgs
 
 nanoemoji --color_format svg \
-	--output_file fonts/samples-svg.ttf \
+	--output_dir fonts \
+	--output_file samples-svg.ttf \
 	$samples_svgs
 
 nanoemoji --color_format svgz \
-	--output_file fonts/samples-svgz.ttf \
+	--output_dir fonts \
+	--output_file samples-svgz.ttf \
 	$samples_svgs
