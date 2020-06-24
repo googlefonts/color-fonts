@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Emoji Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Adobe+Blank" rel="stylesheet">
+  <style>
+  	@font-face {
+  		font-family: "noto-handwriting-svg";
+  		src: url(fonts/noto-handwriting-svg.ttf) format('truetype');
+  	}
+	@font-face {
+  		font-family: "noto-handwriting-svgz";
+  		src: url(fonts/noto-handwriting-svgz.ttf) format('truetype');
+  	}
+  	emoji {
+  		font-size:4em;
+  		border: 1px dashed;
+  	}
+  	.svg emoji {
+  		font-family: "noto-handwriting-svg", "Adobe Blank";
+  	}
+  	.svgz emoji {
+  		font-family: "noto-handwriting-svgz", "Adobe Blank";
+  	}
+  </style>
+</head>
+<body>
+<pre>Intended to be run locally, such as with python -m http.server 8001</pre>
+
+<div class="svg">
+	<emoji>&#x270d;&#x1f3fc;</emoji>
+	<emoji>&#x270d;&#x1f3fb;</emoji>
+	<emoji>&#x270d;&#x1f3fe;</emoji>
+	<emoji>&#x270d;&#x1f3fd;</emoji>
+	<emoji>&#x270d;&#x1f3ff;</emoji>
+	<emoji>&#x270d;</emoji>
+	<span>svg handwriting</span>
+</div>
+<div class="svgz">
+	<emoji>&#x270d;&#x1f3fc;</emoji>
+	<emoji>&#x270d;&#x1f3fb;</emoji>
+	<emoji>&#x270d;&#x1f3fe;</emoji>
+	<emoji>&#x270d;&#x1f3fd;</emoji>
+	<emoji>&#x270d;&#x1f3ff;</emoji>
+	<emoji>&#x270d;</emoji>
+	<span>svgz handwriting</span>
+</div>
+
+</body>
+</html>
