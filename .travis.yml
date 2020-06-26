@@ -17,7 +17,7 @@ python:
   - "3.8"
 script:
   - ./update-samples.sh -t small_samples
-  - git restore fonts/*
+  - git reset --hard fonts/*
 
 deploy:
   provider: releases
