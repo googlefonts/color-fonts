@@ -1,0 +1,31 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+language: python
+python:
+  - "3.8"
+script:
+  - ./update-samples.sh -t small_samples
+  - git restore fonts/*
+
+deploy:
+  provider: releases
+  api_key:
+    secure: CA7eNbyW5LEP6s9CNC2JXqUqN8C5Ni5jOC5Tz/3SKSJb+UrFKXgZ9HHG2LlFnUqNIxAl6W28ThRZPjU6rUQKSvjM8Z9L6Phyrq6Pu9abupClq9EwqKuhHDI8uWDZwhtGQI8tGKDDl1rCekycNoCb9fHmfPB04dyhwJ4mg5spIWHntH7Q8WEFHZPVZMckhy+doWBYoBH1e4DFIfUKEGfkmCSSs04qSPsCKBpOQetJslK72zlkRR+6GeNr1y5CjJQaJa28CF4X5gbnMq2opti5+c0MUo8jfZZPhUjtP1TpB27OGEjn/tS+7QKQ4ctn7+iYbT5QoEnedaSHfTSib85L5drKnu765qCvqFxJ3UKnMmu11Qy3a9yYrZUdud/P3ytz0G5mMgTsKd10B7GI+NiWbmc9HwNFiHMWuizcrW5UlJTpn8dbDO2Q7SuLFSwn5vLcMvWUJMoufpDQpdM271/dP96+UitLC97q00z3gUTyh7hMn5Lc6q5d6r6CYxcLf/7Pgnyvcjh1oq1ZsaWBh6T5XHVlUht/cXj2d8fcPMvWhfvQRK/IpyEy+tFkHc+ZNaXkZCIvNbkxTSSPTTCFjQTu4v0EUFfdD+FqTIIziaqQVSrjjrjWyTKBpdLfwLfyKUELYkyO1s0AIRko3XL6t/Vf75cNuIhQDD1kERPcvBVPby8=
+  file: fonts/*
+  on:
+    tags: true
+    repo: googlefonts/color-fonts
+    condition: "$TRAVIS_PYTHON_VERSION = 3.8"
+  skip_cleanup: 'true'
