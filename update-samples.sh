@@ -106,27 +106,90 @@ function compile_small_samples() {
 }
 
 function compile_noto_emoji() {
-	time nanoemoji --color_format glyf_colr_1 \
+	local fmt="$1"
+	time nanoemoji --color_format "$1" \
 		--output_dir fonts \
-		--output_file noto-emoji-colr_1.ttf \
+		--output_file "noto-emoji-$1.ttf" \
 		$(find font-srcs/noto-emoji/svg -name '*.svg')
 }
 
 function compile_twemoji() {
-	time nanoemoji --color_format glyf_colr_1 \
+	local fmt="$1"
+	time nanoemoji --color_format "$1" \
 		--output_dir fonts \
-		--output_file twemoji-colr_1.ttf \
+		--output_file "twemoji-$1.ttf" \
 		$(find font-srcs/twemoji/assets/svg/ -name '*.svg')
+}
+
+function build() {
+	local target="$1"
+	case "$target" in
+	  small_samples)
+		prebuild
+		compile_small_samples
+	    ;;
+	  noto_emoji_colr)
+		prebuild
+		compile_noto_emoji glyf_colr_1
+		;;
+	  noto_emoji_svg)
+		prebuild
+		compile_noto_emoji svg
+		;;
+	  noto_emoji_svgz)
+		prebuild
+		compile_noto_emoji svgz
+		;;
+	  twemoji_colr)
+		prebuild
+		compile_twemoji glyf_colr_1
+	    ;;
+	  twemoji_colr)
+		prebuild
+		compile_twemoji svg
+	    ;;
+	  twemoji_colr)
+		prebuild
+		compile_twemoji svgz
+	    ;;
+	  twemoji)
+		prebuild
+		compile_twemoji svg
+		compile_twemoji svgz
+		compile_twemoji glyf_colr_1
+	    ;;
+	  noto_emoji)
+		prebuild
+		compile_noto_emoji svg
+		compile_noto_emoji svgz
+		compile_noto_emoji glyf_colr_1
+	    ;;
+	  *)  set +x
+	      echo "Invalid target $target"
+	      usage
+	      exit 1
+	    ;;
+	esac
 }
 
 function usage() {
 	echo "Usage: -t target"
 	echo ""
-	echo "-t one of small_samples, noto_emoji, twemoji"
+	echo "-t one of:"
+	echo "     all"
+	echo "     small_samples"
+	echo "     noto_emoji"
+	echo "     noto_emoji_colr"
+	echo "     noto_emoji_svg"
+	echo "     noto_emoji_svgz"
+	echo "     twemoji"
+	echo "     twemoji_colr"
+	echo "     twemoji_svg"
+	echo "     twemoji_svgz"
 }
 
 target=""
-while getopts "t:" opt; do
+while getopts "t:f:" opt; do
   case $opt in
   t)  target="$OPTARG"
     ;;
@@ -137,22 +200,5 @@ while getopts "t:" opt; do
   esac
 done
 
-case "$target" in
-  small_samples)
-	prebuild
-	compile_small_samples
-    ;;
-  noto_emoji)
-	prebuild
-	compile_noto_emoji
-    ;;
-  twemoji)
-	prebuild
-	compile_twemoji
-    ;;
-  *)  set +x
-      echo "Invalid target $target"
-      usage
-      exit 1
-    ;;
-esac
+build "$target"
+
