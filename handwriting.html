@@ -6,45 +6,81 @@
   <link href="https://fonts.googleapis.com/css2?family=Adobe+Blank" rel="stylesheet">
   <style>
   	@font-face {
-  		font-family: "noto-handwriting-svg";
-  		src: url(fonts/noto-handwriting-svg.ttf) format('truetype');
+  		font-family: "noto-handwriting-picosvg";
+  		src: url(fonts/noto-handwriting-picosvg.ttf) format('truetype');
   	}
 	@font-face {
-  		font-family: "noto-handwriting-svgz";
-  		src: url(fonts/noto-handwriting-svgz.ttf) format('truetype');
+  		font-family: "noto-handwriting-picosvgz";
+  		src: url(fonts/noto-handwriting-picosvgz.ttf) format('truetype');
+  	}
+  	@font-face {
+  		font-family: "noto-handwriting-untouchedsvg";
+  		src: url(fonts/noto-handwriting-untouchedsvg.ttf) format('truetype');
+  	}
+	@font-face {
+  		font-family: "noto-handwriting-untouchedsvgz";
+  		src: url(fonts/noto-handwriting-untouchedsvgz.ttf) format('truetype');
   	}
   	emoji {
   		font-size:4em;
   		border: 1px dashed;
   	}
-  	.svg emoji {
-  		font-family: "noto-handwriting-svg", "Adobe Blank";
+  	.picosvg emoji {
+  		font-family: "noto-handwriting-picosvg", "Adobe Blank";
   	}
-  	.svgz emoji {
-  		font-family: "noto-handwriting-svgz", "Adobe Blank";
+  	.picosvgz emoji {
+  		font-family: "noto-handwriting-picosvgz", "Adobe Blank";
+  	}
+  	.untouchedsvg emoji {
+  		font-family: "noto-handwriting-untouchedsvg", "Adobe Blank";
+  	}
+  	.untouchedsvgz emoji {
+  		font-family: "noto-handwriting-untouchedsvgz", "Adobe Blank";
   	}
   </style>
 </head>
 <body>
-<pre>Intended to be run locally, such as with python -m http.server 8001</pre>
+<pre>
+	Intended to be run locally, such as with python -m http.server 8001
 
-<div class="svg">
+	At time of writing svg only works in Firefox
+</pre>
+
+<div class="picosvg">
 	<emoji>&#x270d;&#x1f3fc;</emoji>
 	<emoji>&#x270d;&#x1f3fb;</emoji>
 	<emoji>&#x270d;&#x1f3fe;</emoji>
 	<emoji>&#x270d;&#x1f3fd;</emoji>
 	<emoji>&#x270d;&#x1f3ff;</emoji>
 	<emoji>&#x270d;</emoji>
-	<span>svg handwriting</span>
+	<span>picosvg handwriting</span>
 </div>
-<div class="svgz">
+<div class="picosvgz">
 	<emoji>&#x270d;&#x1f3fc;</emoji>
 	<emoji>&#x270d;&#x1f3fb;</emoji>
 	<emoji>&#x270d;&#x1f3fe;</emoji>
 	<emoji>&#x270d;&#x1f3fd;</emoji>
 	<emoji>&#x270d;&#x1f3ff;</emoji>
 	<emoji>&#x270d;</emoji>
-	<span>svgz handwriting</span>
+	<span>picosvgz handwriting</span>
+</div>
+<div class="untouchedsvg">
+	<emoji>&#x270d;&#x1f3fc;</emoji>
+	<emoji>&#x270d;&#x1f3fb;</emoji>
+	<emoji>&#x270d;&#x1f3fe;</emoji>
+	<emoji>&#x270d;&#x1f3fd;</emoji>
+	<emoji>&#x270d;&#x1f3ff;</emoji>
+	<emoji>&#x270d;</emoji>
+	<span>untouchedsvg handwriting</span>
+</div>
+<div class="untouchedsvgz">
+	<emoji>&#x270d;&#x1f3fc;</emoji>
+	<emoji>&#x270d;&#x1f3fb;</emoji>
+	<emoji>&#x270d;&#x1f3fe;</emoji>
+	<emoji>&#x270d;&#x1f3fd;</emoji>
+	<emoji>&#x270d;&#x1f3ff;</emoji>
+	<emoji>&#x270d;</emoji>
+	<span>untouchedsvgz handwriting</span>
 </div>
 
 </body>
