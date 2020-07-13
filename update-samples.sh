@@ -22,6 +22,7 @@ function prebuild() {
 
 	source venv/bin/activate
 
+	pip install --upgrade pip setuptools wheel
 	pip install -r requirements.txt
 
 	which nanoemoji  # sanity check
