@@ -50,28 +50,28 @@ function compile_small_samples() {
 	for fmt in glyf_colr_1 cff_colr_1 cff2_colr_1 picosvg picosvgz untouchedsvg untouchedsvgz; do
 		# Noto Emoji Handwriting
 		# https://rsheeter.github.io/android_fonts/emoji.html?q=u:270d
-		./compile.sh $fmt noto-handwriting $noto_handwriting_svgs &
+		./compile.sh $fmt noto-handwriting $noto_handwriting_svgs
 
 		# Twemoji Smileys, these but twemoji:
 		# https://rsheeter.github.io/android_fonts/emoji.html?q=note:smi
 		# Use COLRv0 since these don't use any gradiants
-		./compile.sh $fmt twemoji-smiley $twemoji_smiley_svgs &
+		./compile.sh $fmt twemoji-smiley $twemoji_smiley_svgs
 
 		# Sample files from repo
-		./compile.sh $fmt samples $samples_svgs &
+		./compile.sh $fmt samples $samples_svgs
 	done
 }
 
 function compile_noto_emoji() {
 	local fmt="$1"
 	local svgs="$(find font-srcs/noto-emoji/svg -name '*.svg')"
-	./compile.sh $fmt noto-emoji $svgs &
+	./compile.sh $fmt noto-emoji $svgs
 }
 
 function compile_twemoji() {
 	local fmt="$1"
 	local svgs="$(find font-srcs/twemoji/assets/svg/ -name '*.svg')"
-	./compile.sh $fmt twemoji $svgs &
+	./compile.sh $fmt twemoji $svgs
 }
 
 function build() {
@@ -108,9 +108,6 @@ function build() {
 	      exit 1
 	    ;;
 	esac
-
-	echo "blindly waiting for ALL compile.sh instances to exit :)"
-	wait $(pgrep -f compile.sh)
 }
 
 function usage() {

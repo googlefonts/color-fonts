@@ -14,7 +14,7 @@ fmt="$1"
 name="$2"
 shift 2
 nanoemoji --color_format $fmt \
-	--output_dir fonts \
-	--output_file $name-$fmt.ttf \
+	--output_file fonts/$name-$fmt.ttf \
+	--build_dir build/$name \
 	"$@" > /tmp/$name-$fmt.ttf.log 2>&1 \
 	|| echo "ERROR; see /tmp/$name-$fmt.ttf.log"
