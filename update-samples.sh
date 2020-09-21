@@ -65,6 +65,8 @@ function compile_small_samples() {
 function compile_noto_emoji() {
 	local fmt="$1"
 	local svgs="$(find font-srcs/noto-emoji/svg -name '*.svg')"
+	# filter out input SVGs in the blocklist
+	local svgs="$(echo "$svgs" | tr ' ' '\n' | fgrep -vf BLOCKLIST.txt)"
 	./compile.sh $fmt noto-emoji $svgs
 }
 
