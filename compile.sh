@@ -13,8 +13,17 @@
 fmt="$1"
 name="$2"
 shift 2
+inputs="$@"
+
+if [[ $fmt = cff* ]]
+then
+	ext="otf"
+else
+	ext="ttf"
+fi
+
 nanoemoji --color_format $fmt \
-	--output_file fonts/$name-$fmt.ttf \
+	--output_file fonts/$name-$fmt.$ext \
 	--build_dir build/$name \
-	"$@" > /tmp/$name-$fmt.ttf.log 2>&1 \
-	|| echo "ERROR; see /tmp/$name-$fmt.ttf.log"
+	$inputs > /tmp/$name-$fmt.$ext.log 2>&1 \
+	|| echo "ERROR; see /tmp/$name-$fmt.$ext.log"
