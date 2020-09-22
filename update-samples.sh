@@ -90,6 +90,9 @@ function build() {
 		compile_twemoji picosvgz
 		compile_twemoji untouchedsvg
 		compile_twemoji untouchedsvgz
+		compile_twemoji glyf_colr_0
+		compile_twemoji cff_colr_0
+		compile_twemoji cff2_colr_0
 		compile_twemoji glyf_colr_1
 		compile_twemoji cff_colr_1
 		compile_twemoji cff2_colr_1
