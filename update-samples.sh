@@ -18,13 +18,6 @@
 set -e
 
 function prebuild() {
-	[ ! -d "venv" ] && python3 -m venv venv
-
-	source venv/bin/activate
-
-	pip install --upgrade pip setuptools wheel
-	pip install -r requirements.txt
-
 	which nanoemoji  # sanity check
 }
 
@@ -47,7 +40,7 @@ function compile_small_samples() {
 	local samples_svgs=$(find "$tmp_dir" -name '*.svg')
 
 	# compile each sample set in each format
-	for fmt in glyf_colr_1 cff_colr_1 cff2_colr_1 picosvg picosvgz untouchedsvg untouchedsvgz; do
+	for fmt in glyf_colr_1 cff_colr_1 cff2_colr_1; do
 		# Noto Emoji Handwriting
 		# https://rsheeter.github.io/android_fonts/emoji.html?q=u:270d
 		./compile.sh $fmt noto-handwriting $noto_handwriting_svgs
@@ -86,20 +79,12 @@ function build() {
 	    ;;
 	  twemoji)
 		prebuild
-		compile_twemoji picosvg
-		compile_twemoji picosvgz
-		compile_twemoji untouchedsvg
-		compile_twemoji untouchedsvgz
 		compile_twemoji glyf_colr_1
 		compile_twemoji cff_colr_1
 		compile_twemoji cff2_colr_1
 	    ;;
 	  noto_emoji)
 		prebuild
-		compile_noto_emoji picosvg
-		compile_noto_emoji picosvgz
-		compile_noto_emoji untouchedsvg
-		compile_noto_emoji untouchedsvgz
 		compile_noto_emoji glyf_colr_1
 		compile_noto_emoji cff_colr_1
 		compile_noto_emoji cff2_colr_1
