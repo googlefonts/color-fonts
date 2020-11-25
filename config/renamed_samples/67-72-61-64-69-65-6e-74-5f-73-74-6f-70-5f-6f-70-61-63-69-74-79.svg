@@ -1,0 +1,20 @@
+<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lg1">
+      <stop offset="5%"  stop-color="gold" stop-opacity="0.5" />
+      <stop offset="95%" stop-color="red" />
+    </linearGradient>
+    <linearGradient id="lg2" gradientTransform="rotate(90)">
+      <stop offset="0.05"  stop-color="gold" />
+      <stop offset="0.95" stop-color="red" stop-opacity="0.5" />
+    </linearGradient>
+    <radialGradient id="rg1">
+      <stop offset="0.0"  stop-color="gold" />
+      <stop offset="0.85" stop-color="red" stop-opacity="0.5" />
+      <stop offset="1.0" stop-color="white" stop-opacity="0.7" />
+    </radialGradient>
+  </defs>
+  <rect x="1" y="4.5" width="8" height="1" fill="url(#lg1)" />
+  <rect x="4.5" y="1" width="1" height="8" fill="url(#lg2)" />
+  <circle cx="5" cy="5" r="2" fill="url(#rg1)" />
+</svg>

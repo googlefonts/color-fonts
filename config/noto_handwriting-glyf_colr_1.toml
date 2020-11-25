@@ -1,0 +1,15 @@
+
+family = "noto_handwriting-glyf_colr_1"
+output_file = "noto_handwriting-glyf_colr_1.ttf"
+color_format = "glyf_colr_1"
+
+[axis.wght]
+name = "Weight"
+default = 400
+
+[master.regular]
+style_name = "Regular"
+srcs = ["../font-srcs/noto-emoji/svg/emoji_u270d_1f3fc.svg", "../font-srcs/noto-emoji/svg/emoji_u270d_1f3fb.svg", "../font-srcs/noto-emoji/svg/emoji_u270d_1f3fe.svg", "../font-srcs/noto-emoji/svg/emoji_u270d_1f3fd.svg", "../font-srcs/noto-emoji/svg/emoji_u270d_1f3ff.svg", "../font-srcs/noto-emoji/svg/emoji_u270d.svg"]
+
+[master.regular.position]
+wght = 400

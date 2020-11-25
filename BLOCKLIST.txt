@@ -1,2 +1,0 @@
-font-srcs/noto-emoji/svg/emoji_u1f54d.svg
-font-srcs/noto-emoji/svg/emoji_u1f6cd.svg

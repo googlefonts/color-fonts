@@ -1,0 +1,15 @@
+
+family = "twemoji_smiley-untouchedsvg"
+output_file = "twemoji_smiley-untouchedsvg.ttf"
+color_format = "untouchedsvg"
+
+[axis.wght]
+name = "Weight"
+default = 400
+
+[master.regular]
+style_name = "Regular"
+srcs = ["../font-srcs/twemoji/assets/svg/263a.svg", "../font-srcs/twemoji/assets/svg/1f619.svg", "../font-srcs/twemoji/assets/svg/1f642.svg", "../font-srcs/twemoji/assets/svg/1f970.svg", "../font-srcs/twemoji/assets/svg/1f601.svg", "../font-srcs/twemoji/assets/svg/1f603.svg", "../font-srcs/twemoji/assets/svg/1f604.svg", "../font-srcs/twemoji/assets/svg/1f605.svg", "../font-srcs/twemoji/assets/svg/1f606.svg", "../font-srcs/twemoji/assets/svg/1f607.svg", "../font-srcs/twemoji/assets/svg/1f608.svg", "../font-srcs/twemoji/assets/svg/1f60a.svg", "../font-srcs/twemoji/assets/svg/1f60d.svg", "../font-srcs/twemoji/assets/svg/1f60e.svg", "../font-srcs/twemoji/assets/svg/1f60f.svg"]
+
+[master.regular.position]
+wght = 400
