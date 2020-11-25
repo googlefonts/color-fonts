@@ -24,6 +24,7 @@ from typing import Iterable
 _COLOR_FORMATS = (
     "glyf_colr_1",
     "cff_colr_1",
+    "cff2_colr_1",
     "picosvg",
     "picosvgz",
     "untouchedsvg",

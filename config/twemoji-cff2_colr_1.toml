@@ -1,7 +1,7 @@
 
-family = "twemoji-glyf_colr_1"
-output_file = "twemoji-glyf_colr_1.ttf"
-color_format = "glyf_colr_1"
+family = "twemoji-cff2_colr_1"
+output_file = "twemoji-cff2_colr_1.otf"
+color_format = "cff2_colr_1"
 
 [axis.wght]
 name = "Weight"
