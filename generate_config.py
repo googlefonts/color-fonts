@@ -118,7 +118,7 @@ def _write_all_noto_configs():
 
 
 def _write_all_twemoji_configs():
-    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg"))
+    svgs = tuple(_TWEMOJI_SVG_DIR.glob("*.svg"))
     _write_configs("twemoji", _COLOR_FORMATS, svgs)
 
 
