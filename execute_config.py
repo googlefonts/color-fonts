@@ -33,7 +33,8 @@ def main():
         )
         print(" ".join(cmd))  # very useful on failure
         before_rmtree = time.monotonic()
-        shutil.rmtree(build_dir)
+        if build_dir.exists():
+            shutil.rmtree(build_dir)
         after_rmtree = time.monotonic()
         subprocess.run(cmd, check=True)
         after_nanoemoji = time.monotonic()
