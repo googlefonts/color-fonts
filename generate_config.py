@@ -56,7 +56,7 @@ def _write_configs(prefix, color_formats, svg_files):
         config_file = f"{name}.toml"
         for svg_file in svg_files:
             assert _CONFIG_DIR.joinpath(svg_file).is_file(), f"{svg_file} not found relative to {_CONFIG_DIR}"
-        svg_list = ", ".join(f"\"{f}\"" for f in svg_files)
+        svg_list = ", ".join(f"\"{f}\"" for f in sorted(svg_files))
         with open(_CONFIG_DIR / config_file, "w") as f:
             f.write(textwrap.dedent(f"""
                 family = "{name}"
