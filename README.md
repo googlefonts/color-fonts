@@ -6,7 +6,7 @@ Experimental color font builds. Intended to help verify font toolchain builds th
 To update the fonts:
 
 1.  Run [generate_config.py](https://github.com/googlefonts/color-fonts/blob/master/generate_config.py) if the config needs to be updated
-1.  Run [execute_config.py](https://github.com/googlefonts/color-fonts/blob/master/execute_config.py) to generate the font(s) you want to update
+1.  Run [build.py](https://github.com/googlefonts/color-fonts/blob/master/build.py) to generate the font(s) you want to update
 
 Related:
 
