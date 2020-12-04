@@ -32,6 +32,7 @@ _COLOR_FORMATS = (
 )
 _SAMPLE_SVG_DIR = Path("font-srcs/samples")
 _NOTO_SVG_DIR = Path("font-srcs/noto-emoji/svg")
+_NOTO_SVG_FLAG_DIR = Path("font-srcs/noto-emoji/third_party/waved-flags/svg")
 _TWEMOJI_SVG_DIR = Path("font-srcs/twemoji/assets/svg")
 _CONFIG_DIR = Path("config")
 
@@ -114,7 +115,7 @@ def _write_sample_configs():
 
 
 def _write_all_noto_configs():
-    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg"))
+    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg")) + tuple(_NOTO_SVG_FLAG_DIR.glob("*.svg"))
     _write_configs("noto", _COLOR_FORMATS, svgs)
 
 
