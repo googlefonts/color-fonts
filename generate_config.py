@@ -83,7 +83,7 @@ def _write_noto_handwriting_configs():
 
 
 def _write_noto_flag_configs():
-    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg")) + tuple(_NOTO_SVG_FLAG_DIR.glob("*.svg"))
+    svgs = tuple(_NOTO_SVG_FLAG_DIR.glob("emoji_u*.svg"))
     _write_configs("noto_flag", tuple(cf for cf in _COLOR_FORMATS if cf.endswith("colr_1")), svgs)
 
 
@@ -120,7 +120,7 @@ def _write_sample_configs():
 
 
 def _write_all_noto_configs():
-    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg")) + tuple(_NOTO_SVG_FLAG_DIR.glob("*.svg"))
+    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg")) + tuple(_NOTO_SVG_FLAG_DIR.glob("emoji_u*.svg"))
     _write_configs("noto", _COLOR_FORMATS, svgs)
 
 
