@@ -4,7 +4,7 @@
 #
 #    pip-compile requirements.in
 #
-absl-py==0.10.0           # via nanoemoji
+absl-py==0.11.0           # via nanoemoji
 appdirs==1.4.4            # via fs
 attrs==20.2.0             # via ufolib2
 booleanoperations==0.9.0  # via ufo2ft
