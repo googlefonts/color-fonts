@@ -13,7 +13,7 @@ compreffor==0.5.0         # via ufo2ft
 cu2qu==1.6.7              # via ufo2ft
 fonttools[ufo]==4.15.0    # via booleanoperations, cffsubr, compreffor, cu2qu, nanoemoji, ufo2ft, ufolib2
 fs==2.4.11                # via fonttools
-lxml==4.5.2               # via nanoemoji, picosvg
+lxml==4.6.2               # via nanoemoji, picosvg
 nanoemoji==0.3.4          # via -r requirements.in
 ninja==1.10.0.post2       # via nanoemoji
 picosvg==0.6.1            # via nanoemoji
