@@ -18,7 +18,7 @@ nanoemoji==0.3.4          # via -r requirements.in
 ninja==1.10.0.post2       # via nanoemoji
 picosvg==0.6.1            # via nanoemoji
 pillow==7.2.0             # via nanoemoji
-pyclipper==1.2.0          # via booleanoperations
+pyclipper==1.2.1          # via booleanoperations
 pytz==2020.1              # via fs
 regex==2020.7.14          # via nanoemoji
 six==1.15.0               # via absl-py, fs
