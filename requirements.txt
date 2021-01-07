@@ -13,7 +13,7 @@ compreffor==0.5.0         # via ufo2ft
 cu2qu==1.6.7              # via ufo2ft
 fonttools[ufo]==4.15.0    # via booleanoperations, cffsubr, compreffor, cu2qu, nanoemoji, ufo2ft, ufolib2
 fs==2.4.11                # via fonttools
-lxml==4.5.2               # via nanoemoji, picosvg
+lxml==4.6.2               # via nanoemoji, picosvg
 nanoemoji==0.3.4          # via -r requirements.in
 ninja==1.10.0.post2       # via nanoemoji
 picosvg==0.6.1            # via nanoemoji
@@ -23,7 +23,6 @@ pytz==2020.1              # via fs
 regex==2020.7.14          # via nanoemoji
 six==1.15.0               # via absl-py, fs
 skia-pathops==0.4.1       # via picosvg
-typing-extensions==3.7.4.3  # via ufolib2
 ufo2ft[cffsubr]==2.16.0   # via nanoemoji
 ufolib2==0.8.0            # via nanoemoji
 
