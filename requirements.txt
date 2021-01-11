@@ -16,7 +16,7 @@ fs==2.4.11                # via fonttools
 lxml==4.5.2               # via nanoemoji, picosvg
 nanoemoji==0.3.4          # via -r requirements.in
 ninja==1.10.0.post2       # via nanoemoji
-picosvg==0.6.1            # via nanoemoji
+picosvg==0.11.0            # via nanoemoji
 pillow==7.2.0             # via nanoemoji
 pyclipper==1.2.0          # via booleanoperations
 pytz==2020.1              # via fs
