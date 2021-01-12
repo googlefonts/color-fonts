@@ -32,7 +32,6 @@ _COLOR_FORMATS = (
 )
 _SAMPLE_SVG_DIR = Path("font-srcs/samples")
 _NOTO_SVG_DIR = Path("font-srcs/noto-emoji/svg")
-_NOTO_SVG_FLAG_DIR = Path("font-srcs/noto-emoji/third_party/waved-flags/svg")
 _TWEMOJI_SVG_DIR = Path("font-srcs/twemoji/assets/svg")
 _CONFIG_DIR = Path("config")
 
@@ -82,11 +81,6 @@ def _write_noto_handwriting_configs():
     _write_configs("noto_handwriting", _COLOR_FORMATS, svgs)
 
 
-def _write_noto_flag_configs():
-    svgs = tuple(_NOTO_SVG_FLAG_DIR.glob("emoji_u*.svg"))
-    _write_configs("noto_flag", tuple(cf for cf in _COLOR_FORMATS if cf.endswith("colr_1")), svgs)
-
-
 def _write_twemoji_smiley_configs():
     svgs = tuple(_TWEMOJI_SVG_DIR / (f + ".svg") for f in (
         "263a",
@@ -120,7 +114,7 @@ def _write_sample_configs():
 
 
 def _write_all_noto_configs():
-    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg")) + tuple(_NOTO_SVG_FLAG_DIR.glob("emoji_u*.svg"))
+    svgs = tuple(_NOTO_SVG_DIR.glob("*.svg"))
     _write_configs("noto", _COLOR_FORMATS, svgs)
 
 
@@ -132,7 +126,6 @@ def _write_all_twemoji_configs():
 def main():
     _write_sample_configs()
     _write_noto_handwriting_configs()
-    _write_noto_flag_configs()
     _write_twemoji_smiley_configs()
     _write_all_noto_configs()
     _write_all_twemoji_configs()
