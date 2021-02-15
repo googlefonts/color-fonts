@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,8 @@
 # limitations under the License.
 
 # Rebuild samples whose configurations are specified on cli
-# Ex execute_config.py config/twemoji-*
+# Example:
+#     ./build.py config/twemoji-*
 
 from pathlib import Path
 import shutil
