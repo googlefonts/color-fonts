@@ -119,6 +119,11 @@ def _write_all_noto_configs():
     _write_configs("noto", _COLOR_FORMATS, svgs)
 
 
+def _write_noto_flag_configs():
+    svgs = tuple(_NOTO_WAVED_FLAG_SVG_DIR.glob("*.svg"))
+    _write_configs("noto_flags", _COLOR_FORMATS, svgs)
+
+
 def _write_all_twemoji_configs():
     svgs = tuple(_TWEMOJI_SVG_DIR.glob("*.svg"))
     _write_configs("twemoji", _COLOR_FORMATS, svgs)
@@ -129,6 +134,7 @@ def main():
     _write_noto_handwriting_configs()
     _write_twemoji_smiley_configs()
     _write_all_noto_configs()
+    _write_noto_flag_configs()
     _write_all_twemoji_configs()
 
 
