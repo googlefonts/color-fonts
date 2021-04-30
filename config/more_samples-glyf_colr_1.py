@@ -58,7 +58,7 @@ def _sample_sweep():
                     (1.0, _cpal("red")),
                 ]
             },
-            "centerX": 400,  # TODO: looks off-center at 500
+            "centerX": 500,
             "centerY": 500,
             "startAngle": 0,
             "endAngle": 360,
@@ -103,11 +103,11 @@ def _sample_composite_colr_glyph():
     glyph_name = "composite_colr_glyph"
     # Scale down the sweep and use it to cut a hole in the sweep
     # Transforms combine f(g(x)); build up backwards
-    t = Transform(dx=-400, dy=-500)  # move to origin
+    t = Transform(dx=-500, dy=-500)  # move to origin
     print(t)
     t = Transform(xx=0.75, yy=0.75).transform(t)
     print(t)
-    t = Transform(dx=400, dy=500).transform(t)
+    t = Transform(dx=500, dy=500).transform(t)
     print(t)
     t = tuple(t)
 
@@ -169,7 +169,7 @@ def main():
         {ord(g.accessor): g.glyph_name for g in glyphs if len(g.accessor) == 1}
     )
     fb.setupGlyf({g.glyph_name: g.glyph for g in glyphs})
-    fb.setupHorizontalMetrics({g.glyph_name: (_UPEM, 0) for g in glyphs})
+    fb.setupHorizontalMetrics({g.glyph_name: (_UPEM, g.glyph.xMin) for g in glyphs})
     fb.setupHorizontalHeader(ascent=_ASCENT, descent=-_DESCENT)
     fb.setupOS2(sTypoAscender=_ASCENT, usWinAscent=_ASCENT, usWinDescent=_DESCENT)
     fb.setupNameTable(names)
