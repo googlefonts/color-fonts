@@ -28,24 +28,33 @@ def main():
     font_dir = Path("fonts")
     for config in sys.argv[1:]:
         config = Path(config)
-        cmd = (
-            "nanoemoji",
-            "--config",
-            str(config)
-        )
+        if config.suffix == '.toml':
+            cmd = (
+                "nanoemoji",
+                "--config",
+                str(config)
+            )
+        elif config.suffix == '.py':
+            cmd = (
+                "python",
+                str(config.resolve()),
+                str(build_dir.resolve())
+            )
+        else:
+            raise ValueError(f'Not sure how to handle {config}')
         print(" ".join(cmd))  # very useful on failure
         before_rmtree = time.monotonic()
         if build_dir.exists():
             shutil.rmtree(build_dir)
         after_rmtree = time.monotonic()
         subprocess.run(cmd, check=True)
-        after_nanoemoji = time.monotonic()
+        after_run = time.monotonic()
         font_files = tuple(build_dir.glob("*.[ot]tf"))
         assert len(font_files) == 1
         src, dst = font_files[0], font_dir / (config.stem + font_files[0].suffix)
         shutil.copy(src, dst)
         print(f"{after_rmtree - before_rmtree:.1f}s to delete build/")
-        print(f"{after_nanoemoji - after_rmtree:.1f}s to run {' '.join(cmd)}")
+        print(f"{after_run - after_rmtree:.1f}s to run {' '.join(cmd)}")
 
 
 if __name__ == "__main__":
