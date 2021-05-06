@@ -104,11 +104,8 @@ def _sample_composite_colr_glyph():
     # Scale down the sweep and use it to cut a hole in the sweep
     # Transforms combine f(g(x)); build up backwards
     t = Transform(dx=-500, dy=-500)  # move to origin
-    print(t)
     t = Transform(xx=0.75, yy=0.75).transform(t)
-    print(t)
     t = Transform(dx=500, dy=500).transform(t)
-    print(t)
     t = tuple(t)
 
     colr = {
@@ -138,6 +135,46 @@ def _sample_composite_colr_glyph():
     )
 
 
+def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
+    glyph_name = f"linear_repeat_{first_stop}_{second_stop}"
+
+    pen = TTGlyphPen(None)
+    pen.moveTo((100, 250))
+    pen.lineTo((100, 950))
+    pen.lineTo((900, 950))
+    pen.lineTo((900, 250))
+    pen.closePath()
+
+    colr = {
+        "Format": ot.PaintFormat.PaintGlyph,
+        "Glyph": glyph_name,
+        "Paint": {
+            "Format": ot.PaintFormat.PaintLinearGradient,
+            "ColorLine": {
+                "ColorStop": [
+                    (first_stop, _cpal("red")),
+                    (second_stop, _cpal("blue")),
+                ],
+                "Extend": ot.ExtendMode.REPEAT,
+            },
+            "x0": 100,
+            "y0": 250,
+            "x1": 900,
+            "y1": 250,
+            "x2": 100,
+            "y2": 300,
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -161,6 +198,10 @@ def main():
         _sample_sweep(),
         _sample_colr_glyph(),
         _sample_composite_colr_glyph(),
+        _gradient_stops_repeat(0, 1, "p"),
+        _gradient_stops_repeat(0.2, 0.8, "q"),
+        _gradient_stops_repeat(0, 1.5, "r"),
+        _gradient_stops_repeat(0.5, 1.5, "s"),
     ]
 
     fb = fontBuilder.FontBuilder(_UPEM)
