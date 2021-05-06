@@ -134,8 +134,9 @@ def _sample_composite_colr_glyph():
         glyph_name=glyph_name, accessor="o", advance=_UPEM, glyph=pen.glyph(), colr=colr
     )
 
-def _gradient_stops_repeat(stops, accessor_char):
-    glyph_name = f"linear_repeat_{stops[0]}_{stops[1]}"
+
+def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
+    glyph_name = f"linear_repeat_{first_stop}_{second_stop}"
 
     pen = TTGlyphPen(None)
     pen.moveTo((100, 250))
@@ -151,8 +152,8 @@ def _gradient_stops_repeat(stops, accessor_char):
             "Format": ot.PaintFormat.PaintLinearGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (stops[0], _cpal("red")),
-                    (stops[1], _cpal("blue")),
+                    (first_stop, _cpal("red")),
+                    (second_stop, _cpal("blue")),
                 ],
                 "Extend": ot.ExtendMode.REPEAT,
             },
@@ -166,7 +167,11 @@ def _gradient_stops_repeat(stops, accessor_char):
     }
 
     return SampleGlyph(
-        glyph_name=glyph_name, accessor=accessor_char, advance=_UPEM, glyph=pen.glyph(), colr=colr
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colr=colr,
     )
 
 
@@ -193,10 +198,10 @@ def main():
         _sample_sweep(),
         _sample_colr_glyph(),
         _sample_composite_colr_glyph(),
-        _gradient_stops_repeat((0,1), "p"),
-        _gradient_stops_repeat((0.2,0.8), "q"),
-        _gradient_stops_repeat((0,1.5), "r"),
-        _gradient_stops_repeat((0.5,1.5), "s"),
+        _gradient_stops_repeat(0, 1, "p"),
+        _gradient_stops_repeat(0.2, 0.8, "q"),
+        _gradient_stops_repeat(0, 1.5, "r"),
+        _gradient_stops_repeat(0.5, 1.5, "s"),
     ]
 
     fb = fontBuilder.FontBuilder(_UPEM)
