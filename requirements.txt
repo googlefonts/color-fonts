@@ -1,4 +1,4 @@
-nanoemoji >= 0.8.1  # we need latest spec support
+nanoemoji >= 0.8.2  # we need latest spec support
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
