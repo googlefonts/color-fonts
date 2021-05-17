@@ -3,6 +3,7 @@
 from pathlib import Path
 import csv
 import fontTools.ttLib.woff2
+import functools
 import io
 import itertools
 import logging
@@ -42,10 +43,11 @@ def file_sizes_for_file(file_name):
     }
 
 
-def compare_sizes(name_format):
+def compare_sizes(name_format, noto_cbdt_path=None):
     (name, format) = name_format
     if format == "cbdt":
         # Use parent cbdt file pathname.
+        assert noto_cbdt_path is not None
         return (name, format, file_sizes_for_file(noto_cbdt_path))
     file_name = f"fonts/{name}-{format}.{'o' if 'cff' in format else 't'}tf"
     return (name, format, file_sizes_for_file(file_name))
@@ -72,8 +74,11 @@ if __name__ == "__main__":
             "Not adding Noto Color Emoji bitmap info to result."
         )
 
+    partial_compare_sizes = functools.partial(
+        compare_sizes, noto_cbdt_path=noto_cbdt_path
+    )
     with multiprocessing.Pool(math.floor(multiprocessing.cpu_count() * 0.75)) as p:
-        size_results = p.map(compare_sizes, files)
+        size_results = p.map(partial_compare_sizes, files)
     csv_file = io.StringIO()
     field_names = ["font", "format", "uncompressed_sfnt_size", "woff2_size"]
     writer = csv.DictWriter(csv_file, field_names)
