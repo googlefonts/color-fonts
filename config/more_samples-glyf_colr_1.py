@@ -21,6 +21,8 @@ _FAMILY = "More COLR v1 Samples"
 _STYLE = "Regular"
 _PALETTE = {}  # <3 mutable globals
 
+_CROSS_GLYPH = "cross_glyph"
+
 
 class SampleGlyph(NamedTuple):
     glyph_name: str
@@ -30,8 +32,8 @@ class SampleGlyph(NamedTuple):
     colr: Optional[Mapping[str, Any]] = None
 
 
-def _cpal(color_str):
-    color = Color.fromstring(color_str).to_ufo_color()
+def _cpal(color_str, alpha=1.0):
+    color = Color.fromstring(color_str, alpha).to_ufo_color()
     if color not in _PALETTE:
         _PALETTE[color] = len(_PALETTE)
     return _PALETTE[color]
@@ -78,7 +80,7 @@ def _sample_colr_glyph():
         "dx": 250,
         "dy": 0,
         "Paint": {
-            "Format": ot.PaintFormat.PaintRotate,
+            "Format": ot.PaintFormat.PaintRotateAroundCenter,
             "centerX": _UPEM / 2,
             "centerY": _UPEM / 2,
             "angle": 60,
@@ -175,6 +177,103 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
     )
 
 
+def _cross_glyph():
+
+    pen = TTGlyphPen(None)
+    pen.moveTo((475, 500))
+    pen.lineTo((475, 725))
+    pen.lineTo((525, 725))
+    pen.lineTo((525, 500))
+    pen.lineTo((750, 500))
+    pen.lineTo((750, 450))
+    pen.lineTo((525, 450))
+    pen.lineTo((525, 225))
+    pen.lineTo((475, 225))
+    pen.lineTo((475, 450))
+    pen.lineTo((250, 450))
+    pen.lineTo((250, 500))
+    pen.endPath()
+
+    return SampleGlyph(
+        glyph_name=_CROSS_GLYPH,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        accessor="+",
+    )
+
+
+def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
+    glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
+
+    pen = TTGlyphPen(None)
+    pen.moveTo((0, 0))
+    pen.lineTo((0, _UPEM))
+    pen.lineTo((_UPEM, _UPEM))
+    pen.lineTo((_UPEM, 0))
+    pen.closePath()
+
+    glyph_paint = {
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "Color": _cpal("orange", 0.7),
+            },
+        },
+    }
+
+    if center_x or center_y:
+        if scale_x != scale_y:
+            scaled_colr = {
+                "Format": ot.PaintFormat.PaintScaleAroundCenter,
+                "scaleX": scale_x,
+                "scaleY": scale_y,
+                "centerX": center_x,
+                "centerY": center_y,
+            }
+        else:
+            scaled_colr = {
+                "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
+                "scale": scale_x,
+                "centerX": center_x,
+                "centerY": center_y,
+            }
+    else:
+        if scale_x != scale_y:
+            scaled_colr = {
+                "Format": ot.PaintFormat.PaintScale,
+                "scaleX": scale_x,
+                "scaleY": scale_y,
+            }
+        else:
+            scaled_colr = {
+                "Format": ot.PaintFormat.PaintScaleUniform,
+                "scale": scale_x,
+            }
+
+    scaled_colr = {**scaled_colr, **glyph_paint}
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": scaled_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {"Format": ot.PaintFormat.PaintSolid, "Color": _cpal("blue", 0.5)},
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -202,6 +301,13 @@ def main():
         _gradient_stops_repeat(0.2, 0.8, "q"),
         _gradient_stops_repeat(0, 1.5, "r"),
         _gradient_stops_repeat(0.5, 1.5, "s"),
+        _paint_scale(0.5, 1.5, 500, 475, "t"),
+        _paint_scale(1.5, 1.5, 500, 475, "u"),
+        _paint_scale(0.5, 1.5, 0, 0, "v"),
+        _paint_scale(1.5, 1.5, 0, 0, "w"),
+        _paint_scale(0.5, 1.5, _UPEM, _UPEM, "v"),
+        _paint_scale(1.5, 1.5, _UPEM, _UPEM, "w"),
+        _cross_glyph(),
     ]
 
     fb = fontBuilder.FontBuilder(_UPEM)
