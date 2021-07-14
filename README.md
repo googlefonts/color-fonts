@@ -1,4 +1,4 @@
-[![Travis Build Status](https://travis-ci.org/googlefonts/color-fonts.svg?branch=main)](https://travis-ci.org/googlefonts/color-fonts)
+[![CI Build Status](https://github.com/googlefonts/color-fonts/workflows/Continuous%20Test%20+%20Deploy/badge.svg)](https://github.com/googlefonts/color-fonts/actions/workflows/ci.yml?query=workflow%3ATest)
 
 # color-fonts
 Experimental color font builds. Intended to help verify font toolchain builds things that work with consuming tools for COLRv1 ([colr gradients spec](https://github.com/googlefonts/colr-gradients-spec/blob/main/colr-gradients-spec.md)).
