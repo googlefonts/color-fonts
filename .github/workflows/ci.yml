@@ -1,0 +1,35 @@
+name: Continuous Test + Deploy
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: ['**']
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+  test:
+    runs-on: ${{ matrix.config.platform }}
+    strategy:
+      matrix:
+        config:
+          - {platform: ubuntu-latest, python-version: 3.9}
+          - {platform: windows-latest, python-version: 3.9}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.config.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.config.python-version }}
+    - name: Install requirements
+      run: pip install -r requirements.txt
+    - name: Build small test fonts
+      run: ./build.py config/samples-*
