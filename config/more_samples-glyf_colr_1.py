@@ -13,7 +13,7 @@ from typing import Any, Mapping, NamedTuple, Optional
 from fontTools.ttLib.tables import otTables as ot
 from nanoemoji.colors import css_colors, Color
 from fontTools.misc.transform import Transform
-from itertools import chain
+from string import ascii_letters
 
 _UPEM = 1000
 _ASCENT = 950
@@ -34,11 +34,6 @@ class SampleGlyph(NamedTuple):
     colr: Optional[Mapping[str, Any]] = None
 
 
-def _accessors():
-    for c in chain(range(ord("A"), ord("Z") + 1), range(ord("a"), ord("z") + 1)):
-        yield chr(c)
-
-
 def _cpal(color_str, alpha=1.0):
     color = Color.fromstring(color_str, alpha).to_ufo_color()
     if color not in _PALETTE:
@@ -46,7 +41,7 @@ def _cpal(color_str, alpha=1.0):
     return _PALETTE[color]
 
 
-def _sample_sweep():
+def _sample_sweep(accessor):
     glyph_name = "sweep"
 
     pen = TTGlyphPen(None)
@@ -75,11 +70,15 @@ def _sample_sweep():
     }
 
     return SampleGlyph(
-        glyph_name=glyph_name, accessor="c", advance=_UPEM, glyph=pen.glyph(), colr=colr
+        glyph_name=glyph_name,
+        accessor=accessor,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colr=colr,
     )
 
 
-def _sample_colr_glyph():
+def _sample_colr_glyph(accessor):
     glyph_name = "transformed_sweep"
     # Paint the sweep shifted and rotated
     colr = {
@@ -104,11 +103,15 @@ def _sample_colr_glyph():
     pen.endPath()
 
     return SampleGlyph(
-        glyph_name=glyph_name, accessor="t", advance=_UPEM, glyph=pen.glyph(), colr=colr
+        glyph_name=glyph_name,
+        accessor=accessor,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colr=colr,
     )
 
 
-def _sample_composite_colr_glyph():
+def _sample_composite_colr_glyph(accessor):
     glyph_name = "composite_colr_glyph"
     # Scale down the sweep and use it to cut a hole in the sweep
     # Transforms combine f(g(x)); build up backwards
@@ -136,8 +139,8 @@ def _sample_composite_colr_glyph():
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor="o",
         advance=_UPEM,
+        accessor=accessor,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
     )
@@ -300,7 +303,7 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
         "radial": ot.PaintFormat.PaintRadialGradient,
     }
 
-    if gradient_format not in format_map.keys():
+    if gradient_format not in format_map:
         return None
 
     selected_format = format_map[gradient_format]
@@ -311,7 +314,7 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
         "pad": ot.ExtendMode.PAD,
     }
 
-    if extend_mode not in extend_mode_map.keys():
+    if extend_mode not in extend_mode_map:
         return None
 
     coordinates = {
@@ -378,28 +381,29 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
+    access_chars = iter(ascii_letters)
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
-        _sample_sweep(),
-        _sample_colr_glyph(),
-        _sample_composite_colr_glyph(),
-        _gradient_stops_repeat(0, 1, next(_accessors())),
-        _gradient_stops_repeat(0.2, 0.8, next(_accessors())),
-        _gradient_stops_repeat(0, 1.5, next(_accessors())),
-        _gradient_stops_repeat(0.5, 1.5, next(_accessors())),
-        _paint_scale(0.5, 1.5, 500, 475, next(_accessors())),
-        _paint_scale(1.5, 1.5, 500, 475, next(_accessors())),
-        _paint_scale(0.5, 1.5, 0, 0, next(_accessors())),
-        _paint_scale(1.5, 1.5, 0, 0, next(_accessors())),
-        _paint_scale(0.5, 1.5, _UPEM, _UPEM, next(_accessors())),
-        _paint_scale(1.5, 1.5, _UPEM, _UPEM, next(_accessors())),
-        _extend_modes("linear", "pad", next(_accessors())),
-        _extend_modes("linear", "repeat", next(_accessors())),
-        _extend_modes("linear", "reflect", next(_accessors())),
-        _extend_modes("radial", "pad", next(_accessors())),
-        _extend_modes("radial", "repeat", next(_accessors())),
-        _extend_modes("radial", "reflect", next(_accessors())),
+        _sample_sweep(next(access_chars)),
+        _sample_colr_glyph(next(access_chars)),
+        _sample_composite_colr_glyph(next(access_chars)),
+        _gradient_stops_repeat(0, 1, next(access_chars)),
+        _gradient_stops_repeat(0.2, 0.8, next(access_chars)),
+        _gradient_stops_repeat(0, 1.5, next(access_chars)),
+        _gradient_stops_repeat(0.5, 1.5, next(access_chars)),
+        _paint_scale(0.5, 1.5, 500, 475, next(access_chars)),
+        _paint_scale(1.5, 1.5, 500, 475, next(access_chars)),
+        _paint_scale(0.5, 1.5, 0, 0, next(access_chars)),
+        _paint_scale(1.5, 1.5, 0, 0, next(access_chars)),
+        _paint_scale(0.5, 1.5, _UPEM, _UPEM, next(access_chars)),
+        _paint_scale(1.5, 1.5, _UPEM, _UPEM, next(access_chars)),
+        _extend_modes("linear", "pad", next(access_chars)),
+        _extend_modes("linear", "repeat", next(access_chars)),
+        _extend_modes("linear", "reflect", next(access_chars)),
+        _extend_modes("radial", "pad", next(access_chars)),
+        _extend_modes("radial", "repeat", next(access_chars)),
+        _extend_modes("radial", "reflect", next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
     ]
