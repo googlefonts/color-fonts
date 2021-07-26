@@ -276,7 +276,7 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
                 "scale": scale_x,
             }
 
-    scaled_colr = {**scaled_colr, **glyph_paint}
+    scaled_colr.update(glyph_paint)
 
     color_blue = _cpal("blue", 0.5)
 
@@ -399,7 +399,7 @@ def _paint_rotate(angle, center_x, center_y, accessor_char):
     else:
         rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": angle}
 
-    rotated_colr = {**rotated_colr, **glyph_paint}
+    rotated_colr.update(glyph_paint)
 
     color_blue = _cpal("blue", 0.5)
 
