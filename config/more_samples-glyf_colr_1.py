@@ -35,10 +35,10 @@ class SampleGlyph(NamedTuple):
 
 
 def _cpal(color_str, alpha=1.0):
-    color = Color.fromstring(color_str, alpha).to_ufo_color()
+    color = Color.fromstring(color_str).to_ufo_color()
     if color not in _PALETTE:
         _PALETTE[color] = len(_PALETTE)
-    return _PALETTE[color]
+    return (_PALETTE[color], alpha)
 
 
 def _sample_sweep(accessor):
@@ -57,15 +57,15 @@ def _sample_sweep(accessor):
             "Format": ot.PaintFormat.PaintSweepGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, _cpal("red")),
-                    (0.5, _cpal("yellow")),
-                    (1.0, _cpal("red")),
+                    (0.0, *_cpal("red")),
+                    (0.5, *_cpal("yellow")),
+                    (1.0, *_cpal("red")),
                 ]
             },
             "centerX": 500,
             "centerY": 500,
-            "startAngle": 0,
-            "endAngle": 360,
+            "startAngle": -360,
+            "endAngle": 0,
         },
     }
 
@@ -163,8 +163,8 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
             "Format": ot.PaintFormat.PaintLinearGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (first_stop, _cpal("red")),
-                    (second_stop, _cpal("blue")),
+                    (first_stop, *_cpal("red")),
+                    (second_stop, *_cpal("blue")),
                 ],
                 "Extend": ot.ExtendMode.REPEAT,
             },
@@ -234,13 +234,15 @@ def _upem_box_glyph():
 def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
     glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
 
+    color_orange = _cpal("orange", 0.7)
     glyph_paint = {
         "Paint": {
             "Format": ot.PaintFormat.PaintGlyph,
             "Glyph": _CROSS_GLYPH,
             "Paint": {
                 "Format": ot.PaintFormat.PaintSolid,
-                "Color": _cpal("orange", 0.7),
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
             },
         },
     }
@@ -276,6 +278,8 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
 
     scaled_colr = {**scaled_colr, **glyph_paint}
 
+    color_blue = _cpal("blue", 0.5)
+
     colr = {
         "Format": ot.PaintFormat.PaintComposite,
         "CompositeMode": "DEST_OVER",
@@ -283,7 +287,11 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
         "BackdropPaint": {
             "Format": ot.PaintFormat.PaintGlyph,
             "Glyph": _CROSS_GLYPH,
-            "Paint": {"Format": ot.PaintFormat.PaintSolid, "Color": _cpal("blue", 0.5)},
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
         },
     }
 
@@ -345,9 +353,9 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
             "Format": selected_format,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, _cpal("green")),
-                    (0.5, _cpal("white")),
-                    (1.0, _cpal("red")),
+                    (0.0, *_cpal("green")),
+                    (0.5, *_cpal("white")),
+                    (1.0, *_cpal("red")),
                 ],
                 "Extend": extend_mode_map[extend_mode],
             },
