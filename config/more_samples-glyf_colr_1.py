@@ -485,6 +485,52 @@ def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
     )
 
 
+def _paint_transform(xx, xy, yx, yy, dx, dy, accessor):
+    glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
+
+    t = (xx, xy, yx, yy, dx, dy)
+    color_orange = _cpal("orange", 0.7)
+
+    transformed_colr = {
+        "Format": ot.PaintFormat.PaintTransform,
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+        "Transform": t,
+    }
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": transformed_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        advance=_UPEM,
+        accessor=accessor,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -535,6 +581,14 @@ def main():
         _paint_skew(0, 15, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_skew(-10, 20, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_skew(-10, 20, _UPEM, _UPEM, next(access_chars)),
+        _paint_transform(1, 0, 0, 1, 125, 125, next(access_chars)),
+        _paint_transform(1.5, 0, 0, 1.5, 0, 0, next(access_chars)),
+        _paint_transform(
+            0.9659, 0.2588, -0.2588, 0.9659, 0, 0, next(access_chars)
+        ),  # Rotation 15 degrees counterclockwise
+        _paint_transform(
+            1.0, 0.0, 0.6, 1.0, -300.0, 0.0, next(access_chars)
+        ),  # y-shear around center pivot point
         _cross_glyph(),
         _upem_box_glyph(),
     ]
