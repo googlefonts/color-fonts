@@ -36,7 +36,7 @@ def main():
             )
         elif config.suffix == '.py':
             cmd = (
-                "python",
+                sys.executable,
                 str(config.resolve()),
                 str(build_dir.resolve())
             )
