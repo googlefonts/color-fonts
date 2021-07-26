@@ -372,6 +372,61 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
     )
 
 
+def _paint_rotate(angle, center_x, center_y, accessor_char):
+    glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
+
+    color_orange = _cpal("orange", 0.7)
+
+    glyph_paint = {
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+    }
+
+    if center_x or center_y:
+        rotated_colr = {
+            "Format": ot.PaintFormat.PaintRotateAroundCenter,
+            "centerX": center_x,
+            "centerY": center_y,
+            "angle": angle,
+        }
+    else:
+        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": angle}
+
+    rotated_colr = {**rotated_colr, **glyph_paint}
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": rotated_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -412,6 +467,10 @@ def main():
         _extend_modes("radial", "pad", next(access_chars)),
         _extend_modes("radial", "repeat", next(access_chars)),
         _extend_modes("radial", "reflect", next(access_chars)),
+        _paint_rotate(10, 0, 0, next(access_chars)),
+        _paint_rotate(-10, _UPEM, _UPEM, next(access_chars)),
+        _paint_rotate(25, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
     ]
