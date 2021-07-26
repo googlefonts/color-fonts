@@ -427,6 +427,64 @@ def _paint_rotate(angle, center_x, center_y, accessor_char):
     )
 
 
+def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
+    glyph_name = f"skew_{x_skew_angle}_{y_skew_angle}_center_{center_x}_{center_y}"
+
+    color_orange = _cpal("orange", 0.7)
+
+    glyph_paint = {
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+    }
+
+    skewed_colr = {
+        "xSkewAngle": x_skew_angle,
+        "ySkewAngle": y_skew_angle,
+    }
+
+    if center_x or center_y:
+        skewed_colr["Format"] = ot.PaintFormat.PaintSkewAroundCenter
+        skewed_colr["centerX"] = center_x
+        skewed_colr["centerY"] = center_y
+
+    else:
+        skewed_colr["Format"] = ot.PaintFormat.PaintSkew
+
+    skewed_colr = {**skewed_colr, **glyph_paint}
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": skewed_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -471,6 +529,12 @@ def main():
         _paint_rotate(-10, _UPEM, _UPEM, next(access_chars)),
         _paint_rotate(25, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_rotate(-15, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(25, 0, 0, 0, next(access_chars)),
+        _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(0, 15, 0, 0, next(access_chars)),
+        _paint_skew(0, 15, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(-10, 20, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(-10, 20, _UPEM, _UPEM, next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
     ]
