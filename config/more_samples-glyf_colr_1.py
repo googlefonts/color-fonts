@@ -35,10 +35,10 @@ class SampleGlyph(NamedTuple):
 
 
 def _cpal(color_str, alpha=1.0):
-    color = Color.fromstring(color_str, alpha).to_ufo_color()
+    color = Color.fromstring(color_str).to_ufo_color()
     if color not in _PALETTE:
         _PALETTE[color] = len(_PALETTE)
-    return _PALETTE[color]
+    return (_PALETTE[color], alpha)
 
 
 def _sample_sweep(accessor):
@@ -57,15 +57,15 @@ def _sample_sweep(accessor):
             "Format": ot.PaintFormat.PaintSweepGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, _cpal("red")),
-                    (0.5, _cpal("yellow")),
-                    (1.0, _cpal("red")),
+                    (0.0, *_cpal("red")),
+                    (0.5, *_cpal("yellow")),
+                    (1.0, *_cpal("red")),
                 ]
             },
             "centerX": 500,
             "centerY": 500,
-            "startAngle": 0,
-            "endAngle": 360,
+            "startAngle": -360,
+            "endAngle": 0,
         },
     }
 
@@ -163,8 +163,8 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
             "Format": ot.PaintFormat.PaintLinearGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (first_stop, _cpal("red")),
-                    (second_stop, _cpal("blue")),
+                    (first_stop, *_cpal("red")),
+                    (second_stop, *_cpal("blue")),
                 ],
                 "Extend": ot.ExtendMode.REPEAT,
             },
@@ -234,13 +234,15 @@ def _upem_box_glyph():
 def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
     glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
 
+    color_orange = _cpal("orange", 0.7)
     glyph_paint = {
         "Paint": {
             "Format": ot.PaintFormat.PaintGlyph,
             "Glyph": _CROSS_GLYPH,
             "Paint": {
                 "Format": ot.PaintFormat.PaintSolid,
-                "Color": _cpal("orange", 0.7),
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
             },
         },
     }
@@ -274,7 +276,9 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
                 "scale": scale_x,
             }
 
-    scaled_colr = {**scaled_colr, **glyph_paint}
+    scaled_colr.update(glyph_paint)
+
+    color_blue = _cpal("blue", 0.5)
 
     colr = {
         "Format": ot.PaintFormat.PaintComposite,
@@ -283,7 +287,11 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
         "BackdropPaint": {
             "Format": ot.PaintFormat.PaintGlyph,
             "Glyph": _CROSS_GLYPH,
-            "Paint": {"Format": ot.PaintFormat.PaintSolid, "Color": _cpal("blue", 0.5)},
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
         },
     }
 
@@ -345,9 +353,9 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
             "Format": selected_format,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, _cpal("green")),
-                    (0.5, _cpal("white")),
-                    (1.0, _cpal("red")),
+                    (0.0, *_cpal("green")),
+                    (0.5, *_cpal("white")),
+                    (1.0, *_cpal("red")),
                 ],
                 "Extend": extend_mode_map[extend_mode],
             },
@@ -359,6 +367,165 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
         glyph_name=glyph_name,
         accessor=accessor_char,
         advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+    )
+
+
+def _paint_rotate(angle, center_x, center_y, accessor_char):
+    glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
+
+    color_orange = _cpal("orange", 0.7)
+
+    glyph_paint = {
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+    }
+
+    if center_x or center_y:
+        rotated_colr = {
+            "Format": ot.PaintFormat.PaintRotateAroundCenter,
+            "centerX": center_x,
+            "centerY": center_y,
+            "angle": angle,
+        }
+    else:
+        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": angle}
+
+    rotated_colr.update(glyph_paint)
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": rotated_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+    )
+
+
+def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
+    glyph_name = f"skew_{x_skew_angle}_{y_skew_angle}_center_{center_x}_{center_y}"
+
+    color_orange = _cpal("orange", 0.7)
+
+    glyph_paint = {
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+    }
+
+    skewed_colr = {
+        "xSkewAngle": x_skew_angle,
+        "ySkewAngle": y_skew_angle,
+    }
+
+    if center_x or center_y:
+        skewed_colr["Format"] = ot.PaintFormat.PaintSkewAroundCenter
+        skewed_colr["centerX"] = center_x
+        skewed_colr["centerY"] = center_y
+
+    else:
+        skewed_colr["Format"] = ot.PaintFormat.PaintSkew
+
+    skewed_colr = {**skewed_colr, **glyph_paint}
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": skewed_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+    )
+
+
+def _paint_transform(xx, xy, yx, yy, dx, dy, accessor):
+    glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
+
+    t = (xx, xy, yx, yy, dx, dy)
+    color_orange = _cpal("orange", 0.7)
+
+    transformed_colr = {
+        "Format": ot.PaintFormat.PaintTransform,
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+        "Transform": t,
+    }
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": transformed_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        advance=_UPEM,
+        accessor=accessor,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
     )
@@ -392,8 +559,8 @@ def main():
         _gradient_stops_repeat(0.2, 0.8, next(access_chars)),
         _gradient_stops_repeat(0, 1.5, next(access_chars)),
         _gradient_stops_repeat(0.5, 1.5, next(access_chars)),
-        _paint_scale(0.5, 1.5, 500, 475, next(access_chars)),
-        _paint_scale(1.5, 1.5, 500, 475, next(access_chars)),
+        _paint_scale(0.5, 1.5, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_scale(1.5, 1.5, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_scale(0.5, 1.5, 0, 0, next(access_chars)),
         _paint_scale(1.5, 1.5, 0, 0, next(access_chars)),
         _paint_scale(0.5, 1.5, _UPEM, _UPEM, next(access_chars)),
@@ -404,6 +571,24 @@ def main():
         _extend_modes("radial", "pad", next(access_chars)),
         _extend_modes("radial", "repeat", next(access_chars)),
         _extend_modes("radial", "reflect", next(access_chars)),
+        _paint_rotate(10, 0, 0, next(access_chars)),
+        _paint_rotate(-10, _UPEM, _UPEM, next(access_chars)),
+        _paint_rotate(25, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(25, 0, 0, 0, next(access_chars)),
+        _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(0, 15, 0, 0, next(access_chars)),
+        _paint_skew(0, 15, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(-10, 20, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_skew(-10, 20, _UPEM, _UPEM, next(access_chars)),
+        _paint_transform(1, 0, 0, 1, 125, 125, next(access_chars)),
+        _paint_transform(1.5, 0, 0, 1.5, 0, 0, next(access_chars)),
+        _paint_transform(
+            0.9659, 0.2588, -0.2588, 0.9659, 0, 0, next(access_chars)
+        ),  # Rotation 15 degrees counterclockwise
+        _paint_transform(
+            1.0, 0.0, 0.6, 1.0, -300.0, 0.0, next(access_chars)
+        ),  # y-shear around center pivot point
         _cross_glyph(),
         _upem_box_glyph(),
     ]
