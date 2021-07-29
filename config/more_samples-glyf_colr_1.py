@@ -9,7 +9,7 @@ from fontTools.colorLib import builder as colorBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
 import sys
-from typing import Any, Mapping, NamedTuple, Optional
+from typing import Any, Mapping, NamedTuple, Optional, Tuple
 from fontTools.ttLib.tables import otTables as ot
 from nanoemoji.colors import css_colors, Color
 from fontTools.misc.transform import Transform
@@ -31,6 +31,7 @@ class SampleGlyph(NamedTuple):
     accessor: str
     advance: int
     glyph: Glyph
+    clip_box: Optional[Tuple[float, float, float, float]] = None
     colr: Optional[Mapping[str, Any]] = None
 
 
@@ -74,6 +75,7 @@ def _sample_sweep(accessor):
         accessor=accessor,
         advance=_UPEM,
         glyph=pen.glyph(),
+        clip_box=(100, 0, 900, 1000),
         colr=colr,
     )
 
@@ -97,16 +99,12 @@ def _sample_colr_glyph(accessor):
         },
     }
 
-    pen = TTGlyphPen(None)
-    pen.moveTo((0, 0))
-    pen.lineTo((_UPEM, _UPEM))
-    pen.endPath()
-
     return SampleGlyph(
         glyph_name=glyph_name,
         accessor=accessor,
         advance=_UPEM,
-        glyph=pen.glyph(),
+        glyph=_upem_box_pen().glyph(),
+        clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
     )
 
@@ -182,6 +180,7 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
         accessor=accessor_char,
         advance=_UPEM,
         glyph=pen.glyph(),
+        clip_box=(100, 250, 900, 950),
         colr=colr,
     )
 
@@ -366,8 +365,9 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
     return SampleGlyph(
         glyph_name=glyph_name,
         accessor=accessor_char,
-        advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
+        advance=_UPEM,
+        clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
     )
 
@@ -531,6 +531,93 @@ def _paint_transform(xx, xy, yx, yy, dx, dy, accessor):
     )
 
 
+clip_position_map = {
+    "top_left": (0, _UPEM / 2, _UPEM / 2, _UPEM),
+    "bottom_left": (0, 0, _UPEM / 2, _UPEM / 2),
+    "bottom_right": (_UPEM / 2, 0, _UPEM, _UPEM / 2),
+    "top_right": (_UPEM / 2, _UPEM / 2, _UPEM, _UPEM),
+    "center": (_UPEM / 4, _UPEM / 4, _UPEM / 4 * 3, _UPEM / 4 * 3),
+}
+
+
+# A composited glyph which shades the intended clip box without
+# defining a clip box for itself. Useful in testing ClipBoxes to see whether
+# only the shaded portion is drawn or other parts of the glyph peek out.
+def _clip_shade_glyph(position, accessor_char):
+    if not position in clip_position_map:
+        return None
+
+    (x_min, y_min, x_max, y_max) = clip_position_map[position]
+
+    clip_pen = TTGlyphPen(None)
+    clip_pen.moveTo((x_min, y_min))
+    clip_pen.lineTo((x_min, y_max))
+    clip_pen.lineTo((x_max, y_max))
+    clip_pen.lineTo((x_max, y_min))
+    clip_pen.closePath()
+
+    return SampleGlyph(
+        glyph_name=f"clip_shade_{position}",
+        advance=_UPEM,
+        glyph=clip_pen.glyph(),
+        accessor=accessor_char,
+    )
+
+
+# A clone (PaintColrGlyph) of the radial_gradient_extend_mode_reflect glyph,
+# clipped with a smaller clip box in order to test nested clip boxes.
+def _inset_clipped_radial_reflect(accessor_char):
+    colr = {
+        "Format": ot.PaintFormat.PaintColrGlyph,
+        "Glyph": "radial_gradient_extend_mode_reflect",
+    }
+
+    return SampleGlyph(
+        glyph_name="inset_clipped_radial_reflect",
+        accessor=accessor_char,
+        glyph=_upem_box_pen().glyph(),
+        advance=_UPEM,
+        clip_box=(_UPEM / 10, _UPEM / 10, _UPEM - _UPEM / 10, _UPEM - _UPEM / 10),
+        colr=colr,
+    )
+
+
+def _clip_box(position, accessor_char):
+
+    other_glyph_colr = {
+        "Format": ot.PaintFormat.PaintColrGlyph,
+        "Glyph": "inset_clipped_radial_reflect",
+    }
+
+    shade_color = _cpal("gray", 0.4)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "SRC_OVER",
+        "SourcePaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": f"clip_shade_{position}",
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": shade_color[0],
+                "Alpha": shade_color[1],
+            },
+        },
+        "BackdropPaint": other_glyph_colr,
+    }
+
+    (x_min, y_min, x_max, y_max) = clip_position_map[position]
+
+    return SampleGlyph(
+        glyph_name=f"clip_box_{position}",
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        clip_box=(x_min, y_min, x_max, y_max),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -589,8 +676,19 @@ def main():
         _paint_transform(
             1.0, 0.0, 0.6, 1.0, -300.0, 0.0, next(access_chars)
         ),  # y-shear around center pivot point
+        _clip_box("top_left", next(access_chars)),
+        _clip_box("bottom_left", next(access_chars)),
+        _clip_box("bottom_right", next(access_chars)),
+        _clip_box("top_right", next(access_chars)),
+        _clip_box("center", next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
+        _clip_shade_glyph("center", next(access_chars)),
+        _clip_shade_glyph("top_left", next(access_chars)),
+        _clip_shade_glyph("bottom_left", next(access_chars)),
+        _clip_shade_glyph("bottom_right", next(access_chars)),
+        _clip_shade_glyph("top_right", next(access_chars)),
+        _inset_clipped_radial_reflect(next(access_chars)),
     ]
 
     fb = fontBuilder.FontBuilder(_UPEM)
@@ -598,8 +696,16 @@ def main():
     fb.setupCharacterMap(
         {ord(g.accessor): g.glyph_name for g in glyphs if len(g.accessor) == 1}
     )
-    fb.setupGlyf({g.glyph_name: g.glyph for g in glyphs})
-    fb.setupHorizontalMetrics({g.glyph_name: (_UPEM, g.glyph.xMin) for g in glyphs})
+    fb.setupGlyf({g.glyph_name: g.glyph for g in glyphs if g.glyph})
+
+    def find_xmin(g):
+        if g.clip_box:
+            return g.clip_box[0]
+        if g.glyph:
+            return g.glyph.xMin
+        return 0
+
+    fb.setupHorizontalMetrics({g.glyph_name: (g.advance, find_xmin(g)) for g in glyphs})
     fb.setupHorizontalHeader(ascent=_ASCENT, descent=-_DESCENT)
     fb.setupOS2(sTypoAscender=_ASCENT, usWinAscent=_ASCENT, usWinDescent=_DESCENT)
     fb.setupNameTable(names)
@@ -617,7 +723,8 @@ def main():
     fb.font["hhea"].advanceWidthMax = _UPEM
 
     fb.font["COLR"] = colorBuilder.buildCOLR(
-        {g.glyph_name: g.colr for g in glyphs if g.colr}
+        {g.glyph_name: g.colr for g in glyphs if g.colr},
+        clipBoxes={g.glyph_name: g.clip_box for g in glyphs if g.clip_box},
     )
     fb.font["CPAL"] = colorBuilder.buildCPAL([list(_PALETTE)])
 
