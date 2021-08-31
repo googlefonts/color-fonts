@@ -2,6 +2,7 @@
 family = "noto_noflags-cff_colr_1"
 output_file = "noto_noflags-cff_colr_1.otf"
 color_format = "cff_colr_1"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

@@ -2,6 +2,7 @@
 family = "samples-untouchedsvg"
 output_file = "samples-untouchedsvg.ttf"
 color_format = "untouchedsvg"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

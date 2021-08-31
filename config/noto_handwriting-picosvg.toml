@@ -2,6 +2,7 @@
 family = "noto_handwriting-picosvg"
 output_file = "noto_handwriting-picosvg.ttf"
 color_format = "picosvg"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

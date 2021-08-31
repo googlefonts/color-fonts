@@ -2,6 +2,7 @@
 family = "noto-glyf_colr_1"
 output_file = "noto-glyf_colr_1.ttf"
 color_format = "glyf_colr_1"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

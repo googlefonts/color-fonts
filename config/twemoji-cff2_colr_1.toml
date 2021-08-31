@@ -2,6 +2,7 @@
 family = "twemoji-cff2_colr_1"
 output_file = "twemoji-cff2_colr_1.otf"
 color_format = "cff2_colr_1"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

@@ -2,6 +2,7 @@
 family = "twemoji_smiley-picosvg"
 output_file = "twemoji_smiley-picosvg.ttf"
 color_format = "picosvg"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"
