@@ -1,4 +1,5 @@
-nanoemoji >= 0.8.3  # we need latest spec support
+nanoemoji >= 0.9.3  # we need latest spec support
+Brotli>=1.0.9  # for compare sizes
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

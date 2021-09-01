@@ -2,6 +2,7 @@
 family = "samples-picosvg"
 output_file = "samples-picosvg.ttf"
 color_format = "picosvg"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

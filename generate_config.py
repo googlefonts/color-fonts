@@ -64,6 +64,7 @@ def _write_configs(prefix, color_formats, svg_files):
                 family = "{name}"
                 output_file = "{name}{font_ext}"
                 color_format = "{color_format}"
+                clipbox_quantization = 32
 
                 [axis.wght]
                 name = "Weight"

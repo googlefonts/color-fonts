@@ -2,6 +2,7 @@
 family = "twemoji_smiley-untouchedsvgz"
 output_file = "twemoji_smiley-untouchedsvgz.ttf"
 color_format = "untouchedsvgz"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

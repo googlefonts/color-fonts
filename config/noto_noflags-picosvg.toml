@@ -2,6 +2,7 @@
 family = "noto_noflags-picosvg"
 output_file = "noto_noflags-picosvg.ttf"
 color_format = "picosvg"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"

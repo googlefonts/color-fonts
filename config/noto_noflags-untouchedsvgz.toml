@@ -2,6 +2,7 @@
 family = "noto_noflags-untouchedsvgz"
 output_file = "noto_noflags-untouchedsvgz.ttf"
 color_format = "untouchedsvgz"
+clipbox_quantization = 32
 
 [axis.wght]
 name = "Weight"
