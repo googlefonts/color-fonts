@@ -14,11 +14,12 @@ import argparse
 
 FONT_BASE_NAMES = {
     "noto": "Noto Color Emoji",
-    "noto_flags": "Noto Color Emoji Flags only",
-    "noto_handwriting": "Noto Color single Handwriting emoji",
+    "noto_noflags": "Noto Color Emoji except flags",
+    "noto_flags": "Noto Color Emoji only flags",
+    #"noto_handwriting": "Noto Color single Handwriting emoji",
     "twemoji": "Twemoji",
-    "twemoji_smiley": "Twemoji single Smiley Emoji",
-    "samples": "Samples test font",
+    #"twemoji_smiley": "Twemoji single Smiley Emoji",
+    #"samples": "Samples test font",
 }
 FORMAT_DICT = {
     "cff2_colr_1": "binary vectors (cff2)",
