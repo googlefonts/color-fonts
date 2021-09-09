@@ -618,6 +618,71 @@ def _clip_box(position, accessor_char):
     )
 
 
+def _composite(composite_mode, accessor_char):
+
+    color_black = _cpal("black", 1)
+    color_blue = _cpal("#68c7e8", 1)
+    color_yellow = _cpal("#ffdc01", 1)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintColrLayers,
+        "Layers": [
+            {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_black[0],
+                    "Alpha": color_black[1],
+                },
+            },
+            {
+                "Format": ot.PaintFormat.PaintComposite,
+                "CompositeMode": composite_mode,
+                "SourcePaint": {
+                    "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
+                    "centerX": _UPEM / 3 * 2,
+                    "centerY": _UPEM / 3,
+                    "scale": 1 / 2,
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintGlyph,
+                        "Glyph": _UPEM_BOX_GLYPH,
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintSolid,
+                            "PaletteIndex": color_blue[0],
+                            "Alpha": color_blue[1],
+                        },
+                    },
+                },
+                "BackdropPaint": {
+                    "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
+                    "centerX": _UPEM / 3,
+                    "centerY": _UPEM / 3 * 2,
+                    "scale": 1 / 2,
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintGlyph,
+                        "Glyph": _UPEM_BOX_GLYPH,
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintSolid,
+                            "PaletteIndex": color_yellow[0],
+                            "Alpha": color_yellow[1],
+                        },
+                    },
+                },
+            },
+        ],
+    }
+
+    return SampleGlyph(
+        glyph_name=f"composite_{composite_mode}",
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        clip_box=(0, 0, _UPEM, _UPEM),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -681,6 +746,13 @@ def main():
         _clip_box("bottom_right", next(access_chars)),
         _clip_box("top_right", next(access_chars)),
         _clip_box("center", next(access_chars)),
+        _composite("DEST_OVER", next(access_chars)),
+        _composite("XOR", next(access_chars)),
+        _composite("OVERLAY", next(access_chars)),
+        _composite("SRC_IN", next(access_chars)),
+        _composite("PLUS", next(access_chars)),
+        _composite("LIGHTEN", next(access_chars)),
+        _composite("MULTIPLY", next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
