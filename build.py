@@ -117,8 +117,6 @@ def main():
                 print(f"Failed: {cmd_str}")
                 print("See {working_dir.relative_to(self_dir)} for logs")
 
-            before_rmtree = time.monotonic()
-
     done = time.monotonic()
 
     print(f"{spawn_start - setup_start:.1f}s to setup")
