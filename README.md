@@ -5,8 +5,25 @@ Experimental color font builds. Intended to help verify font toolchain builds th
 
 To update the fonts:
 
-1.  Run [generate_config.py](https://github.com/googlefonts/color-fonts/blob/main/generate_config.py) if the config needs to be updated
-1.  Run [build.py](https://github.com/googlefonts/color-fonts/blob/main/build.py) to generate the font(s) you want to update
+```bash
+# Setup environment
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# If config needs to be updated
+python generate_config.py
+
+
+# To generate fonts with a config; ~30 minutes on a fairly fast desktop
+time nanoemoji config/*.toml
+cp -v build/*.[ot]tf fonts/
+
+# To generate additional samples (covering space nanoemoji doesn't)
+python config/more_samples-glyf_colr_1.py fonts/
+
+# Commit, etc
+```
 
 Related:
 

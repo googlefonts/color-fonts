@@ -688,7 +688,7 @@ def main():
     build_dir = Path(sys.argv[1])
     build_dir.mkdir(exist_ok=True)
 
-    out_file = (build_dir / _FAMILY.replace(" ", "")).with_suffix(".ttf")
+    out_file = build_dir / "more_samples-glyf_colr_1.ttf"
 
     version = datetime.datetime.now().isoformat()
     names = {
