@@ -683,21 +683,23 @@ def _composite(composite_mode, accessor_char):
     )
 
 
-def _foreground_color(fill_type, accessor_char):
+def _foreground_color(fill_type, foreground_alpha, accessor_char):
+
+    FOREGROUND_PALETTE_INDEX = 0xFFFF
 
     fill_type_map = {
         "solid": {
             "Format": ot.PaintFormat.PaintSolid,
-            "PaletteIndex": 0xFFFF,
-            "Alpha": 1,
+            "PaletteIndex": FOREGROUND_PALETTE_INDEX,
+            "Alpha": foreground_alpha,
         },
         "linear": {
             "Format": ot.PaintFormat.PaintLinearGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, *_cpal("white")),
-                    (0.5, 0xFFFF, 1),
-                    (1.0, *_cpal("white")),
+                    (0.0, *_cpal("orange")),
+                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                    (1.0, *_cpal("orange")),
                 ]
             },
             "x0": 100,
@@ -711,9 +713,9 @@ def _foreground_color(fill_type, accessor_char):
             "Format": ot.PaintFormat.PaintRadialGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, *_cpal("white")),
-                    (0.5, 0xFFFF, 1),
-                    (1.0, *_cpal("white")),
+                    (0.0, *_cpal("orange")),
+                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                    (1.0, *_cpal("orange")),
                 ]
             },
             "x0": 500,
@@ -727,9 +729,9 @@ def _foreground_color(fill_type, accessor_char):
             "Format": ot.PaintFormat.PaintSweepGradient,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, *_cpal("white")),
-                    (0.5, 0xFFFF, 1),
-                    (1.0, *_cpal("white")),
+                    (0.0, *_cpal("orange")),
+                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                    (1.0, *_cpal("orange")),
                 ]
             },
             "centerX": 500,
@@ -739,10 +741,7 @@ def _foreground_color(fill_type, accessor_char):
         },
     }
 
-    if not fill_type in fill_type_map:
-        return
-
-    glyph_name = f"foreground_color_{fill_type}"
+    glyph_name = f"foreground_color_{fill_type}_alpha_{foreground_alpha}"
 
     pen = _upem_box_pen()
 
@@ -832,10 +831,14 @@ def main():
         _composite("PLUS", next(access_chars)),
         _composite("LIGHTEN", next(access_chars)),
         _composite("MULTIPLY", next(access_chars)),
-        _foreground_color("linear", next(access_chars)),
-        _foreground_color("radial", next(access_chars)),
-        _foreground_color("sweep", next(access_chars)),
-        _foreground_color("solid", next(access_chars)),
+        _foreground_color("linear", 1, next(access_chars)),
+        _foreground_color("radial", 1, next(access_chars)),
+        _foreground_color("sweep", 1, next(access_chars)),
+        _foreground_color("solid", 1, next(access_chars)),
+        _foreground_color("linear", 0.3, next(access_chars)),
+        _foreground_color("radial", 0.3, next(access_chars)),
+        _foreground_color("sweep", 0.3, next(access_chars)),
+        _foreground_color("solid", 0.3, next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
