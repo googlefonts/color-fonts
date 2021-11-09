@@ -13,7 +13,7 @@ from typing import Any, Mapping, NamedTuple, Optional, Tuple
 from fontTools.ttLib.tables import otTables as ot
 from nanoemoji.colors import css_colors, Color
 from fontTools.misc.transform import Transform
-from string import ascii_letters
+from string import ascii_letters, digits
 
 _UPEM = 1000
 _ASCENT = 950
@@ -683,6 +683,84 @@ def _composite(composite_mode, accessor_char):
     )
 
 
+def _foreground_color(fill_type, foreground_alpha, accessor_char):
+
+    FOREGROUND_PALETTE_INDEX = 0xFFFF
+
+    fill_type_map = {
+        "solid": {
+            "Format": ot.PaintFormat.PaintSolid,
+            "PaletteIndex": FOREGROUND_PALETTE_INDEX,
+            "Alpha": foreground_alpha,
+        },
+        "linear": {
+            "Format": ot.PaintFormat.PaintLinearGradient,
+            "ColorLine": {
+                "ColorStop": [
+                    (0.0, *_cpal("orange")),
+                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                    (1.0, *_cpal("orange")),
+                ]
+            },
+            "x0": 100,
+            "y0": 250,
+            "x1": 900,
+            "y1": 250,
+            "x2": 100,
+            "y2": 300,
+        },
+        "radial": {
+            "Format": ot.PaintFormat.PaintRadialGradient,
+            "ColorLine": {
+                "ColorStop": [
+                    (0.0, *_cpal("orange")),
+                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                    (1.0, *_cpal("orange")),
+                ]
+            },
+            "x0": 500,
+            "y0": 600,
+            "r0": 50,
+            "x1": 500,
+            "y1": 600,
+            "r1": 450,
+        },
+        "sweep": {
+            "Format": ot.PaintFormat.PaintSweepGradient,
+            "ColorLine": {
+                "ColorStop": [
+                    (0.0, *_cpal("orange")),
+                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                    (1.0, *_cpal("orange")),
+                ]
+            },
+            "centerX": 500,
+            "centerY": 600,
+            "startAngle": -360,
+            "endAngle": 270,
+        },
+    }
+
+    glyph_name = f"foreground_color_{fill_type}_alpha_{foreground_alpha}"
+
+    pen = _upem_box_pen()
+
+    colr = {
+        "Format": ot.PaintFormat.PaintGlyph,
+        "Glyph": glyph_name,
+        "Paint": fill_type_map[fill_type],
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        clip_box=(100, 250, 900, 950),
+        colr=colr,
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -700,7 +778,7 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    access_chars = iter(ascii_letters)
+    access_chars = iter(ascii_letters + digits)
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
@@ -753,6 +831,14 @@ def main():
         _composite("PLUS", next(access_chars)),
         _composite("LIGHTEN", next(access_chars)),
         _composite("MULTIPLY", next(access_chars)),
+        _foreground_color("linear", 1, next(access_chars)),
+        _foreground_color("radial", 1, next(access_chars)),
+        _foreground_color("sweep", 1, next(access_chars)),
+        _foreground_color("solid", 1, next(access_chars)),
+        _foreground_color("linear", 0.3, next(access_chars)),
+        _foreground_color("radial", 0.3, next(access_chars)),
+        _foreground_color("sweep", 0.3, next(access_chars)),
+        _foreground_color("solid", 0.3, next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
