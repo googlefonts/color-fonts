@@ -23,25 +23,33 @@ import subprocess
 import sys
 import time
 
+
+def nanoemoji_cmd(*configs):
+    return ("nanoemoji", *(str(config) for config in configs))
+
+
+def py_cmd(config):
+    return (sys.executable, str(config.resolve()), str(build_dir.resolve()))
+
+
 def main():
-    build_dir = Path("build")
-    font_dir = Path("fonts")
+    toml_files = []
+    py_scripts = []
     for config in sys.argv[1:]:
         config = Path(config)
-        if config.suffix == '.toml':
-            cmd = (
-                "nanoemoji",
-                "--config",
-                str(config)
-            )
-        elif config.suffix == '.py':
-            cmd = (
-                sys.executable,
-                str(config.resolve()),
-                str(build_dir.resolve())
-            )
+        if config.suffix == ".toml":
+            toml_files.append(config)
+        elif config.suffix == ".py":
+            py_scripts.append(config)
         else:
-            raise ValueError(f'Not sure how to handle {config}')
+            raise ValueError(f"Not sure how to handle {config}")
+
+    build_dir = Path("build")
+    font_dir = Path("fonts")
+    for (build_cmd, configs) in [(nanoemoji_cmd, toml_files)] + [
+        (py_cmd, (script,)) for script in py_scripts
+    ]:
+        cmd = build_cmd(*configs)
         print(" ".join(cmd))  # very useful on failure
         before_rmtree = time.monotonic()
         if build_dir.exists():
@@ -50,7 +58,7 @@ def main():
         subprocess.run(cmd, check=True)
         after_run = time.monotonic()
         font_files = tuple(build_dir.glob("*.[ot]tf"))
-        assert len(font_files) == 1
+        assert len(font_files) >= 1
         src, dst = font_files[0], font_dir / (config.stem + font_files[0].suffix)
         shutil.copy(src, dst)
         print(f"{after_rmtree - before_rmtree:.1f}s to delete build/")
