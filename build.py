@@ -24,14 +24,6 @@ import sys
 import time
 
 
-def nanoemoji_cmd(*configs):
-    return ("nanoemoji", *(str(config) for config in configs))
-
-
-def py_cmd(config):
-    return (sys.executable, str(config.resolve()), str(build_dir.resolve()))
-
-
 def main():
     toml_files = []
     py_scripts = []
@@ -46,9 +38,16 @@ def main():
 
     build_dir = Path("build")
     font_dir = Path("fonts")
-    for (build_cmd, configs) in [(nanoemoji_cmd, toml_files)] + [
-        (py_cmd, (script,)) for script in py_scripts
-    ]:
+
+    def nanoemoji_cmd(*configs):
+        return ("nanoemoji", *(str(config) for config in configs))
+
+    def py_cmd(config):
+        return (sys.executable, str(config.resolve()), str(build_dir.resolve()))
+
+    for (build_cmd, configs) in (
+        [(nanoemoji_cmd, toml_files)] if toml_files else []
+    ) + [(py_cmd, (script,)) for script in py_scripts]:
         cmd = build_cmd(*configs)
         print(" ".join(cmd))  # very useful on failure
         before_rmtree = time.monotonic()
