@@ -22,13 +22,13 @@ FONT_BASE_NAMES = {
     #"samples": "Samples test font",
 }
 FORMAT_DICT = {
-    "cff2_colr_1": "binary vectors (cff2)",
-    "cff_colr_1": "binary vectors (cff)",
-    "glyf_colr_1": "binary vectors (glyf)",
-    "picosvg": "picosvg",
-    "picosvgz": "compressed picosvg",
-    "untouchedsvg": "svg",
-    "untouchedsvgz": "svgz",
+    "cff2_colr_1": "colr_1, cff2",
+    "cff_colr_1": "colr_1, cff",
+    "glyf_colr_1": "colr_1, glyf",
+    "picosvg": "ot-svg, picosvg",
+    "picosvgz": "ot-svg, picosvg, zipped",
+    "untouchedsvg": "ot-svg, svg",
+    "untouchedsvgz": "ot-svg, svg, zipped",
 }
 
 
