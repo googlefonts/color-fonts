@@ -766,7 +766,8 @@ def main():
     build_dir = Path(sys.argv[1])
     build_dir.mkdir(exist_ok=True)
 
-    out_file = (build_dir / _FAMILY.replace(" ", "")).with_suffix(".ttf")
+    script_name = Path(__file__).name
+    out_file = (build_dir / script_name).with_suffix(".ttf")
 
     version = datetime.datetime.now().isoformat()
     names = {

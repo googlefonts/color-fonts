@@ -59,7 +59,7 @@ def main():
         font_files = tuple(build_dir.glob("*.[ot]tf"))
         assert len(font_files) >= 1
         for font_file in font_files:
-            src, dst = font_file, font_dir / (config.stem + font_file.suffix)
+            src, dst = font_file, font_dir / font_file.name
             shutil.copy(src, dst)
         print(f"{after_rmtree - before_rmtree:.1f}s to delete build/")
         print(f"{after_run - after_rmtree:.1f}s to run {' '.join(cmd)}")
