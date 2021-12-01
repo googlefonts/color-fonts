@@ -41,7 +41,12 @@ The following color font and glyph definition formats exist:
 | `untouchedsvg` | OT-SVG font with SVG source images embeddded as-is |
 | `untouchedsvgz` | OT-SVG font with SVG source images embeddded as-is and gzip compressed |
 
-For example, `noto-glyf_colr_1.ttf` means that this font contains the Noto Emoji full glyph set, contains the glyph definitions in `glyf` table format (TrueType outlines) and features a COLRv1 table for the color glyphs functionality. `noto_flags-picosvgz.ttf` contains only the flag glyphs part of the Noto emoji set, the font is an OT-SVG font where SVG source images went through picosvg for optimization and flattening. 
+For example, `noto-glyf_colr_1.ttf` means that this font contains the Noto Emoji
+full glyph set, contains the glyph definitions in `glyf` table format (TrueType
+outlines) and features a COLRv1 table for the color glyphs
+functionality. `noto_flags-picosvgz.ttf` contains only the flag glyphs part of
+the Noto emoji set, the font is an OT-SVG font where SVG source images went
+through picosvg for optimization and flattening.
 
 ## References
 
