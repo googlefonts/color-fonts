@@ -36,7 +36,7 @@ The following color font and glyph definition formats exist:
 | `cff2_colr_1` | COLRv1 font with `CFF2` table contour definitions |
 | `cff_colr_1` | COLRv1 fotn with `CFF ` table contour definitions |
 | `glyf_colr_1` | COLRv1 fotn with `glyf ` table contour definitions (TrueType contours) |
-| `picosvg` | OT-SVG font with SVG sources process through picosvg |
+| `picosvg` | OT-SVG font with SVG sources processed through picosvg |
 | `picosvgz` | OT-SVG font with SVG sources process through picosvg and gzip compressed |
 | `untouchedsvg` | OT-SVG font with SVG source images embeddded as-is |
 | `untouchedsvgz` | OT-SVG font with SVG source images embeddded as-is and gzip compressed |
