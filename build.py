@@ -18,16 +18,25 @@
 #     ./build.py config/twemoji-*
 
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import sys
 import time
 
+_CONFIG_DIR = Path("config")
+
 
 def main():
     toml_files = []
     py_scripts = []
-    for config in sys.argv[1:]:
+    config_list = sys.argv[1:]
+    no_args = len(config_list) == 0
+    if no_args:
+        config_list.extend(tuple(_CONFIG_DIR.glob("*.toml")))
+        config_list.extend(tuple(_CONFIG_DIR.glob("*.py")))
+
+    for config in config_list:
         config = Path(config)
         if config.suffix == ".toml":
             toml_files.append(config)
@@ -38,6 +47,7 @@ def main():
 
     build_dir = Path("build")
     font_dir = Path("fonts")
+    os.makedirs(font_dir, exist_ok = True)
 
     def nanoemoji_cmd(*configs):
         return ("nanoemoji", *(str(config) for config in configs))
