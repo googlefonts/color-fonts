@@ -184,6 +184,47 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
         colr=colr,
     )
 
+def _gradient_p2_skewed(accessor_char):
+    glyph_name = f"gradient_p2_skewed"
+
+    pen = TTGlyphPen(None)
+    pen.moveTo((100, 250))
+    pen.lineTo((100, 950))
+    pen.lineTo((1200, 950))
+    pen.lineTo((1200, 250))
+    pen.closePath()
+
+    colr = {
+        "Format": ot.PaintFormat.PaintGlyph,
+        "Glyph": glyph_name,
+        "Paint": {
+            "Format": ot.PaintFormat.PaintLinearGradient,
+            "ColorLine": {
+                "ColorStop": [
+                    (0, *_cpal("red")),
+                    (0.5, *_cpal("blue")),
+                    (1, *_cpal("yellow")),
+                ],
+                "Extend": ot.ExtendMode.PAD,
+            },
+            "x0": 100,
+            "y0": 950,
+            "x1": 2300,
+            "y1": 950,
+            "x2": -1000,
+            "y2": 250,
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        clip_box=(100, 250, 1200, 950),
+        colr=colr,
+    )
+
 
 def _cross_glyph():
 
@@ -840,6 +881,7 @@ def main():
         _foreground_color("radial", 0.3, next(access_chars)),
         _foreground_color("sweep", 0.3, next(access_chars)),
         _foreground_color("solid", 0.3, next(access_chars)),
+        _gradient_p2_skewed(next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
