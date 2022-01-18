@@ -6,6 +6,7 @@ from pathlib import Path
 from fontTools import fontBuilder
 from fontTools import ttLib
 from fontTools.colorLib import builder as colorBuilder
+from fontTools.colorLib.builder import ColorPaletteType
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
@@ -808,18 +809,19 @@ def _foreground_color(fill_type, foreground_alpha, accessor_char):
     )
 
 
-def _colrv0_colored_circles(accessor_char):
+def _colrv0_colored_circles(palette_test_colors, accessor_char):
     pen = _upem_box_pen()
     glyph_name = "colored_circles_v0"
+    color_iter = iter(palette_test_colors)
 
     colrv0_layers = [
-        ("circle_r350", _cpal("red")[0]),
-        ("circle_r300", _cpal("orange")[0]),
-        ("circle_r250", _cpal("yellow")[0]),
-        ("circle_r200", _cpal("green")[0]),
-        ("circle_r150", _cpal("blue")[0]),
-        ("circle_r100", _cpal("indigo")[0]),
-        ("circle_r50", _cpal("violet")[0]),
+        ("circle_r350", next(color_iter)),
+        ("circle_r300", next(color_iter)),
+        ("circle_r250", next(color_iter)),
+        ("circle_r200", next(color_iter)),
+        ("circle_r150", next(color_iter)),
+        ("circle_r100", next(color_iter)),
+        ("circle_r50", next(color_iter)),
         ("zero", _cpal("black")[0]),
     ]
 
@@ -832,31 +834,33 @@ def _colrv0_colored_circles(accessor_char):
     )
 
 
-def _colrv1_colored_circles(accessor_char):
+def _colrv1_colored_circles(palette_test_colors, accessor_char):
     pen = _upem_box_pen()
     glyph_name = "colored_circles_v1"
 
-    def circle_reference(size, color_name):
+    def circle_reference(size, color_index):
         return {
             "Format": ot.PaintFormat.PaintGlyph,
             "Glyph": f"circle_r{size}",
             "Paint": {
                 "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": _cpal(color_name)[0],
+                "PaletteIndex": color_index,
                 "Alpha": 1.0,
             },
         }
 
+    color_iter = iter(palette_test_colors)
+
     colrv1 = {
         "Format": ot.PaintFormat.PaintColrLayers,
         "Layers": [
-            circle_reference(350, "red"),
-            circle_reference(300, "orange"),
-            circle_reference(250, "yellow"),
-            circle_reference(200, "green"),
-            circle_reference(150, "blue"),
-            circle_reference(100, "indigo"),
-            circle_reference(50, "violet"),
+            circle_reference(350, next(color_iter)),
+            circle_reference(300, next(color_iter)),
+            circle_reference(250, next(color_iter)),
+            circle_reference(200, next(color_iter)),
+            circle_reference(150, next(color_iter)),
+            circle_reference(100, next(color_iter)),
+            circle_reference(50, next(color_iter)),
             {
                 "Format": ot.PaintFormat.PaintGlyph,
                 "Glyph": "one",
@@ -963,6 +967,63 @@ def _zero_glyph(accessor_char):
     )
 
 
+def _reserve_circle_colors():
+    return [
+        _cpal("red")[0],
+        _cpal("orange")[0],
+        _cpal("yellow")[0],
+        _cpal("green")[0],
+        _cpal("blue")[0],
+        _cpal("indigo")[0],
+        _cpal("violet")[0],
+    ]
+
+
+def _prepare_palette():
+    dark_palette_sparse = [
+        Color.fromstring(color_spec).to_ufo_color()
+        for color_spec in [
+            "#2a294a",
+            "#244163",
+            "#1b6388",
+            "#157da3",
+            "#0e9ac2",
+            "#05bee8",
+            "#00d4ff",
+        ]
+    ]
+    light_palette_sparse = [
+        Color.fromstring(color_spec).to_ufo_color()
+        for color_spec in [
+            "#fc7118",
+            "#fb8115",
+            "#fa9511",
+            "#faa80d",
+            "#f9be09",
+            "#f8d304",
+            "#f8e700",
+        ]
+    ]
+
+    def _pad_palette(palette, expected_length):
+        return palette + [Color.fromstring("gray").to_ufo_color()] * (
+            expected_length - len(palette)
+        )
+
+    return {
+        "palettes": [
+            _PALETTE,
+            _pad_palette(dark_palette_sparse, len(_PALETTE)),
+            _pad_palette(light_palette_sparse, len(_PALETTE)),
+        ],
+        "paletteTypes": [
+            0,
+            ColorPaletteType.USABLE_WITH_DARK_BACKGROUND,
+            ColorPaletteType.USABLE_WITH_LIGHT_BACKGROUND,
+        ],
+    }
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -980,6 +1041,9 @@ def main():
         "version": version,
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
+
+    # Place these first in the global primary palette.
+    palette_test_colors = _reserve_circle_colors()
 
     access_chars = iter(
         ascii_letters
@@ -1047,8 +1111,8 @@ def main():
         _foreground_color("sweep", 0.3, next(access_chars)),
         _foreground_color("solid", 0.3, next(access_chars)),
         _gradient_p2_skewed(next(access_chars)),
-        _colrv0_colored_circles(next(access_chars)),
-        _colrv1_colored_circles(next(access_chars)),
+        _colrv0_colored_circles(palette_test_colors, next(access_chars)),
+        _colrv1_colored_circles(palette_test_colors, next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
@@ -1105,7 +1169,7 @@ def main():
         {**colr_v0_glyphs, **colr_v1_glyphs},
         clipBoxes={g.glyph_name: g.clip_box for g in glyphs if g.clip_box},
     )
-    fb.font["CPAL"] = colorBuilder.buildCPAL([list(_PALETTE)])
+    fb.font["CPAL"] = colorBuilder.buildCPAL(**_prepare_palette())
 
     fb.save(out_file)
     print(f"Wrote {out_file}")
