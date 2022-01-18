@@ -223,6 +223,8 @@ def _gradient_p2_skewed(accessor_char):
     return SampleGlyph(
         glyph_name=glyph_name,
         accessor=accessor_char,
+        # Larger advance required for this glyph as it is wider to test the
+        # P2-skewed gradient.
         advance=1250,
         glyph=pen.glyph(),
         clip_box=(100, 250, 1200, 950),
@@ -857,7 +859,7 @@ def _colrv1_colored_circles(accessor_char):
             circle_reference(50, "violet"),
             {
                 "Format": ot.PaintFormat.PaintGlyph,
-                "Glyph": f"one",
+                "Glyph": "one",
                 "Paint": {
                     "Format": ot.PaintFormat.PaintSolid,
                     "PaletteIndex": _cpal("black")[0],
@@ -982,7 +984,7 @@ def main():
     access_chars = iter(
         ascii_letters
         + digits
-        + "".join([str(greek_letter) for greek_letter in list(range(0x03B1, 0x3C9))])
+        + "".join([str(greek_letter) for greek_letter in range(0x03B1, 0x3C9)])
     )
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
