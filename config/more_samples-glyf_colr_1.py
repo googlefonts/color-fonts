@@ -7,13 +7,15 @@ from fontTools import fontBuilder
 from fontTools import ttLib
 from fontTools.colorLib import builder as colorBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
 import sys
-from typing import Any, Mapping, NamedTuple, Optional, Tuple
+from typing import Any, Mapping, NamedTuple, Optional, Tuple, List
 from fontTools.ttLib.tables import otTables as ot
 from nanoemoji.colors import css_colors, Color
 from fontTools.misc.transform import Transform
 from string import ascii_letters, digits
+from math import sqrt
 
 _UPEM = 1000
 _ASCENT = 950
@@ -33,6 +35,7 @@ class SampleGlyph(NamedTuple):
     glyph: Glyph
     clip_box: Optional[Tuple[float, float, float, float]] = None
     colr: Optional[Mapping[str, Any]] = None
+    colrv0: Optional[Mapping[str, List[Tuple[str, int]]]] = None
 
 
 def _cpal(color_str, alpha=1.0):
@@ -184,6 +187,7 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
         colr=colr,
     )
 
+
 def _gradient_p2_skewed(accessor_char):
     glyph_name = f"gradient_p2_skewed"
 
@@ -219,7 +223,9 @@ def _gradient_p2_skewed(accessor_char):
     return SampleGlyph(
         glyph_name=glyph_name,
         accessor=accessor_char,
-        advance=_UPEM,
+        # Larger advance required for this glyph as it is wider to test the
+        # P2-skewed gradient.
+        advance=1250,
         glyph=pen.glyph(),
         clip_box=(100, 250, 1200, 950),
         colr=colr,
@@ -802,6 +808,161 @@ def _foreground_color(fill_type, foreground_alpha, accessor_char):
     )
 
 
+def _colrv0_colored_circles(accessor_char):
+    pen = _upem_box_pen()
+    glyph_name = "colored_circles_v0"
+
+    colrv0_layers = [
+        ("circle_r350", _cpal("red")[0]),
+        ("circle_r300", _cpal("orange")[0]),
+        ("circle_r250", _cpal("yellow")[0]),
+        ("circle_r200", _cpal("green")[0]),
+        ("circle_r150", _cpal("blue")[0]),
+        ("circle_r100", _cpal("indigo")[0]),
+        ("circle_r50", _cpal("violet")[0]),
+        ("zero", _cpal("black")[0]),
+    ]
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colrv0=colrv0_layers,
+    )
+
+
+def _colrv1_colored_circles(accessor_char):
+    pen = _upem_box_pen()
+    glyph_name = "colored_circles_v1"
+
+    def circle_reference(size, color_name):
+        return {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": f"circle_r{size}",
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": _cpal(color_name)[0],
+                "Alpha": 1.0,
+            },
+        }
+
+    colrv1 = {
+        "Format": ot.PaintFormat.PaintColrLayers,
+        "Layers": [
+            circle_reference(350, "red"),
+            circle_reference(300, "orange"),
+            circle_reference(250, "yellow"),
+            circle_reference(200, "green"),
+            circle_reference(150, "blue"),
+            circle_reference(100, "indigo"),
+            circle_reference(50, "violet"),
+            {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": "one",
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": _cpal("black")[0],
+                    "Alpha": 1.0,
+                },
+            },
+        ],
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=pen.glyph(),
+        colr=colrv1,
+    )
+
+
+def _circle_of_size(upem_radius, accessor_char):
+    glyph_name = f"circle_r{upem_radius}"
+
+    center_x = 500
+    center_y = 600
+    size_x = upem_radius
+    size_y = upem_radius
+
+    # Drawing 4 quadrants of a circle.
+    approx = 4 * (sqrt(2) - 1) / 3
+    tt_pen = TTGlyphPen(None)
+    pen = Cu2QuPen(other_pen=tt_pen, max_err=_UPEM / 1000)
+    for direction in [(-1, 1), (1, 1), (1, -1), (-1, -1)]:
+        pen.moveTo((center_x - (direction[0] * size_x), center_y))
+        pen.curveTo(
+            (
+                center_x - direction[0] * size_x,
+                center_y - approx * direction[1] * size_y,
+            ),
+            (
+                center_x - approx * direction[0] * size_x,
+                center_y - direction[1] * size_y,
+            ),
+            (center_x, center_y - direction[1] * size_y),
+        )
+        pen.lineTo((center_x, center_y))
+        pen.closePath()
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor_char,
+        advance=_UPEM,
+        glyph=tt_pen.glyph(),
+    )
+
+
+def _one_glyph(accessor_char):
+    glyph_name = "one"
+
+    draw_pen = TTGlyphPen(None)
+    pen = draw_pen.transformPen(draw_pen, (0.2, 0, 0, 0.2, 150, 250))
+    # 1 glyph taken from Roboto Regular.
+    pen.moveTo((729, 1464))
+    for line_point in [
+        (729, 0),
+        (544, 0),
+        (544, 1233),
+        (171, 1079),
+        (171, 1264),
+        (700, 1464),
+    ]:
+        pen.lineTo(line_point)
+    pen.closePath()
+    return SampleGlyph(
+        glyph_name="one", accessor=accessor_char, advance=_UPEM, glyph=draw_pen.glyph()
+    )
+
+
+def _zero_glyph(accessor_char):
+    glyph_name = "zero"
+    draw_pen = TTGlyphPen(None)
+    pen = draw_pen.transformPen(draw_pen, (0.2, 0, 0, 0.2, 150, 250))
+
+    # 0 glyph taken from Roboto Regular
+    pen.moveTo((1035, 622))
+    pen.qCurveTo((1035, 264), (788, -20), (576, -20))
+    pen.qCurveTo((367, -20), (115, 264), (115, 622))
+    pen.lineTo((115, 844))
+    pen.qCurveTo((115, 1201), (365, 1476), (574, 1476))
+    pen.qCurveTo((786, 1476), (1035, 1201), (1035, 844))
+    pen.closePath()
+
+    pen.moveTo((849, 875))
+    pen.qCurveTo((849, 1121), (709, 1325), (574, 1325))
+    pen.qCurveTo((442, 1325), (301, 1121), (301, 875))
+    pen.lineTo((301, 592))
+    pen.qCurveTo((301, 348), (444, 132), (576, 132))
+    pen.qCurveTo((712, 132), (849, 348), (849, 592))
+    pen.closePath()
+
+    return SampleGlyph(
+        glyph_name="zero", accessor=accessor_char, advance=_UPEM, glyph=draw_pen.glyph()
+    )
+
+
 def main():
     assert len(sys.argv) == 2
     build_dir = Path(sys.argv[1])
@@ -820,7 +981,11 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    access_chars = iter(ascii_letters + digits)
+    access_chars = iter(
+        ascii_letters
+        + digits
+        + "".join([str(greek_letter) for greek_letter in range(0x03B1, 0x3C9)])
+    )
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
@@ -882,6 +1047,8 @@ def main():
         _foreground_color("sweep", 0.3, next(access_chars)),
         _foreground_color("solid", 0.3, next(access_chars)),
         _gradient_p2_skewed(next(access_chars)),
+        _colrv0_colored_circles(next(access_chars)),
+        _colrv1_colored_circles(next(access_chars)),
         _cross_glyph(),
         _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
@@ -890,6 +1057,15 @@ def main():
         _clip_shade_glyph("bottom_right", next(access_chars)),
         _clip_shade_glyph("top_right", next(access_chars)),
         _inset_clipped_radial_reflect(next(access_chars)),
+        _circle_of_size(50, next(access_chars)),
+        _circle_of_size(100, next(access_chars)),
+        _circle_of_size(150, next(access_chars)),
+        _circle_of_size(200, next(access_chars)),
+        _circle_of_size(250, next(access_chars)),
+        _circle_of_size(300, next(access_chars)),
+        _circle_of_size(350, next(access_chars)),
+        _one_glyph(next(access_chars)),
+        _zero_glyph(next(access_chars)),
     ]
 
     fb = fontBuilder.FontBuilder(_UPEM)
@@ -923,8 +1099,10 @@ def main():
 
     fb.font["hhea"].advanceWidthMax = _UPEM
 
+    colr_v0_glyphs = {g.glyph_name: g.colrv0 for g in glyphs if g.colrv0}
+    colr_v1_glyphs = {g.glyph_name: g.colr for g in glyphs if g.colr}
     fb.font["COLR"] = colorBuilder.buildCOLR(
-        {g.glyph_name: g.colr for g in glyphs if g.colr},
+        {**colr_v0_glyphs, **colr_v1_glyphs},
         clipBoxes={g.glyph_name: g.clip_box for g in glyphs if g.clip_box},
     )
     fb.font["CPAL"] = colorBuilder.buildCPAL([list(_PALETTE)])
