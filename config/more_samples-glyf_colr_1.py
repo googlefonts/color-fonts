@@ -1045,11 +1045,13 @@ def main():
     # Place these first in the global primary palette.
     palette_test_colors = _reserve_circle_colors()
 
-    access_chars = iter(
+    access_chars_set = (
         ascii_letters
         + digits
-        + "".join([str(greek_letter) for greek_letter in range(0x03B1, 0x3C9)])
+        + "".join([chr(greek_letter) for greek_letter in range(0x03B1, 0x3C9)])
+        + "".join([chr(greek_letter) for greek_letter in range(0x0391, 0x3A9)])
     )
+    access_chars = iter(access_chars_set)
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
