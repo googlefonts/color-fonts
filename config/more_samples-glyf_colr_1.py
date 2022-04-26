@@ -70,6 +70,15 @@ def _sample_sweep(start_angle, end_angle, extend_mode_arg, color_line_range, acc
                 (0.75, *_cpal("blue")),
             ]
         },
+        "wide": {
+            "ColorStop": [
+                (-1 / 6, *_cpal("chocolate")),
+                (0, *_cpal("darkorange")),
+                (0.5, *_cpal("darkgreen")),
+                (1, *_cpal("lavender")),
+                (7 / 6, *_cpal("dodgerblue")),
+            ]
+        },
     }
 
     if color_line_range not in color_line_range_map:
@@ -1162,6 +1171,8 @@ def main():
         _sample_sweep(-270, 270, "repeat", "narrow", next(access_chars)),
         _sample_sweep(-45, 45, "repeat", "narrow", next(access_chars)),
         _sample_sweep(315, 45, "repeat", "narrow", next(access_chars)),
+        # Wide sweeps:
+        _sample_sweep(90, 180, "pad", "wide", next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
