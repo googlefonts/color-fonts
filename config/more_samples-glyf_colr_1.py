@@ -72,8 +72,8 @@ def _sample_sweep(start_angle, end_angle, extend_mode_arg, color_line_range, acc
         },
         "wide": {
             "ColorStop": [
-                (-1 / 6, *_cpal("chocolate")),
-                (0, *_cpal("darkorange")),
+                (-1 / 6, *_cpal("gold")),
+                (0, *_cpal("orangered")),
                 (0.5, *_cpal("darkgreen")),
                 (1, *_cpal("lavender")),
                 (7 / 6, *_cpal("dodgerblue")),
@@ -1146,33 +1146,52 @@ def main():
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
         # Sweep with repeat mode pad
-        _sample_sweep(0, 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "pad", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "pad", "narrow", next(access_chars)),
+        # First one for pad, see above, second glyph.
+        _sample_sweep(-360, -360 + 90, "pad", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 45, -360 + 90, "pad", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 247.5, -360 + 292.5, "pad", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 90, -360 + 270, "pad", "narrow", next(access_chars)),
         _sample_sweep(-270, 270, "pad", "narrow", next(access_chars)),
         _sample_sweep(-45, 45, "pad", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "pad", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 315, -360 + 45, "pad", "narrow", next(access_chars)),
         # Sweep with repeat mode reflect
         _sample_sweep(-360, 0, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(0, 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(-360, -360 + 90, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 45, -360 + 90, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(
+            -360 + 247.5, -360 + 292.5, "reflect", "narrow", next(access_chars)
+        ),
+        _sample_sweep(-360 + 90, -360 + 270, "reflect", "narrow", next(access_chars)),
         _sample_sweep(-270, 270, "reflect", "narrow", next(access_chars)),
         _sample_sweep(-45, 45, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 315, -360 + 45, "reflect", "narrow", next(access_chars)),
         # Sweep with repeat mode repeat
         _sample_sweep(-360, 0, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(0, 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(-360, -360 + 90, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 45, -360 + 90, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(
+            -360 + 247.5, -360 + 292.5, "repeat", "narrow", next(access_chars)
+        ),
+        _sample_sweep(-360 + 90, -360 + 270, "repeat", "narrow", next(access_chars)),
         _sample_sweep(-270, 270, "repeat", "narrow", next(access_chars)),
         _sample_sweep(-45, 45, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(-360 + 315, -360 + 45, "repeat", "narrow", next(access_chars)),
         # Wide sweeps:
-        _sample_sweep(90, 180, "pad", "wide", next(access_chars)),
+        # Extend mode Pad from here.
+        _sample_sweep(-270, -180, "pad", "wide", next(access_chars)),
+        _sample_sweep(-45, 45, "pad", "wide", next(access_chars)),
+        _sample_sweep(-315, -45, "pad", "wide", next(access_chars)),
+        _sample_sweep(-352, -320, "pad", "wide", next(access_chars)),
+        # Extend mode Reflect from here.
+        _sample_sweep(-270, -180, "reflect", "wide", next(access_chars)),
+        _sample_sweep(-45, 45, "reflect", "wide", next(access_chars)),
+        _sample_sweep(-315, -45, "reflect", "wide", next(access_chars)),
+        _sample_sweep(-352, -320, "reflect", "wide", next(access_chars)),
+        # Extend mode Repeat from here.
+        _sample_sweep(-270, -180, "repeat", "wide", next(access_chars)),
+        _sample_sweep(-45, 45, "repeat", "wide", next(access_chars)),
+        _sample_sweep(-315, -45, "repeat", "wide", next(access_chars)),
+        _sample_sweep(-352, -320, "repeat", "wide", next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
