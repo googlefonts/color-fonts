@@ -1145,37 +1145,45 @@ def main():
         _gradient_p2_skewed(next(access_chars)),
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
+    ]
+    narrow_angles = [
+        (-360, 0),
+        (-360, -360 + 90),
+        (-360 + 45, -360 + 90),
+        (-360 + 247.5, -360 + 292.5),
+        (-360 + 90, -360 + 270),
+        (-270, 270),
+        (-45, 45),
+        (-360 + 315, -360 + 45),
+    ]
+    glyphs += [
         # Sweep with repeat mode pad
         # First one for pad, see above, second glyph.
-        _sample_sweep(-360, -360 + 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 45, -360 + 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 247.5, -360 + 292.5, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 90, -360 + 270, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 315, -360 + 45, "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[1], "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[2], "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[3], "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[4], "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[5], "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[6], "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[7], "pad", "narrow", next(access_chars)),
         # Sweep with repeat mode reflect
-        _sample_sweep(-360, 0, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-360, -360 + 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 45, -360 + 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(
-            -360 + 247.5, -360 + 292.5, "reflect", "narrow", next(access_chars)
-        ),
-        _sample_sweep(-360 + 90, -360 + 270, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 315, -360 + 45, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[0], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[1], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[2], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[3], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[4], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[5], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[6], "reflect", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[7], "reflect", "narrow", next(access_chars)),
         # Sweep with repeat mode repeat
-        _sample_sweep(-360, 0, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-360, -360 + 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 45, -360 + 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(
-            -360 + 247.5, -360 + 292.5, "repeat", "narrow", next(access_chars)
-        ),
-        _sample_sweep(-360 + 90, -360 + 270, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-360 + 315, -360 + 45, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[0], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[1], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[2], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[3], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[4], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[5], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[6], "repeat", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[7], "repeat", "narrow", next(access_chars)),
     ]
     wide_angles = [(-180, 180), (-90, 0), (-45, 45), (-135, 135), (-172, -140)]
     glyphs += [
