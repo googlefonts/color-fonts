@@ -128,7 +128,7 @@ def _sample_colr_glyph(accessor):
             "angle": 60,
             "Paint": {
                 "Format": ot.PaintFormat.PaintColrGlyph,
-                "Glyph": "sweep_-360_0_pad_narrow",
+                "Glyph": "sweep_-180_180_pad_narrow",
             },
         },
     }
@@ -157,13 +157,13 @@ def _sample_composite_colr_glyph(accessor):
         "CompositeMode": "SRC_OUT",
         "SourcePaint": {
             "Format": ot.PaintFormat.PaintColrGlyph,
-            "Glyph": "sweep_-360_0_pad_narrow",
+            "Glyph": "sweep_-180_180_pad_narrow",
         },
         "BackdropPaint": {
             "Format": ot.PaintFormat.PaintTransform,
             "Paint": {
                 "Format": ot.PaintFormat.PaintColrGlyph,
-                "Glyph": "sweep_-360_0_pad_narrow",
+                "Glyph": "sweep_-180_180_pad_narrow",
             },
             "Transform": t,
         },
@@ -1082,10 +1082,20 @@ def main():
         + "".join([chr(greek_letter) for greek_letter in range(0x0391, 0x3A9)])
     )
     access_chars = iter(access_chars_set)
+    narrow_angles = [
+        (-180, 180),
+        (-180, -90),
+        (-180 + 45, -180 + 90),
+        (-180 + 247.5, -180 + 292.5),
+        (-180 + 90, -180 + 270),
+        (-90, 270),
+        (-45, 45),
+        (-180 + 315, -180 + 45),
+    ]
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
-        _sample_sweep(-360, 0, "pad", "narrow", next(access_chars)),
+        _sample_sweep(*narrow_angles[0], "pad", "narrow", next(access_chars)),
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
         _gradient_stops_repeat(0, 1, next(access_chars)),
@@ -1145,18 +1155,6 @@ def main():
         _gradient_p2_skewed(next(access_chars)),
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
-    ]
-    narrow_angles = [
-        (-180, 180),
-        (-180, -90),
-        (-180 + 45, -180 + 90),
-        (-180 + 247.5, -180 + 292.5),
-        (-180 + 90, -180 + 270),
-        (-90, 270),
-        (-45, 45),
-        (-180 + 315, -180 + 45),
-    ]
-    glyphs += [
         # Sweep with repeat mode pad
         # First one for pad, see above, second glyph.
         _sample_sweep(*narrow_angles[1], "pad", "narrow", next(access_chars)),
