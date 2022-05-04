@@ -1176,22 +1176,28 @@ def main():
         _sample_sweep(-270, 270, "repeat", "narrow", next(access_chars)),
         _sample_sweep(-45, 45, "repeat", "narrow", next(access_chars)),
         _sample_sweep(-360 + 315, -360 + 45, "repeat", "narrow", next(access_chars)),
+    ]
+    wide_angles = [(-180, 180), (-90, 0), (-45, 45), (-135, 135), (-172, -140)]
+    glyphs += [
         # Wide sweeps:
         # Extend mode Pad from here.
-        _sample_sweep(-270, -180, "pad", "wide", next(access_chars)),
-        _sample_sweep(-45, 45, "pad", "wide", next(access_chars)),
-        _sample_sweep(-315, -45, "pad", "wide", next(access_chars)),
-        _sample_sweep(-352, -320, "pad", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[0], "pad", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[1], "pad", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[2], "pad", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[3], "pad", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[4], "pad", "wide", next(access_chars)),
         # Extend mode Reflect from here.
-        _sample_sweep(-270, -180, "reflect", "wide", next(access_chars)),
-        _sample_sweep(-45, 45, "reflect", "wide", next(access_chars)),
-        _sample_sweep(-315, -45, "reflect", "wide", next(access_chars)),
-        _sample_sweep(-352, -320, "reflect", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[0], "reflect", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[1], "reflect", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[2], "reflect", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[3], "reflect", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[4], "reflect", "wide", next(access_chars)),
         # Extend mode Repeat from here.
-        _sample_sweep(-270, -180, "repeat", "wide", next(access_chars)),
-        _sample_sweep(-45, 45, "repeat", "wide", next(access_chars)),
-        _sample_sweep(-315, -45, "repeat", "wide", next(access_chars)),
-        _sample_sweep(-352, -320, "repeat", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[0], "repeat", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[1], "repeat", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[2], "repeat", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[3], "repeat", "wide", next(access_chars)),
+        _sample_sweep(*wide_angles[4], "repeat", "wide", next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
