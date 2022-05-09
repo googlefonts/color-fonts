@@ -1044,25 +1044,7 @@ def _prepare_palette():
         ],
     }
 
-
-def main():
-    assert len(sys.argv) == 2
-    build_dir = Path(sys.argv[1])
-    build_dir.mkdir(exist_ok=True)
-
-    script_name = Path(__file__).name
-    out_file = (build_dir / script_name).with_suffix(".ttf")
-
-    version = datetime.datetime.now().isoformat()
-    names = {
-        "familyName": _FAMILY,
-        "styleName": _STYLE,
-        "uniqueFontIdentifier": " ".join((_FAMILY, version)),
-        "fullName": " ".join((_FAMILY, _STYLE)),
-        "version": version,
-        "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
-    }
-
+def _get_glyph_definitions():
     # Place these first in the global primary palette.
     palette_test_colors = _reserve_circle_colors()
 
@@ -1181,7 +1163,11 @@ def main():
         _one_glyph(next(access_chars)),
         _zero_glyph(next(access_chars)),
     ]
+    return glyphs
 
+
+def _build_font(names):
+    glyphs = _get_glyph_definitions()
     fb = fontBuilder.FontBuilder(_UPEM)
     fb.setupGlyphOrder([g.glyph_name for g in glyphs])
     fb.setupCharacterMap(
@@ -1220,7 +1206,28 @@ def main():
         clipBoxes={g.glyph_name: g.clip_box for g in glyphs if g.clip_box},
     )
     fb.font["CPAL"] = colorBuilder.buildCPAL(**_prepare_palette())
+    return fb
 
+
+def main():
+    assert len(sys.argv) == 2
+    build_dir = Path(sys.argv[1])
+    build_dir.mkdir(exist_ok=True)
+
+    script_name = Path(__file__).name
+    out_file = (build_dir / script_name).with_suffix(".ttf")
+
+    version = datetime.datetime.now().isoformat()
+    names = {
+        "familyName": _FAMILY,
+        "styleName": _STYLE,
+        "uniqueFontIdentifier": " ".join((_FAMILY, version)),
+        "fullName": " ".join((_FAMILY, _STYLE)),
+        "version": version,
+        "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
+    }
+
+    fb = _build_font(names)
     fb.save(out_file)
     print(f"Wrote {out_file}")
 
