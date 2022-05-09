@@ -3,8 +3,10 @@
 
 import datetime
 from pathlib import Path
+from fontTools import designspaceLib
 from fontTools import fontBuilder
 from fontTools import ttLib
+from fontTools import varLib
 from fontTools.colorLib import builder as colorBuilder
 from fontTools.colorLib.builder import ColorPaletteType
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -46,7 +48,9 @@ def _cpal(color_str, alpha=1.0):
     return (_PALETTE[color], alpha)
 
 
-def _sample_sweep(start_angle, end_angle, extend_mode_arg, color_line_range, accessor):
+def _sample_sweep(
+    start_angle, end_angle, extend_mode_arg, color_line_range, position, accessor
+):
 
     extend_mode_map = {
         "reflect": ot.ExtendMode.REFLECT,
@@ -79,6 +83,9 @@ def _sample_sweep(start_angle, end_angle, extend_mode_arg, color_line_range, acc
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
+    angle_addition = 45 if position["swep"] > 0 else 0
+    start_angle = min(start_angle + angle_addition, 359.989013671875)
+    print((angle_addition, start_angle))
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": "circle_r350",
@@ -1044,7 +1051,8 @@ def _prepare_palette():
         ],
     }
 
-def _get_glyph_definitions():
+
+def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
     palette_test_colors = _reserve_circle_colors()
 
@@ -1058,7 +1066,7 @@ def _get_glyph_definitions():
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
-        _sample_sweep(-360, 0, "pad", "narrow", next(access_chars)),
+        _sample_sweep(-360, 0, "pad", "narrow", position, next(access_chars)),
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
         _gradient_stops_repeat(0, 1, next(access_chars)),
@@ -1119,31 +1127,31 @@ def _get_glyph_definitions():
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
         # Sweep with repeat mode pad
-        _sample_sweep(0, 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "pad", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "pad", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "pad", "narrow", next(access_chars)),
+        _sample_sweep(0, 90, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(45, 90, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(247.5, 292.5, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(90, 270, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(-270, 270, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(-45, 45, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(315, 45, "pad", "narrow", position, next(access_chars)),
         # Sweep with repeat mode reflect
-        _sample_sweep(-360, 0, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(0, 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(-360, 0, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(0, 90, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(45, 90, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(247.5, 292.5, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(90, 270, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(-270, 270, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(-45, 45, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(315, 45, "reflect", "narrow", position, next(access_chars)),
         # Sweep with repeat mode repeat
-        _sample_sweep(-360, 0, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(0, 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(-360, 0, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(0, 90, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(45, 90, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(247.5, 292.5, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(90, 270, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(-270, 270, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(-45, 45, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(315, 45, "repeat", "narrow", position, next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
@@ -1166,8 +1174,8 @@ def _get_glyph_definitions():
     return glyphs
 
 
-def _build_font(names):
-    glyphs = _get_glyph_definitions()
+def _build_font(names, position):
+    glyphs = _get_glyph_definitions(position)
     fb = fontBuilder.FontBuilder(_UPEM)
     fb.setupGlyphOrder([g.glyph_name for g in glyphs])
     fb.setupCharacterMap(
@@ -1216,6 +1224,7 @@ def main():
 
     script_name = Path(__file__).name
     out_file = (build_dir / script_name).with_suffix(".ttf")
+    print(out_file)
 
     version = datetime.datetime.now().isoformat()
     names = {
@@ -1227,8 +1236,55 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    fb = _build_font(names)
-    fb.save(out_file)
+    variation_positions = [{"swep": 0}, {"swep": 45}]
+
+    fb = []
+    for pos in variation_positions:
+        fb.append(_build_font(names, pos))
+
+    designspace = designspaceLib.DesignSpaceDocument()
+
+    axis_defs = [
+        dict(
+            tag="swep",
+            name="Sweep Start Angle Offset",
+            minimum=0,
+            default=0,
+            maximum=45,
+        ),
+    ]
+    for axis_def in axis_defs:
+        designspace.addAxisDescriptor(**axis_def)
+
+    designspace.addSourceDescriptor(
+        name="Master 1",
+        location={"Sweep Start Angle Offset": 0},
+        font=fb[0].font,
+    )
+
+    designspace.addSourceDescriptor(
+        name="Master 2",
+        location={"Sweep Start Angle Offset": 45},
+        font=fb[1].font,
+    )
+
+    # Optionally add named instances
+    # designspace.addInstanceDescriptor(
+    #     styleName="Regular",
+    #     location={"Weight": 400, "Width": 100},
+    # )
+
+    # print(designspace.tostring().decode())
+
+    # Build the variable font.
+    # I exclude HVAR otherwise the masters also need to contain hmtx (which is pretty
+    # standard for actual fonts, but here I just care about COLR table).
+    # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
+    vf = varLib.build(
+        designspace,
+    )[0]
+
+    vf.save(out_file)
     print(f"Wrote {out_file}")
 
 
