@@ -3,8 +3,10 @@
 
 import datetime
 from pathlib import Path
+from fontTools import designspaceLib
 from fontTools import fontBuilder
 from fontTools import ttLib
+from fontTools import varLib
 from fontTools.colorLib import builder as colorBuilder
 from fontTools.colorLib.builder import ColorPaletteType
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -46,7 +48,9 @@ def _cpal(color_str, alpha=1.0):
     return (_PALETTE[color], alpha)
 
 
-def _sample_sweep(start_angle, end_angle, extend_mode_arg, color_line_range, accessor):
+def _sample_sweep(
+    start_angle, end_angle, extend_mode_arg, color_line_range, position, accessor
+):
 
     extend_mode_map = {
         "reflect": ot.ExtendMode.REFLECT,
@@ -79,6 +83,10 @@ def _sample_sweep(start_angle, end_angle, extend_mode_arg, color_line_range, acc
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
+    angle_addition = (
+        position["SWEP"] if "SWEP" in position and position["SWEP"] > 0 else 0
+    )
+    end_angle = min(end_angle + angle_addition, 359.989013671875)
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": "circle_r350",
@@ -372,7 +380,7 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
     )
 
 
-def _extend_modes(gradient_format, extend_mode, accessor_char):
+def _extend_modes(gradient_format, extend_mode, position, accessor_char):
 
     format_map = {
         "linear": ot.PaintFormat.PaintLinearGradient,
@@ -414,6 +422,12 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
 
     glyph_name = f"{gradient_format}_gradient_extend_mode_{extend_mode}"
 
+    color_stop_positions = [0.0, 0.5, 1.0]
+    for i in range(0, 3):
+        axis = f"COL{i+1}"
+        if axis in position:
+            color_stop_positions[i] += position[axis]
+
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": _UPEM_BOX_GLYPH,
@@ -421,9 +435,9 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
             "Format": selected_format,
             "ColorLine": {
                 "ColorStop": [
-                    (0.0, *_cpal("green")),
-                    (0.5, *_cpal("white")),
-                    (1.0, *_cpal("red")),
+                    (color_stop_positions[0], *_cpal("green")),
+                    (color_stop_positions[1], *_cpal("white")),
+                    (color_stop_positions[2], *_cpal("red")),
                 ],
                 "Extend": extend_mode_map[extend_mode],
             },
@@ -441,10 +455,13 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
     )
 
 
-def _paint_rotate(angle, center_x, center_y, accessor_char):
+def _paint_rotate(angle, center_x, center_y, position, accessor_char):
     glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
 
     color_orange = _cpal("orange", 0.7)
+
+    angle_addition = position["ROTA"] if "ROTA" in position else 0
+    rotate_angle = min(angle + angle_addition, 359.989013671875)
 
     glyph_paint = {
         "Paint": {
@@ -463,10 +480,10 @@ def _paint_rotate(angle, center_x, center_y, accessor_char):
             "Format": ot.PaintFormat.PaintRotateAroundCenter,
             "centerX": center_x,
             "centerY": center_y,
-            "angle": angle,
+            "angle": rotate_angle,
         }
     else:
-        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": angle}
+        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": rotate_angle}
 
     rotated_colr.update(glyph_paint)
 
@@ -1045,24 +1062,7 @@ def _prepare_palette():
     }
 
 
-def main():
-    assert len(sys.argv) == 2
-    build_dir = Path(sys.argv[1])
-    build_dir.mkdir(exist_ok=True)
-
-    script_name = Path(__file__).name
-    out_file = (build_dir / script_name).with_suffix(".ttf")
-
-    version = datetime.datetime.now().isoformat()
-    names = {
-        "familyName": _FAMILY,
-        "styleName": _STYLE,
-        "uniqueFontIdentifier": " ".join((_FAMILY, version)),
-        "fullName": " ".join((_FAMILY, _STYLE)),
-        "version": version,
-        "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
-    }
-
+def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
     palette_test_colors = _reserve_circle_colors()
 
@@ -1076,7 +1076,7 @@ def main():
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
-        _sample_sweep(-360, 0, "pad", "narrow", next(access_chars)),
+        _sample_sweep(-360, 0, "pad", "narrow", position, next(access_chars)),
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
         _gradient_stops_repeat(0, 1, next(access_chars)),
@@ -1089,16 +1089,16 @@ def main():
         _paint_scale(1.5, 1.5, 0, 0, next(access_chars)),
         _paint_scale(0.5, 1.5, _UPEM, _UPEM, next(access_chars)),
         _paint_scale(1.5, 1.5, _UPEM, _UPEM, next(access_chars)),
-        _extend_modes("linear", "pad", next(access_chars)),
-        _extend_modes("linear", "repeat", next(access_chars)),
-        _extend_modes("linear", "reflect", next(access_chars)),
-        _extend_modes("radial", "pad", next(access_chars)),
-        _extend_modes("radial", "repeat", next(access_chars)),
-        _extend_modes("radial", "reflect", next(access_chars)),
-        _paint_rotate(10, 0, 0, next(access_chars)),
-        _paint_rotate(-10, _UPEM, _UPEM, next(access_chars)),
-        _paint_rotate(25, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _extend_modes("linear", "pad", position, next(access_chars)),
+        _extend_modes("linear", "repeat", position, next(access_chars)),
+        _extend_modes("linear", "reflect", position, next(access_chars)),
+        _extend_modes("radial", "pad", position, next(access_chars)),
+        _extend_modes("radial", "repeat", position, next(access_chars)),
+        _extend_modes("radial", "reflect", position, next(access_chars)),
+        _paint_rotate(10, 0, 0, position, next(access_chars)),
+        _paint_rotate(-10, _UPEM, _UPEM, position, next(access_chars)),
+        _paint_rotate(25, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
         _paint_skew(25, 0, 0, 0, next(access_chars)),
         _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_skew(0, 15, 0, 0, next(access_chars)),
@@ -1137,31 +1137,31 @@ def main():
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
         # Sweep with repeat mode pad
-        _sample_sweep(0, 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "pad", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "pad", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "pad", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "pad", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "pad", "narrow", next(access_chars)),
+        _sample_sweep(0, 90, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(45, 90, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(247.5, 292.5, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(90, 270, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(-270, 270, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(-45, 45, "pad", "narrow", position, next(access_chars)),
+        _sample_sweep(315, 45, "pad", "narrow", position, next(access_chars)),
         # Sweep with repeat mode reflect
-        _sample_sweep(-360, 0, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(0, 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "reflect", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "reflect", "narrow", next(access_chars)),
+        _sample_sweep(-360, 0, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(0, 90, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(45, 90, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(247.5, 292.5, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(90, 270, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(-270, 270, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(-45, 45, "reflect", "narrow", position, next(access_chars)),
+        _sample_sweep(315, 45, "reflect", "narrow", position, next(access_chars)),
         # Sweep with repeat mode repeat
-        _sample_sweep(-360, 0, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(0, 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(45, 90, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(247.5, 292.5, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(90, 270, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-270, 270, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(-45, 45, "repeat", "narrow", next(access_chars)),
-        _sample_sweep(315, 45, "repeat", "narrow", next(access_chars)),
+        _sample_sweep(-360, 0, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(0, 90, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(45, 90, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(247.5, 292.5, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(90, 270, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(-270, 270, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(-45, 45, "repeat", "narrow", position, next(access_chars)),
+        _sample_sweep(315, 45, "repeat", "narrow", position, next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
@@ -1181,7 +1181,11 @@ def main():
         _one_glyph(next(access_chars)),
         _zero_glyph(next(access_chars)),
     ]
+    return glyphs
 
+
+def _build_font(names, position):
+    glyphs = _get_glyph_definitions(position)
     fb = fontBuilder.FontBuilder(_UPEM)
     fb.setupGlyphOrder([g.glyph_name for g in glyphs])
     fb.setupCharacterMap(
@@ -1220,8 +1224,116 @@ def main():
         clipBoxes={g.glyph_name: g.clip_box for g in glyphs if g.clip_box},
     )
     fb.font["CPAL"] = colorBuilder.buildCPAL(**_prepare_palette())
+    return fb
 
-    fb.save(out_file)
+
+def main():
+    assert len(sys.argv) == 2
+    build_dir = Path(sys.argv[1])
+    build_dir.mkdir(exist_ok=True)
+
+    script_name = Path(__file__).name
+    out_file = (build_dir / script_name).with_suffix(".ttf")
+
+    version = datetime.datetime.now().isoformat()
+    names = {
+        "familyName": _FAMILY,
+        "styleName": _STYLE,
+        "uniqueFontIdentifier": " ".join((_FAMILY, version)),
+        "fullName": " ".join((_FAMILY, _STYLE)),
+        "version": version,
+        "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
+    }
+
+    designspace = designspaceLib.DesignSpaceDocument()
+
+    axis_defs = [
+        dict(
+            tag="SWEP",
+            name="Sweep End Angle Offset",
+            minimum=0,
+            default=0,
+            maximum=90,
+        ),
+        dict(
+            tag="ROTA",
+            name="Var Rotate Angle Offset",
+            minimum=0,
+            default=0,
+            maximum=359.989013671875,
+        ),
+        dict(
+            tag="COL1",
+            name="Extend tests color stop offset 1",
+            minimum=-2,
+            default=0,
+            maximum=2,
+        ),
+        dict(
+            tag="COL2",
+            name="Extend tests color stop offset 2",
+            minimum=-2,
+            default=0,
+            maximum=2,
+        ),
+        dict(
+            tag="COL3",
+            name="Extend tests color stop offset 3",
+            minimum=-2,
+            default=0,
+            maximum=2,
+        ),
+    ]
+
+    # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
+    all_default_positions = {}
+    all_default_locations = {}
+    for axis_def in axis_defs:
+        designspace.addAxisDescriptor(**axis_def)
+        all_default_positions[axis_def["tag"]] = axis_def["default"]
+        all_default_locations[axis_def["name"]] = axis_def["default"]
+
+    # Start with the master of all default positions.
+    variation_positions = [all_default_positions]
+
+    designspace.addSourceDescriptor(
+        name="All Default",
+        location=all_default_locations,
+        font=_build_font(names, all_default_positions).font,
+    )
+
+    # Append the minimum and maximum for each axis as masters, if differing from default.
+    for change_axis in axis_defs:
+        for change_key in ["minimum", "maximum"]:
+            axis_value = change_axis[change_key]
+            if axis_value == change_axis["default"]:
+                continue
+            position_dict = all_default_positions.copy()
+            position_dict[change_axis["tag"]] = axis_value
+            location_dict = all_default_locations.copy()
+            location_dict[change_axis["name"]] = axis_value
+            master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
+            designspace.addSourceDescriptor(
+                name=master_name,
+                location=location_dict,
+                font=_build_font(names, position_dict).font,
+            )
+
+    # Optionally add named instances
+    # designspace.addInstanceDescriptor(
+    #     styleName="Regular",
+    #     location={"Weight": 400, "Width": 100},
+    # )
+
+    print(designspace.tostring().decode())
+
+    # Build the variable font.
+    # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
+    vf = varLib.build(
+        designspace,
+    )[0]
+
+    vf.save(out_file)
     print(f"Wrote {out_file}")
 
 
