@@ -83,8 +83,8 @@ def _sample_sweep(
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
-    angle_addition = 45 if position["swep"] > 0 else 0
-    start_angle = min(start_angle + angle_addition, 359.989013671875)
+    angle_addition = 90 if position["swep"] > 0 else 0
+    end_angle = min(end_angle + angle_addition, 359.989013671875)
     print((angle_addition, start_angle))
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
