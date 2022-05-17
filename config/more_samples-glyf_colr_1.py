@@ -1279,13 +1279,7 @@ def main():
     )
 
     designspace.addSourceDescriptor(
-        name="Rotate Master 1",
-        location={"Rotate Angle Offset": 0, "Sweep Start Angle Offset": 0},
-        font=fb[2].font,
-    )
-
-    designspace.addSourceDescriptor(
-        name="Rotate Master 2",
+        name="Rotate Master",
         location={
             "Rotate Angle Offset": 359.989013671875,
             "Sweep Start Angle Offset": 0,
