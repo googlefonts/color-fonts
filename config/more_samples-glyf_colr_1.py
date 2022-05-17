@@ -1239,7 +1239,7 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    variation_positions = [{"swep": 0}, {"swep": 45}, {"rota": 0}, {"rota": 540}]
+    variation_positions = [{"swep": 0}, {"swep": 45}, {"rota": 540}]
 
     fb = []
     for pos in variation_positions:
@@ -1284,7 +1284,7 @@ def main():
             "Rotate Angle Offset": 359.989013671875,
             "Sweep Start Angle Offset": 0,
         },
-        font=fb[3].font,
+        font=fb[2].font,
     )
 
     # Optionally add named instances
