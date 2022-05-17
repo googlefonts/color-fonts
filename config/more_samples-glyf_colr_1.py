@@ -83,7 +83,7 @@ def _sample_sweep(
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
-    angle_addition = 90 if position["swep"] > 0 else 0
+    angle_addition = 90 if "swep" in position and position["swep"] > 0 else 0
     end_angle = min(end_angle + angle_addition, 359.989013671875)
     print((angle_addition, start_angle))
     colr = {
@@ -448,10 +448,13 @@ def _extend_modes(gradient_format, extend_mode, accessor_char):
     )
 
 
-def _paint_rotate(angle, center_x, center_y, accessor_char):
+def _paint_rotate(angle, center_x, center_y, position, accessor_char):
     glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
 
     color_orange = _cpal("orange", 0.7)
+
+    angle_addition = position["rota"] if "rota" in position else 0
+    rotate_angle = min(angle + angle_addition, 359.989013671875)
 
     glyph_paint = {
         "Paint": {
@@ -470,10 +473,10 @@ def _paint_rotate(angle, center_x, center_y, accessor_char):
             "Format": ot.PaintFormat.PaintRotateAroundCenter,
             "centerX": center_x,
             "centerY": center_y,
-            "angle": angle,
+            "angle": rotate_angle,
         }
     else:
-        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": angle}
+        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": rotate_angle}
 
     rotated_colr.update(glyph_paint)
 
@@ -1085,10 +1088,10 @@ def _get_glyph_definitions(position):
         _extend_modes("radial", "pad", next(access_chars)),
         _extend_modes("radial", "repeat", next(access_chars)),
         _extend_modes("radial", "reflect", next(access_chars)),
-        _paint_rotate(10, 0, 0, next(access_chars)),
-        _paint_rotate(-10, _UPEM, _UPEM, next(access_chars)),
-        _paint_rotate(25, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, next(access_chars)),
+        _paint_rotate(10, 0, 0, position, next(access_chars)),
+        _paint_rotate(-10, _UPEM, _UPEM, position, next(access_chars)),
+        _paint_rotate(25, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
         _paint_skew(25, 0, 0, 0, next(access_chars)),
         _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_skew(0, 15, 0, 0, next(access_chars)),
@@ -1236,7 +1239,7 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    variation_positions = [{"swep": 0}, {"swep": 45}]
+    variation_positions = [{"swep": 0}, {"swep": 45}, {"rota": 0}, {"rota": 540}]
 
     fb = []
     for pos in variation_positions:
@@ -1252,20 +1255,42 @@ def main():
             default=0,
             maximum=45,
         ),
+        dict(
+            tag="rota",
+            name="Rotate Angle Offset",
+            minimum=0,
+            default=0,
+            maximum=359.989013671875,
+        ),
     ]
     for axis_def in axis_defs:
         designspace.addAxisDescriptor(**axis_def)
 
     designspace.addSourceDescriptor(
         name="Master 1",
-        location={"Sweep Start Angle Offset": 0},
+        location={"Sweep Start Angle Offset": 0, "Rotate Angle Offset": 0},
         font=fb[0].font,
     )
 
     designspace.addSourceDescriptor(
         name="Master 2",
-        location={"Sweep Start Angle Offset": 45},
+        location={"Sweep Start Angle Offset": 45, "Rotate Angle Offset": 0},
         font=fb[1].font,
+    )
+
+    designspace.addSourceDescriptor(
+        name="Rotate Master 1",
+        location={"Rotate Angle Offset": 0, "Sweep Start Angle Offset": 0},
+        font=fb[2].font,
+    )
+
+    designspace.addSourceDescriptor(
+        name="Rotate Master 2",
+        location={
+            "Rotate Angle Offset": 359.989013671875,
+            "Sweep Start Angle Offset": 0,
+        },
+        font=fb[3].font,
     )
 
     # Optionally add named instances
@@ -1277,8 +1302,6 @@ def main():
     # print(designspace.tostring().decode())
 
     # Build the variable font.
-    # I exclude HVAR otherwise the masters also need to contain hmtx (which is pretty
-    # standard for actual fonts, but here I just care about COLR table).
     # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
     vf = varLib.build(
         designspace,
