@@ -1239,7 +1239,12 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    variation_positions = [{"swep": 0, "rota":0}, {"swep": 45, "rota":0}, {"rota":359.989013671875, "swep":0 }, {"swep": 45, "rota": 359.989013671875}]
+    variation_positions = [
+        {"swep": 0, "rota": 0},
+        {"swep": 45, "rota": 0},
+        {"rota": 359.989013671875, "swep": 0},
+        {"swep": 45, "rota": 359.989013671875},
+    ]
 
     fb = []
     for pos in variation_positions:
