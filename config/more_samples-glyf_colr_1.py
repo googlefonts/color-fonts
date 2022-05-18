@@ -1239,7 +1239,7 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    variation_positions = [{"swep": 0}, {"swep": 45}, {"rota": 540}]
+    variation_positions = [{"swep": 0, "rota":0}, {"swep": 45, "rota":0}, {"rota":359.989013671875, "swep":0 }, {"swep": 45, "rota": 359.989013671875}]
 
     fb = []
     for pos in variation_positions:
@@ -1253,7 +1253,7 @@ def main():
             name="Sweep Start Angle Offset",
             minimum=0,
             default=0,
-            maximum=45,
+            maximum=90,
         ),
         dict(
             tag="rota",
@@ -1279,12 +1279,21 @@ def main():
     )
 
     designspace.addSourceDescriptor(
-        name="Rotate Master",
+        name="Rotate Master 1",
         location={
             "Rotate Angle Offset": 359.989013671875,
             "Sweep Start Angle Offset": 0,
         },
         font=fb[2].font,
+    )
+
+    designspace.addSourceDescriptor(
+        name="Rotate Master 2",
+        location={
+            "Rotate Angle Offset": 359.989013671875,
+            "Sweep Start Angle Offset": 45,
+        },
+        font=fb[3].font,
     )
 
     # Optionally add named instances
