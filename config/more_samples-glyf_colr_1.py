@@ -83,9 +83,10 @@ def _sample_sweep(
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
-    angle_addition = 90 if "swep" in position and position["swep"] > 0 else 0
+    angle_addition = (
+        position["SWEP"] if "SWEP" in position and position["SWEP"] > 0 else 0
+    )
     end_angle = min(end_angle + angle_addition, 359.989013671875)
-    print((angle_addition, start_angle))
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": "circle_r350",
@@ -453,7 +454,7 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
 
     color_orange = _cpal("orange", 0.7)
 
-    angle_addition = position["rota"] if "rota" in position else 0
+    angle_addition = position["ROTA"] if "ROTA" in position else 0
     rotate_angle = min(angle + angle_addition, 359.989013671875)
 
     glyph_paint = {
@@ -1227,7 +1228,6 @@ def main():
 
     script_name = Path(__file__).name
     out_file = (build_dir / script_name).with_suffix(".ttf")
-    print(out_file)
 
     version = datetime.datetime.now().isoformat()
     names = {
@@ -1239,67 +1239,58 @@ def main():
         "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
     }
 
-    variation_positions = [
-        {"swep": 0, "rota": 0},
-        {"swep": 45, "rota": 0},
-        {"rota": 359.989013671875, "swep": 0},
-        {"swep": 45, "rota": 359.989013671875},
-    ]
-
-    fb = []
-    for pos in variation_positions:
-        fb.append(_build_font(names, pos))
-
     designspace = designspaceLib.DesignSpaceDocument()
 
     axis_defs = [
         dict(
-            tag="swep",
+            tag="SWEP",
             name="Sweep Start Angle Offset",
             minimum=0,
             default=0,
             maximum=90,
         ),
         dict(
-            tag="rota",
+            tag="ROTA",
             name="Rotate Angle Offset",
             minimum=0,
             default=0,
             maximum=359.989013671875,
         ),
     ]
+
+    # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
+    all_default_positions = {}
+    all_default_locations = {}
     for axis_def in axis_defs:
         designspace.addAxisDescriptor(**axis_def)
+        all_default_positions[axis_def["tag"]] = axis_def["default"]
+        all_default_locations[axis_def["name"]] = axis_def["default"]
+
+    # Start with the master of all default positions.
+    variation_positions = [all_default_positions]
 
     designspace.addSourceDescriptor(
-        name="Master 1",
-        location={"Sweep Start Angle Offset": 0, "Rotate Angle Offset": 0},
-        font=fb[0].font,
+        name="All Default",
+        location=all_default_locations,
+        font=_build_font(names, all_default_positions).font,
     )
 
-    designspace.addSourceDescriptor(
-        name="Master 2",
-        location={"Sweep Start Angle Offset": 45, "Rotate Angle Offset": 0},
-        font=fb[1].font,
-    )
-
-    designspace.addSourceDescriptor(
-        name="Rotate Master 1",
-        location={
-            "Rotate Angle Offset": 359.989013671875,
-            "Sweep Start Angle Offset": 0,
-        },
-        font=fb[2].font,
-    )
-
-    designspace.addSourceDescriptor(
-        name="Rotate Master 2",
-        location={
-            "Rotate Angle Offset": 359.989013671875,
-            "Sweep Start Angle Offset": 45,
-        },
-        font=fb[3].font,
-    )
+    # Append the minimum and maximum for each axis as masters, if differing from default.
+    for change_axis in axis_defs:
+        for change_key in ["minimum", "maximum"]:
+            axis_value = change_axis[change_key]
+            if axis_value == change_axis["default"]:
+                continue
+            position_dict = all_default_positions.copy()
+            position_dict[change_axis["tag"]] = axis_value
+            location_dict = all_default_locations.copy()
+            location_dict[change_axis["name"]] = axis_value
+            master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
+            designspace.addSourceDescriptor(
+                name=master_name,
+                location=location_dict,
+                font=_build_font(names, position_dict).font,
+            )
 
     # Optionally add named instances
     # designspace.addInstanceDescriptor(
@@ -1307,7 +1298,7 @@ def main():
     #     location={"Weight": 400, "Width": 100},
     # )
 
-    # print(designspace.tostring().decode())
+    print(designspace.tostring().decode())
 
     # Build the variable font.
     # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
