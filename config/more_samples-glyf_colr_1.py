@@ -26,6 +26,8 @@ _DESCENT = 250
 _FAMILY = "More COLR v1 Samples"
 _STYLE = "Regular"
 _PALETTE = {}  # <3 mutable globals
+_MAX_F2DOT14_ANGLE = (2-1/(2**14))*180+180
+_MIN_F2DOT14_ANGLE = -2 * 180 + 180
 
 _CROSS_GLYPH = "cross_glyph"
 _UPEM_BOX_GLYPH = "upem_box_glyph"
@@ -83,10 +85,10 @@ def _sample_sweep(
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
-    angle_addition = (
-        position["SWEP"] if "SWEP" in position and position["SWEP"] > 0 else 0
-    )
-    end_angle = min(end_angle + angle_addition, 359.989013671875)
+    start_angle_addition = position["SWPS"] if "SWPS" in position else 0
+    end_angle_addition = position["SWPE"] if "SWPE" in position else 0
+    end_angle = max(min(end_angle + end_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE)
+    start_angle = max(min(start_angle + start_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE)
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": "circle_r350",
@@ -461,7 +463,7 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
     color_orange = _cpal("orange", 0.7)
 
     angle_addition = position["ROTA"] if "ROTA" in position else 0
-    rotate_angle = min(angle + angle_addition, 359.989013671875)
+    rotate_angle = min(angle + angle_addition, _MAX_F2DOT14_ANGLE)
 
     glyph_paint = {
         "Paint": {
@@ -822,7 +824,7 @@ def _foreground_color(fill_type, foreground_alpha, accessor_char):
             },
             "centerX": 500,
             "centerY": 600,
-            "startAngle": -360,
+            "startAngle": -180,
             "endAngle": 270,
         },
     }
@@ -1249,9 +1251,16 @@ def main():
 
     axis_defs = [
         dict(
-            tag="SWEP",
+            tag="SWPS",
+            name="Sweep Start Angle Offset",
+            minimum=-90,
+            default=0,
+            maximum=90,
+        ),
+        dict(
+            tag="SWPE",
             name="Sweep End Angle Offset",
-            minimum=0,
+            minimum=-90,
             default=0,
             maximum=90,
         ),
@@ -1260,7 +1269,7 @@ def main():
             name="Var Rotate Angle Offset",
             minimum=0,
             default=0,
-            maximum=359.989013671875,
+            maximum=_MAX_F2DOT14_ANGLE,
         ),
         dict(
             tag="COL1",
