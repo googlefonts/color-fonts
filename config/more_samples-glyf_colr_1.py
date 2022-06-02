@@ -26,8 +26,10 @@ _DESCENT = 250
 _FAMILY = "More COLR v1 Samples"
 _STYLE = "Regular"
 _PALETTE = {}  # <3 mutable globals
-_MAX_F2DOT14_ANGLE = (2-1/(2**14))*180+180
-_MIN_F2DOT14_ANGLE = -2 * 180 + 180
+_MAX_F2DOT14 = 2 - 1 / (2**14)
+_MIN_F2DOT14 = -2
+_MAX_F2DOT14_ANGLE = _MAX_F2DOT14 * 180 + 180
+_MIN_F2DOT14_ANGLE = _MIN_F2DOT14 * 180 + 180
 
 _CROSS_GLYPH = "cross_glyph"
 _UPEM_BOX_GLYPH = "upem_box_glyph"
@@ -87,8 +89,12 @@ def _sample_sweep(
 
     start_angle_addition = position["SWPS"] if "SWPS" in position else 0
     end_angle_addition = position["SWPE"] if "SWPE" in position else 0
-    end_angle = max(min(end_angle + end_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE)
-    start_angle = max(min(start_angle + start_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE)
+    end_angle = max(
+        min(end_angle + end_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE
+    )
+    start_angle = max(
+        min(start_angle + start_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE
+    )
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": "circle_r350",
@@ -309,7 +315,7 @@ def _upem_box_glyph():
     )
 
 
-def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
+def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
     glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
 
     color_orange = _cpal("orange", 0.7)
@@ -325,6 +331,8 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
         },
     }
 
+    # Can't apply deltas before as the original values are used for determining
+    # which Paint format to choose.
     if center_x or center_y:
         if scale_x != scale_y:
             scaled_colr = {
@@ -353,6 +361,17 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, accessor_char):
                 "Format": ot.PaintFormat.PaintScaleUniform,
                 "scale": scale_x,
             }
+
+    if "centerX" in scaled_colr:
+        scaled_colr["centerX"] += position["SCOX"]
+    if "centerY" in scaled_colr:
+        scaled_colr["centerY"] += position["SCOY"]
+    if "scale" in scaled_colr:
+        scaled_colr["scale"] += position["SCSX"]
+    if "scaleX" in scaled_colr:
+        scaled_colr["scaleX"] += position["SCSX"]
+    if "scaleY" in scaled_colr:
+        scaled_colr["scaleY"] += position["SCSY"]
 
     scaled_colr.update(glyph_paint)
 
@@ -1085,12 +1104,12 @@ def _get_glyph_definitions(position):
         _gradient_stops_repeat(0.2, 0.8, next(access_chars)),
         _gradient_stops_repeat(0, 1.5, next(access_chars)),
         _gradient_stops_repeat(0.5, 1.5, next(access_chars)),
-        _paint_scale(0.5, 1.5, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_scale(1.5, 1.5, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_scale(0.5, 1.5, 0, 0, next(access_chars)),
-        _paint_scale(1.5, 1.5, 0, 0, next(access_chars)),
-        _paint_scale(0.5, 1.5, _UPEM, _UPEM, next(access_chars)),
-        _paint_scale(1.5, 1.5, _UPEM, _UPEM, next(access_chars)),
+        _paint_scale(0.5, 1.5, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_scale(1.5, 1.5, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_scale(0.5, 1.5, 0, 0, position, next(access_chars)),
+        _paint_scale(1.5, 1.5, 0, 0, position, next(access_chars)),
+        _paint_scale(0.5, 1.5, _UPEM, _UPEM, position, next(access_chars)),
+        _paint_scale(1.5, 1.5, _UPEM, _UPEM, position, next(access_chars)),
         _extend_modes("linear", "pad", position, next(access_chars)),
         _extend_modes("linear", "repeat", position, next(access_chars)),
         _extend_modes("linear", "reflect", position, next(access_chars)),
@@ -1291,6 +1310,34 @@ def main():
             minimum=-2,
             default=0,
             maximum=2,
+        ),
+        dict(
+            tag="SCOX",
+            name="Scale tests, center x offset",
+            minimum=-200,
+            default=0,
+            maximum=200,
+        ),
+        dict(
+            tag="SCOY",
+            name="Scale tests, center y offset",
+            minimum=-200,
+            default=0,
+            maximum=200,
+        ),
+        dict(
+            tag="SCSX",
+            name="Scale tests, x or uniform scale",
+            minimum=_MIN_F2DOT14,
+            default=0,
+            maximum=_MAX_F2DOT14,
+        ),
+        dict(
+            tag="SCSY",
+            name="Scale tests, y scale",
+            minimum=_MIN_F2DOT14,
+            default=0,
+            maximum=_MAX_F2DOT14,
         ),
     ]
 
