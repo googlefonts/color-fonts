@@ -449,6 +449,13 @@ def _extend_modes(gradient_format, extend_mode, position, accessor_char):
         if axis in position:
             color_stop_positions[i] += position[axis]
 
+    # Gradient coordinates variations.
+    coordinates = coordinates[selected_format]
+    for key in coordinates.keys():
+        axis_name = f"GR{key.upper()}"
+        if axis_name in position:
+            coordinates[key] += position[axis_name]
+
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
         "Glyph": _UPEM_BOX_GLYPH,
@@ -462,7 +469,7 @@ def _extend_modes(gradient_format, extend_mode, position, accessor_char):
                 ],
                 "Extend": extend_mode_map[extend_mode],
             },
-            **coordinates[selected_format],
+            **coordinates,
         },
     }
 
@@ -1340,6 +1347,18 @@ def main():
             maximum=_MAX_F2DOT14,
         ),
     ]
+
+    gradient_coords = ["x0", "y0", "x1", "y1", "x2", "y2", "r0", "r1"]
+    for coord in gradient_coords:
+        axis_defs.append(
+            dict(
+                tag=f"GR{coord.upper()}",
+                name=f"Gradient coords, {coord}",
+                minimum=-1000,
+                default=0,
+                maximum=1000,
+            )
+        )
 
     # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
     all_default_positions = {}
