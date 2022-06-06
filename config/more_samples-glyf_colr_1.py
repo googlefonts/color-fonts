@@ -121,6 +121,76 @@ def _sample_sweep(
     )
 
 
+def _lin_rad_solid_alpha(position, accessor):
+    glyph_name = "solid_colorline_alpha"
+
+    solid_alpha = 1
+    gradient_alphas = [1, 1]
+
+    if "APH1" in position:
+        solid_alpha += position["APH1"]
+    if "APH2" in position:
+        gradient_alphas[0] += position["APH2"]
+    if "APH3" in position:
+        gradient_alphas[1] += position["APH3"]
+
+    color_solid = _cpal("green", solid_alpha)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintColrLayers,
+        "Layers": [
+            {
+                "Format": ot.PaintFormat.PaintTranslate,
+                "dx": 150,
+                "dy": 0,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintGlyph,
+                    "Glyph": "circle_r350",
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintSolid,
+                        "PaletteIndex": color_solid[0],
+                        "Alpha": color_solid[1],
+                    },
+                },
+            },
+            {
+                "Format": ot.PaintFormat.PaintTranslate,
+                "dx": -150,
+                "dy": 0,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintGlyph,
+                    "Glyph": "circle_r350",
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintLinearGradient,
+                        "x0": 500,
+                        "y0": 250,
+                        "x1": 500,
+                        "y1": 950,
+                        "x2": 0,
+                        "y2": 0,
+                        "ColorLine": {
+                            "ColorStop": [
+                                (0, *_cpal("red", gradient_alphas[0])),
+                                (1, *_cpal("blue", gradient_alphas[1])),
+                            ],
+                            "Extend": ot.ExtendMode.REPEAT,
+                        },
+                    },
+                },
+            },
+        ],
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        accessor=accessor,
+        advance=_UPEM,
+        glyph=_upem_box_pen().glyph(),
+        clip_box=(0, 0, _UPEM, _UPEM),
+        colr=colr,
+    )
+
+
 def _sample_colr_glyph(accessor):
     glyph_name = "transformed_sweep"
     # Paint the sweep shifted and rotated
@@ -1190,6 +1260,7 @@ def _get_glyph_definitions(position):
         _sample_sweep(-270, 270, "repeat", "narrow", position, next(access_chars)),
         _sample_sweep(-45, 45, "repeat", "narrow", position, next(access_chars)),
         _sample_sweep(315, 45, "repeat", "narrow", position, next(access_chars)),
+        _lin_rad_solid_alpha(position, next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
@@ -1345,6 +1416,15 @@ def main():
             minimum=_MIN_F2DOT14,
             default=0,
             maximum=_MAX_F2DOT14,
+        ),
+        dict(
+            tag="APH1", name="Alpha axis, PaintSolid", minimum=-1, default=0, maximum=0
+        ),
+        dict(
+            tag="APH2", name="Alpha axis, ColorStop 0", minimum=-1, default=0, maximum=0
+        ),
+        dict(
+            tag="APH3", name="Alpha axis, ColorStop 1", minimum=-1, default=0, maximum=0
         ),
     ]
 
