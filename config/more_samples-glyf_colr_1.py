@@ -166,8 +166,8 @@ def _lin_rad_solid_alpha(position, accessor):
                         "y0": 250,
                         "x1": 500,
                         "y1": 950,
-                        "x2": 0,
-                        "y2": 0,
+                        "x2": 600,
+                        "y2": 250,
                         "ColorLine": {
                             "ColorStop": [
                                 (0, *_cpal("red", gradient_alphas[0])),
@@ -669,10 +669,23 @@ def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
     )
 
 
-def _paint_transform(xx, xy, yx, yy, dx, dy, accessor):
+def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
     glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
 
-    t = (xx, xy, yx, yy, dx, dy)
+    def deltaOrZero(axis):
+        if axis in position:
+            return position[axis]
+        else:
+            return 0
+
+    t = (
+        xx + deltaOrZero("TRXX"),
+        xy + deltaOrZero("TRXY"),
+        yx + deltaOrZero("TRYX"),
+        yy + deltaOrZero("TRYY"),
+        dx + deltaOrZero("TRDX"),
+        dy + deltaOrZero("TRDY"),
+    )
     color_orange = _cpal("orange", 0.7)
 
     transformed_colr = {
@@ -1203,13 +1216,13 @@ def _get_glyph_definitions(position):
         _paint_skew(0, 15, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_skew(-10, 20, _UPEM / 2, _UPEM / 2, next(access_chars)),
         _paint_skew(-10, 20, _UPEM, _UPEM, next(access_chars)),
-        _paint_transform(1, 0, 0, 1, 125, 125, next(access_chars)),
-        _paint_transform(1.5, 0, 0, 1.5, 0, 0, next(access_chars)),
+        _paint_transform(1, 0, 0, 1, 125, 125, position, next(access_chars)),
+        _paint_transform(1.5, 0, 0, 1.5, 0, 0, position, next(access_chars)),
         _paint_transform(
-            0.9659, 0.2588, -0.2588, 0.9659, 0, 0, next(access_chars)
+            0.9659, 0.2588, -0.2588, 0.9659, 0, 0, position, next(access_chars)
         ),  # Rotation 15 degrees counterclockwise
         _paint_transform(
-            1.0, 0.0, 0.6, 1.0, -300.0, 0.0, next(access_chars)
+            1.0, 0.0, 0.6, 1.0, -300.0, 0.0, position, next(access_chars)
         ),  # y-shear around center pivot point
         _clip_box("top_left", next(access_chars)),
         _clip_box("bottom_left", next(access_chars)),
@@ -1437,6 +1450,18 @@ def main():
                 minimum=-1000,
                 default=0,
                 maximum=1000,
+            )
+        )
+
+    transform_matrix = ["xx", "yx", "xy", "yy", "dx", "dy"]
+    for transform_scalar in transform_matrix:
+        axis_defs.append(
+            dict(
+                tag=f"TR{coord.upper()}",
+                name=f"Transform scalars, {transform_scalar}",
+                minimum=-2,
+                default=0,
+                maximum=2,
             )
         )
 
