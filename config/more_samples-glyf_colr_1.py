@@ -1,4 +1,7 @@
-"""Compile samples that are infeasible or difficult by svg compilation.
+"""Generate a test font consisting of samples that provide wide coverage for
+COLRv1 Paint* tables, including PaintVar* tables, including such samples that
+are impossible to generate from SVG at this point, for example
+PaintSweepGradient tests.
 """
 
 import datetime
@@ -19,6 +22,9 @@ from nanoemoji.colors import css_colors, Color
 from fontTools.misc.transform import Transform
 from string import ascii_letters, digits
 from math import sqrt
+import json
+import argparse
+import logging
 
 _UPEM = 1000
 _ASCENT = 950
@@ -33,6 +39,9 @@ _MIN_F2DOT14_ANGLE = _MIN_F2DOT14 * 180 + 180
 
 _CROSS_GLYPH = "cross_glyph"
 _UPEM_BOX_GLYPH = "upem_box_glyph"
+
+
+logger = logging.getLogger()
 
 
 class SampleGlyph(NamedTuple):
@@ -388,6 +397,8 @@ def _upem_box_glyph():
 def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
     glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
 
+    logger.debug(position)
+
     color_orange = _cpal("orange", 0.7)
     glyph_paint = {
         "Paint": {
@@ -673,10 +684,7 @@ def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
     glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
 
     def deltaOrZero(axis):
-        if axis in position:
-            return position[axis]
-        else:
-            return 0
+        return position[axis] if axis in position else 0
 
     t = (
         xx + deltaOrZero("TRXX"),
@@ -1339,10 +1347,51 @@ def _build_font(names, position):
     return fb
 
 
-def main():
-    assert len(sys.argv) == 2
-    build_dir = Path(sys.argv[1])
+def main(args=None):
+
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--build-static",
+        help="Build static test font.",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="More verbose output, repeat option for higher verbosity.",
+        action="count",
+        default=0,
+    )
+    parser.add_argument(
+        "build_dir",
+        type=str,
+        default="",
+        help="Output directory",
+        nargs=1,
+        metavar="BUILD_DIR",
+    )
+    options = parser.parse_args(args)
+
+    if not options.verbose:
+        level = "WARNING"
+    elif options.verbose == 1:
+        level = "INFO"
+    else:
+        level = "DEBUG"
+    logging.basicConfig(level=level, format="%(message)s")
+
+    build_dir = Path(options.build_dir[0]) or None
+    if not build_dir:
+        parser.error("No output directory specified.")
     build_dir.mkdir(exist_ok=True)
+
+    logger.info(f"Output directory: {build_dir}")
+
+    build_static = options.build_static
 
     script_name = Path(__file__).name
     out_file = (build_dir / script_name).with_suffix(".ttf")
@@ -1457,13 +1506,15 @@ def main():
     for transform_scalar in transform_matrix:
         axis_defs.append(
             dict(
-                tag=f"TR{coord.upper()}",
+                tag=f"TR{transform_scalar.upper()}",
                 name=f"Transform scalars, {transform_scalar}",
-                minimum=-2,
+                minimum=-2 if not "d" in transform_scalar else -500,
                 default=0,
-                maximum=2,
+                maximum=2 if not "d" in transform_scalar else 500,
             )
         )
+
+    logger.debug(json.dumps(axis_defs))
 
     # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
     all_default_positions = {}
@@ -1476,45 +1527,42 @@ def main():
     # Start with the master of all default positions.
     variation_positions = [all_default_positions]
 
-    designspace.addSourceDescriptor(
-        name="All Default",
-        location=all_default_locations,
-        font=_build_font(names, all_default_positions).font,
-    )
+    default_font_builder = _build_font(names, all_default_positions)
 
-    # Append the minimum and maximum for each axis as masters, if differing from default.
-    for change_axis in axis_defs:
-        for change_key in ["minimum", "maximum"]:
-            axis_value = change_axis[change_key]
-            if axis_value == change_axis["default"]:
-                continue
-            position_dict = all_default_positions.copy()
-            position_dict[change_axis["tag"]] = axis_value
-            location_dict = all_default_locations.copy()
-            location_dict[change_axis["name"]] = axis_value
-            master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
-            designspace.addSourceDescriptor(
-                name=master_name,
-                location=location_dict,
-                font=_build_font(names, position_dict).font,
-            )
+    if build_static:
+        default_font_builder.save(out_file)
+        logger.info(f"Static font {out_file} written.")
+    else:
+        designspace.addSourceDescriptor(
+            name="All Default",
+            location=all_default_locations,
+            font=default_font_builder.font,
+        )
 
-    # Optionally add named instances
-    # designspace.addInstanceDescriptor(
-    #     styleName="Regular",
-    #     location={"Weight": 400, "Width": 100},
-    # )
+        # Append the minimum and maximum for each axis as masters, if differing from default.
+        for change_axis in axis_defs:
+            for change_key in ["minimum", "maximum"]:
+                axis_value = change_axis[change_key]
+                if axis_value == change_axis["default"]:
+                    continue
+                position_dict = all_default_positions.copy()
+                position_dict[change_axis["tag"]] = axis_value
+                location_dict = all_default_locations.copy()
+                location_dict[change_axis["name"]] = axis_value
+                master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
+                designspace.addSourceDescriptor(
+                    name=master_name,
+                    location=location_dict,
+                    font=_build_font(names, position_dict).font,
+                )
 
-    print(designspace.tostring().decode())
-
-    # Build the variable font.
-    # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
-    vf = varLib.build(
-        designspace,
-    )[0]
-
-    vf.save(out_file)
-    print(f"Wrote {out_file}")
+        # Build the variable font.
+        # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
+        vf = varLib.build(
+            designspace,
+        )[0]
+        vf.save(out_file)
+        logger.info(f"Variable font {out_file} written.")
 
 
 if __name__ == "__main__":
