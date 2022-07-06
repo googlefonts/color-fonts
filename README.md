@@ -48,22 +48,10 @@ functionality. `noto_flags-picosvgz.ttf` contains only the flag glyphs part of
 the Noto emoji set, the font is an OT-SVG font where SVG source images went
 through picosvg for optimization and flattening.
 
-## Early preview of Variable COLRv1 examples
+## Variable COLRv1 examples
 
-This branch
-[`variableCOLRv1Preview`](https://github.com/googlefonts/color-fonts/tree/variableCOLRv1Preview)
-contains very experimental and so far unreviewed examples of variable aspects of
-COLRv1 for PaintVarRotate, variable color stops with PaintVarLinearGradient and
-PaintVarRadialGradient as well as end angle variation for
-PaintVarSweepGradient. I am sharing this with the intention of sharing early
-access to variable COLRv1 for aiding development of COLRv1 implementations.
-
-| Glyph id | Codepoint | Description                                                                                                                                 |
-|----------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| 21-24    | t-w       | PaintVarRotate example, varying total angle deltas depending on glyph, maximum of 359.989013671875, ROTA axis, the orange cross is rotating |
-| 15-20    | n-s       | Variable color stops, COL1-COLR axes, color stops can be varied -2 to 2, truncation and overflow may need to be discussed                   |
-| 58-80    | α-ρ       | PaintVarSweepGradient, end angle, SWEP axis                                                                                                 |
-
+The font `fonts/more_samples-glyf_colr_1.ttf` in this repository contains tests
+of variable aspects of COLRv1. Please see the descriptions of [test glyphs here](glyph_descriptions.md).
 
 ### Building the variable COLRv1 font
 
@@ -71,21 +59,12 @@ A binary of the variable COLRv1 example font is available in the
 `fonts/more_samples-glyf_colr_1.ttf` file in this branch. If you want to build
 the font yourself, follow these steps:
 
-1. In the checkout of this color-fonts repository, make a virtual environment using python venv.
-2. Clone https://github.com/fonttools/fonttools/ to a separate directory
-3. Check out branch `wip-variable-colr` in the checkout in 2
-4. Run `$ pip install -e .` in the fonttools directory from 2, while staying in the virtual environment created in 1.
-5. Change back to the color-fonts directory and run `$ ./build.py config/more_samples-glyf_colr_1.py`
+Run
+`$ ./build.py config/more_samples-glyf_colr_1.py`
 
-To check whether a variable COLRv1 font was built, run
+To verify that a variable COLRv1 font was built, run
 `$ ttx -tCOLR -o- fonts/more_samples-glyf_colr_1.ttf | grep VarStore`
 which should show a `<VarStore Format="1">` line.
-
-### Limitations
-
-Currently, the variable COLRv1 font will always use a DeltaSetIndex map and not
-use direct outer or inner indices into the VarStore.  The VarStore is not fully
-space-optimized at this point.
 
 ## References
 

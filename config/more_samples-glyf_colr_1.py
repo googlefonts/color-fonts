@@ -49,6 +49,8 @@ class SampleGlyph(NamedTuple):
     accessor: str
     advance: int
     glyph: Glyph
+    description: Optional[str] = None
+    axes_effect: Optional[str] = None
     clip_box: Optional[Tuple[float, float, float, float]] = None
     colr: Optional[Mapping[str, Any]] = None
     colrv0: Optional[Mapping[str, List[Tuple[str, int]]]] = None
@@ -127,6 +129,8 @@ def _sample_sweep(
         glyph=_upem_box_pen().glyph(),
         clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
+        description="Tests `Paint(Var)SweepGradient`.",
+        axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle.",
     )
 
 
@@ -197,6 +201,8 @@ def _lin_rad_solid_alpha(position, accessor):
         glyph=_upem_box_pen().glyph(),
         clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
+        description="Tests variable alpha in linear gradient color stops, and in PaintVarSolid.",
+        axes_effect="`APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values.",
     )
 
 
@@ -302,6 +308,7 @@ def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
         glyph=pen.glyph(),
         clip_box=(100, 250, 900, 950),
         colr=colr,
+        description=f"Tests `PaintLinearGradient` repeat modes for color stops {first_stop}, {second_stop}.",
     )
 
 
@@ -414,6 +421,7 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
 
     # Can't apply deltas before as the original values are used for determining
     # which Paint format to choose.
+    description = ""
     if center_x or center_y:
         if scale_x != scale_y:
             scaled_colr = {
@@ -423,6 +431,7 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
                 "centerX": center_x,
                 "centerY": center_y,
             }
+            description = "`Paint(Var)ScaleAroundCenter`"
         else:
             scaled_colr = {
                 "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
@@ -430,6 +439,7 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
                 "centerX": center_x,
                 "centerY": center_y,
             }
+            description = "`Paint(Var)ScaleUniformAroundCenter`"
     else:
         if scale_x != scale_y:
             scaled_colr = {
@@ -437,22 +447,24 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
                 "scaleX": scale_x,
                 "scaleY": scale_y,
             }
+            description = "`Paint(Var)Scale`"
         else:
             scaled_colr = {
                 "Format": ot.PaintFormat.PaintScaleUniform,
                 "scale": scale_x,
             }
+            description = "`Paint(Var)ScaleUniform`"
 
     if "centerX" in scaled_colr:
-        scaled_colr["centerX"] += position["SCOX"]
+        scaled_colr["centerX"] += position["SCOX"] if "SCOX" in position else 0
     if "centerY" in scaled_colr:
-        scaled_colr["centerY"] += position["SCOY"]
+        scaled_colr["centerY"] += position["SCOY"] if "SCOY" in position else 0
     if "scale" in scaled_colr:
-        scaled_colr["scale"] += position["SCSX"]
+        scaled_colr["scale"] += position["SCSX"] if "SCSX" in position else 0
     if "scaleX" in scaled_colr:
-        scaled_colr["scaleX"] += position["SCSX"]
+        scaled_colr["scaleX"] += position["SCSX"] if "SCSX" in position else 0
     if "scaleY" in scaled_colr:
-        scaled_colr["scaleY"] += position["SCSY"]
+        scaled_colr["scaleY"] += position["SCSY"] if "SCSY" in position else 0
 
     scaled_colr.update(glyph_paint)
 
@@ -479,6 +491,8 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
+        description=f"Tests {description}.",
+        axes_effect="`SCOX` shifts center x offset, `SCOY` shifts center Y offfset, `SCSX` changes x or uniform scale factor, `SCSY` changes y scale factor.",
     )
 
 
@@ -493,6 +507,12 @@ def _extend_modes(gradient_format, extend_mode, position, accessor_char):
         return None
 
     selected_format = format_map[gradient_format]
+
+    description = (
+        "`Paint(Var)LinearGradient`"
+        if gradient_format == "linear"
+        else "`Paint(Var)RadialGradient`"
+    )
 
     extend_mode_map = {
         "reflect": ot.ExtendMode.REFLECT,
@@ -561,6 +581,8 @@ def _extend_modes(gradient_format, extend_mode, position, accessor_char):
         advance=_UPEM,
         clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
+        description=f"Tests {description} with variable gradient coordinates or variable color lines.",
+        axes_effect="`GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops.",
     )
 
 
@@ -584,6 +606,7 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
         },
     }
 
+    description = ""
     if center_x or center_y:
         rotated_colr = {
             "Format": ot.PaintFormat.PaintRotateAroundCenter,
@@ -591,8 +614,12 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
             "centerY": center_y,
             "angle": rotate_angle,
         }
+        description = (
+            f"`Paint(Var)RotateAroundCenter` with center at ({center_x}, {center_y})."
+        )
     else:
         rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": rotate_angle}
+        description = "`Paint(Var)Rotate`"
 
     rotated_colr.update(glyph_paint)
 
@@ -619,6 +646,8 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
+        description=f"Tests {description}.",
+        axes_effect="`ROTA`: changes rotation angle.",
     )
 
 
@@ -677,6 +706,7 @@ def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
+        description="Tests `PaintSkew*` for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}.",
     )
 
 
@@ -733,6 +763,8 @@ def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
         accessor=accessor,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
+        description="Tests `Paint(Var)Transform`.",
+        axes_effect="`TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates.",
     )
 
 
@@ -885,6 +917,7 @@ def _composite(composite_mode, accessor_char):
         glyph=_upem_box_pen().glyph(),
         clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
+        description=f"Tests `PaintComposite` for mode {composite_mode}.",
     )
 
 
@@ -1347,6 +1380,35 @@ def _build_font(names, position):
     return fb
 
 
+def build_descriptions_(font):
+    glyphs = _get_glyph_definitions({})
+    reverse_glyph_map = font.getReverseGlyphMap()
+
+    def find_description(glyph_name):
+        for glyph in glyphs:
+            if glyph.glyph_name == glyph_name:
+                return (glyph.description, glyph.axes_effect, glyph.accessor)
+
+    description_map = {}
+    for glyph_name, glyph_id in reverse_glyph_map.items():
+        description_effect = find_description(glyph_name)
+        description_map[glyph_name] = {
+            "glyph_id": glyph_id,
+            "character": description_effect[2],
+            "description": description_effect[0],
+            "axes_effect": description_effect[1],
+        }
+    with open("glyph_descriptions.md", "w", encoding="utf-8") as md_file:
+        md_file.write(
+            "| Id | Char | Glyph name | Description | Variable Axes effect |\n"
+        )
+        md_file.write("|-|-|-|-|-|\n")
+        for glyph_name, glyph in description_map.items():
+            md_file.write(
+                f'| {glyph["glyph_id"]} | {glyph["character"]} | `{glyph_name}` | {glyph["description"]} | {glyph["axes_effect"]} |\n'
+            )
+
+
 def main(args=None):
 
     parser = argparse.ArgumentParser(
@@ -1365,6 +1427,12 @@ def main(args=None):
         help="More verbose output, repeat option for higher verbosity.",
         action="count",
         default=0,
+    )
+    parser.add_argument(
+        "--generate-descriptions",
+        help="Generate Markdown glyph descriptions.",
+        action="store_true",
+        default=False,
     )
     parser.add_argument(
         "build_dir",
@@ -1392,6 +1460,7 @@ def main(args=None):
     logger.info(f"Output directory: {build_dir}")
 
     build_static = options.build_static
+    generate_descriptions = options.generate_descriptions
 
     script_name = Path(__file__).name
     out_file = (build_dir / script_name).with_suffix(".ttf")
@@ -1528,6 +1597,10 @@ def main(args=None):
     variation_positions = [all_default_positions]
 
     default_font_builder = _build_font(names, all_default_positions)
+
+    if generate_descriptions:
+        logger.info("Building descriptions.")
+        build_descriptions_(default_font_builder.font)
 
     if build_static:
         default_font_builder.save(out_file)
