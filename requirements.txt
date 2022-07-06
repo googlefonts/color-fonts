@@ -1,5 +1,6 @@
 nanoemoji >= 0.12.2  # we need latest spec support
 Brotli>=1.0.9  # for compare sizes
+fonttools >= 4.34.0 # COLRv1 variations support needed for building test font
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
