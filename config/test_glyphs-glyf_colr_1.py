@@ -592,6 +592,9 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
     color_orange = _cpal("orange", 0.7)
 
     angle_addition = position["ROTA"] if "ROTA" in position else 0
+    x_addition = position["ROTX"] if "ROTX" in position else 0
+    y_addition = position["ROTY"] if "ROTY" in position else 0
+
     rotate_angle = min(angle + angle_addition, _MAX_F2DOT14_ANGLE)
 
     glyph_paint = {
@@ -610,8 +613,8 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
     if center_x or center_y:
         rotated_colr = {
             "Format": ot.PaintFormat.PaintRotateAroundCenter,
-            "centerX": center_x,
-            "centerY": center_y,
+            "centerX": center_x + x_addition,
+            "centerY": center_y + y_addition,
             "angle": rotate_angle,
         }
         description = (
@@ -647,7 +650,7 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
         glyph=_upem_box_pen().glyph(),
         colr=colr,
         description=f"Tests {description}.",
-        axes_effect="`ROTA`: changes rotation angle.",
+        axes_effect="`ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y.",
     )
 
 
@@ -1488,6 +1491,20 @@ def main(args=None):
             minimum=0,
             default=0,
             maximum=_MAX_F2DOT14_ANGLE,
+        ),
+        dict(
+            tag="ROTX",
+            name="Var Rotate Center X Offset",
+            minimum=-500,
+            default=0,
+            maximum=500,
+        ),
+        dict(
+            tag="ROTY",
+            name="Var Rotate Center Y Offset",
+            minimum=-500,
+            default=0,
+            maximum=500,
         ),
         dict(
             tag="COL1",

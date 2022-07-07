@@ -21,10 +21,10 @@
 | 18 | 󰀐 | U+F0010 | `radial_gradient_extend_mode_pad` | Tests `Paint(Var)RadialGradient` with variable gradient coordinates or variable color lines. | `GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops. |
 | 19 | 󰀑 | U+F0011 | `radial_gradient_extend_mode_repeat` | Tests `Paint(Var)RadialGradient` with variable gradient coordinates or variable color lines. | `GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops. |
 | 20 | 󰀒 | U+F0012 | `radial_gradient_extend_mode_reflect` | Tests `Paint(Var)RadialGradient` with variable gradient coordinates or variable color lines. | `GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops. |
-| 21 | 󰀓 | U+F0013 | `rotate_10_center_0_0` | Tests `Paint(Var)Rotate`. | `ROTA`: changes rotation angle. |
-| 22 | 󰀔 | U+F0014 | `rotate_-10_center_1000_1000` | Tests `Paint(Var)RotateAroundCenter` with center at (1000, 1000).. | `ROTA`: changes rotation angle. |
-| 23 | 󰀕 | U+F0015 | `rotate_25_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle. |
-| 24 | 󰀖 | U+F0016 | `rotate_-15_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle. |
+| 21 | 󰀓 | U+F0013 | `rotate_10_center_0_0` | Tests `Paint(Var)Rotate`. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 22 | 󰀔 | U+F0014 | `rotate_-10_center_1000_1000` | Tests `Paint(Var)RotateAroundCenter` with center at (1000, 1000).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 23 | 󰀕 | U+F0015 | `rotate_25_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 24 | 󰀖 | U+F0016 | `rotate_-15_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
 | 25 | 󰀗 | U+F0017 | `skew_25_0_center_0_0` | Tests `PaintSkew*` for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}. | None |
 | 26 | 󰀘 | U+F0018 | `skew_25_0_center_500.0_500.0` | Tests `PaintSkew*` for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}. | None |
 | 27 | 󰀙 | U+F0019 | `skew_0_15_center_0_0` | Tests `PaintSkew*` for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}. | None |
