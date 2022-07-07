@@ -5,7 +5,7 @@ PaintSweepGradient tests.
 """
 
 import datetime
-from pathlib import Path
+from pathlib import Path, PurePath
 from fontTools import designspaceLib
 from fontTools import fontBuilder
 from fontTools import ttLib
@@ -1416,12 +1416,6 @@ def main(args=None):
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--build-static",
-        help="Build static test font.",
-        action="store_true",
-        default=False,
-    )
-    parser.add_argument(
         "-v",
         "--verbose",
         help="More verbose output, repeat option for higher verbosity.",
@@ -1459,11 +1453,7 @@ def main(args=None):
 
     logger.info(f"Output directory: {build_dir}")
 
-    build_static = options.build_static
     generate_descriptions = options.generate_descriptions
-
-    script_name = Path(__file__).name
-    out_file = (build_dir / script_name).with_suffix(".ttf")
 
     version = datetime.datetime.now().isoformat()
     names = {
@@ -1602,40 +1592,44 @@ def main(args=None):
         logger.info("Building descriptions.")
         build_descriptions_(default_font_builder.font)
 
-    if build_static:
-        default_font_builder.save(out_file)
-        logger.info(f"Static font {out_file} written.")
-    else:
-        designspace.addSourceDescriptor(
-            name="All Default",
-            location=all_default_locations,
-            font=default_font_builder.font,
-        )
+    script_name = Path(__file__).name
+    variable_name = PurePath(__file__).stem + "_variable"
+    static_out_file = (build_dir / script_name).with_suffix(".ttf")
+    variable_out_file = (build_dir / variable_name).with_suffix(".ttf")
 
-        # Append the minimum and maximum for each axis as masters, if differing from default.
-        for change_axis in axis_defs:
-            for change_key in ["minimum", "maximum"]:
-                axis_value = change_axis[change_key]
-                if axis_value == change_axis["default"]:
-                    continue
-                position_dict = all_default_positions.copy()
-                position_dict[change_axis["tag"]] = axis_value
-                location_dict = all_default_locations.copy()
-                location_dict[change_axis["name"]] = axis_value
-                master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
-                designspace.addSourceDescriptor(
-                    name=master_name,
-                    location=location_dict,
-                    font=_build_font(names, position_dict).font,
-                )
+    default_font_builder.save(static_out_file)
+    logger.info(f"Static font {static_out_file} written.")
 
-        # Build the variable font.
-        # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
-        vf = varLib.build(
-            designspace,
-        )[0]
-        vf.save(out_file)
-        logger.info(f"Variable font {out_file} written.")
+    designspace.addSourceDescriptor(
+        name="All Default",
+        location=all_default_locations,
+        font=default_font_builder.font,
+    )
+
+    # Append the minimum and maximum for each axis as masters, if differing from default.
+    for change_axis in axis_defs:
+        for change_key in ["minimum", "maximum"]:
+            axis_value = change_axis[change_key]
+            if axis_value == change_axis["default"]:
+                continue
+            position_dict = all_default_positions.copy()
+            position_dict[change_axis["tag"]] = axis_value
+            location_dict = all_default_locations.copy()
+            location_dict[change_axis["name"]] = axis_value
+            master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
+            designspace.addSourceDescriptor(
+                name=master_name,
+                location=location_dict,
+                font=_build_font(names, position_dict).font,
+            )
+
+    # Build the variable font.
+    # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
+    vf = varLib.build(
+        designspace,
+    )[0]
+    vf.save(variable_out_file)
+    logger.info(f"Variable font {variable_out_file} written.")
 
 
 if __name__ == "__main__":
