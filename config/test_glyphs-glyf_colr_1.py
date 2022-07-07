@@ -63,6 +63,10 @@ def _cpal(color_str, alpha=1.0):
     return (_PALETTE[color], alpha)
 
 
+def _deltaOrZero(axis: str, position: dict):
+    return position.get(axis, 0)
+
+
 def _sample_sweep(
     start_angle, end_angle, extend_mode_arg, color_line_range, position, accessor
 ):
@@ -98,8 +102,8 @@ def _sample_sweep(
 
     glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
 
-    start_angle_addition = position["SWPS"] if "SWPS" in position else 0
-    end_angle_addition = position["SWPE"] if "SWPE" in position else 0
+    start_angle_addition = _deltaOrZero("SWPS", position)
+    end_angle_addition = _deltaOrZero("SWPE", position)
     end_angle = max(
         min(end_angle + end_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE
     )
@@ -140,12 +144,9 @@ def _lin_rad_solid_alpha(position, accessor):
     solid_alpha = 1
     gradient_alphas = [1, 1]
 
-    if "APH1" in position:
-        solid_alpha += position["APH1"]
-    if "APH2" in position:
-        gradient_alphas[0] += position["APH2"]
-    if "APH3" in position:
-        gradient_alphas[1] += position["APH3"]
+    solid_alpha += _deltaOrZero("APH1", position)
+    gradient_alphas[0] += _deltaOrZero("APH2", position)
+    gradient_alphas[1] += _deltaOrZero("APH3", position)
 
     color_solid = _cpal("green", solid_alpha)
 
@@ -456,15 +457,15 @@ def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
             description = "`Paint(Var)ScaleUniform`"
 
     if "centerX" in scaled_colr:
-        scaled_colr["centerX"] += position["SCOX"] if "SCOX" in position else 0
+        scaled_colr["centerX"] += _deltaOrZero("SCOX", position)
     if "centerY" in scaled_colr:
-        scaled_colr["centerY"] += position["SCOY"] if "SCOY" in position else 0
+        scaled_colr["centerY"] += _deltaOrZero("SCOY", position)
     if "scale" in scaled_colr:
-        scaled_colr["scale"] += position["SCSX"] if "SCSX" in position else 0
+        scaled_colr["scale"] += _deltaOrZero("SCSX", position)
     if "scaleX" in scaled_colr:
-        scaled_colr["scaleX"] += position["SCSX"] if "SCSX" in position else 0
+        scaled_colr["scaleX"] += _deltaOrZero("SCSX", position)
     if "scaleY" in scaled_colr:
-        scaled_colr["scaleY"] += position["SCSY"] if "SCSY" in position else 0
+        scaled_colr["scaleY"] += _deltaOrZero("SCSY", position)
 
     scaled_colr.update(glyph_paint)
 
@@ -547,15 +548,13 @@ def _extend_modes(gradient_format, extend_mode, position, accessor_char):
     color_stop_positions = [0.0, 0.5, 1.0]
     for i in range(0, 3):
         axis = f"COL{i+1}"
-        if axis in position:
-            color_stop_positions[i] += position[axis]
+        color_stop_positions[i] += _deltaOrZero(axis, position)
 
     # Gradient coordinates variations.
     coordinates = coordinates[selected_format]
     for key in coordinates.keys():
-        axis_name = f"GR{key.upper()}"
-        if axis_name in position:
-            coordinates[key] += position[axis_name]
+        axis = f"GR{key.upper()}"
+        coordinates[key] += _deltaOrZero(axis, position)
 
     colr = {
         "Format": ot.PaintFormat.PaintGlyph,
@@ -591,9 +590,9 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
 
     color_orange = _cpal("orange", 0.7)
 
-    angle_addition = position["ROTA"] if "ROTA" in position else 0
-    x_addition = position["ROTX"] if "ROTX" in position else 0
-    y_addition = position["ROTY"] if "ROTY" in position else 0
+    angle_addition = _deltaOrZero("ROTA", position)
+    x_addition = _deltaOrZero("ROTX", position)
+    y_addition = _deltaOrZero("ROTY", position)
 
     rotate_angle = min(angle + angle_addition, _MAX_F2DOT14_ANGLE)
 
@@ -716,16 +715,13 @@ def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
 def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
     glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
 
-    def deltaOrZero(axis):
-        return position[axis] if axis in position else 0
-
     t = (
-        xx + deltaOrZero("TRXX"),
-        xy + deltaOrZero("TRXY"),
-        yx + deltaOrZero("TRYX"),
-        yy + deltaOrZero("TRYY"),
-        dx + deltaOrZero("TRDX"),
-        dy + deltaOrZero("TRDY"),
+        xx + _deltaOrZero("TRXX", position),
+        xy + _deltaOrZero("TRXY", position),
+        yx + _deltaOrZero("TRYX", position),
+        yy + _deltaOrZero("TRYY", position),
+        dx + _deltaOrZero("TRDX", position),
+        dy + _deltaOrZero("TRDY", position),
     )
     color_orange = _cpal("orange", 0.7)
 
@@ -774,11 +770,8 @@ def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
 def _paint_translate(dx, dy, position, accessor):
     glyph_name = f"translate_{dx}_{dy}"
 
-    def deltaOrZero(axis):
-        return position[axis] if axis in position else 0
-
-    dx += deltaOrZero("TLDX")
-    dy += deltaOrZero("TLDY")
+    dx += _deltaOrZero("TLDX", position)
+    dy += _deltaOrZero("TLDY", position)
 
     color_orange = _cpal("orange", 0.7)
 
