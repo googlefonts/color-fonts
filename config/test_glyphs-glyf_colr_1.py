@@ -771,6 +771,60 @@ def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
     )
 
 
+def _paint_translate(dx, dy, position, accessor):
+    glyph_name = f"translate_{dx}_{dy}"
+
+    def deltaOrZero(axis):
+        return position[axis] if axis in position else 0
+
+    dx += deltaOrZero("TLDX")
+    dy += deltaOrZero("TLDY")
+
+    color_orange = _cpal("orange", 0.7)
+
+    transformed_colr = {
+        "Format": ot.PaintFormat.PaintTranslate,
+        "Paint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_orange[0],
+                "Alpha": color_orange[1],
+            },
+        },
+        "dx": dx,
+        "dy": dy,
+    }
+
+    color_blue = _cpal("blue", 0.5)
+
+    colr = {
+        "Format": ot.PaintFormat.PaintComposite,
+        "CompositeMode": "DEST_OVER",
+        "SourcePaint": transformed_colr,
+        "BackdropPaint": {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": _CROSS_GLYPH,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": color_blue[0],
+                "Alpha": color_blue[1],
+            },
+        },
+    }
+
+    return SampleGlyph(
+        glyph_name=glyph_name,
+        advance=_UPEM,
+        accessor=accessor,
+        glyph=_upem_box_pen().glyph(),
+        colr=colr,
+        description="Tests `Paint(Var)Translate`.",
+        axes_effect="`TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate.",
+    )
+
+
 clip_position_map = {
     "top_left": (0, _UPEM / 2, _UPEM / 2, _UPEM),
     "bottom_left": (0, 0, _UPEM / 2, _UPEM / 2),
@@ -1264,6 +1318,13 @@ def _get_glyph_definitions(position):
         _paint_transform(
             1.0, 0.0, 0.6, 1.0, -300.0, 0.0, position, next(access_chars)
         ),  # y-shear around center pivot point
+        _paint_translate(0, 0, position, next(access_chars)),
+        _paint_translate(0, 100, position, next(access_chars)),
+        _paint_translate(0, -100, position, next(access_chars)),
+        _paint_translate(100, 0, position, next(access_chars)),
+        _paint_translate(-100, 0, position, next(access_chars)),
+        _paint_translate(200, 200, position, next(access_chars)),
+        _paint_translate(-200, -200, position, next(access_chars)),
         _clip_box("top_left", next(access_chars)),
         _clip_box("bottom_left", next(access_chars)),
         _clip_box("bottom_right", next(access_chars)),
@@ -1563,6 +1624,20 @@ def main(args=None):
         ),
         dict(
             tag="APH3", name="Alpha axis, ColorStop 1", minimum=-1, default=0, maximum=0
+        ),
+        dict(
+            tag="TLDX",
+            name="Var Translate dx Offset",
+            minimum=-500,
+            default=0,
+            maximum=500,
+        ),
+        dict(
+            tag="TLDY",
+            name="Var Translate dy Offset",
+            minimum=-500,
+            default=0,
+            maximum=500,
         ),
     ]
 
