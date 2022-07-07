@@ -653,7 +653,9 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
     )
 
 
-def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
+def _paint_skew(
+    x_skew_angle, y_skew_angle, center_x, center_y, position, accessor_char
+):
     glyph_name = f"skew_{x_skew_angle}_{y_skew_angle}_center_{center_x}_{center_y}"
 
     color_orange = _cpal("orange", 0.7)
@@ -671,17 +673,19 @@ def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
     }
 
     skewed_colr = {
-        "xSkewAngle": x_skew_angle,
-        "ySkewAngle": y_skew_angle,
+        "xSkewAngle": x_skew_angle + _deltaOrZero("SKXA", position),
+        "ySkewAngle": y_skew_angle + _deltaOrZero("SKYA", position),
     }
 
+    description = ""
     if center_x or center_y:
         skewed_colr["Format"] = ot.PaintFormat.PaintSkewAroundCenter
-        skewed_colr["centerX"] = center_x
-        skewed_colr["centerY"] = center_y
-
+        skewed_colr["centerX"] = center_x + _deltaOrZero("SKCX", position)
+        skewed_colr["centerY"] = center_y + _deltaOrZero("SKCY", position)
+        description = "`Paint(Var)SkewAroundCenter`"
     else:
         skewed_colr["Format"] = ot.PaintFormat.PaintSkew
+        description = "`Paint(Var)Skew`"
 
     skewed_colr = {**skewed_colr, **glyph_paint}
 
@@ -708,7 +712,8 @@ def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, accessor_char):
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
-        description="Tests `PaintSkew*` for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}.",
+        description=f"Tests {description} for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}.",
+        axes_effect="`SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively.",
     )
 
 
@@ -1297,12 +1302,12 @@ def _get_glyph_definitions(position):
         _paint_rotate(-10, _UPEM, _UPEM, position, next(access_chars)),
         _paint_rotate(25, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
         _paint_rotate(-15, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
-        _paint_skew(25, 0, 0, 0, next(access_chars)),
-        _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_skew(0, 15, 0, 0, next(access_chars)),
-        _paint_skew(0, 15, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_skew(-10, 20, _UPEM / 2, _UPEM / 2, next(access_chars)),
-        _paint_skew(-10, 20, _UPEM, _UPEM, next(access_chars)),
+        _paint_skew(25, 0, 0, 0, position, next(access_chars)),
+        _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_skew(0, 15, 0, 0, position, next(access_chars)),
+        _paint_skew(0, 15, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_skew(-10, 20, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
+        _paint_skew(-10, 20, _UPEM, _UPEM, position, next(access_chars)),
         _paint_transform(1, 0, 0, 1, 125, 125, position, next(access_chars)),
         _paint_transform(1.5, 0, 0, 1.5, 0, 0, position, next(access_chars)),
         _paint_transform(
@@ -1628,6 +1633,34 @@ def main(args=None):
         dict(
             tag="TLDY",
             name="Var Translate dy Offset",
+            minimum=-500,
+            default=0,
+            maximum=500,
+        ),
+        dict(
+            tag="SKXA",
+            name="Var Skew X Angle Offset",
+            minimum=-90,
+            default=0,
+            maximum=90,
+        ),
+        dict(
+            tag="SKYA",
+            name="Var Skew Y Angle Offset",
+            minimum=-90,
+            default=0,
+            maximum=90,
+        ),
+        dict(
+            tag="SKCX",
+            name="Var Skew Center X Offset",
+            minimum=-500,
+            default=0,
+            maximum=500,
+        ),
+        dict(
+            tag="SKCY",
+            name="Var Skew Center Y Offset",
             minimum=-500,
             default=0,
             maximum=500,
