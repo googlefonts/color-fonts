@@ -1398,7 +1398,7 @@ def build_descriptions_(font):
         md_file.write(
             "| Id | Char | U+hex | Name | Description | Variable Axes effect |\n"
         )
-        md_file.write("|-|-|-|-|-|\n")
+        md_file.write("|-|-|-|-|-|-|\n")
         for glyph_name, glyph in description_map.items():
             u_codepoint = f'U+{ord(glyph["character"]):X}' if glyph["character"] else ""
             md_file.write(
