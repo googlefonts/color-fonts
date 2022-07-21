@@ -1218,12 +1218,8 @@ def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
     palette_test_colors = _reserve_circle_colors()
 
-    access_chars_set = (
-        ascii_letters
-        + digits
-        + "".join([chr(greek_letter) for greek_letter in range(0x03B1, 0x3C9)])
-        + "".join([chr(greek_letter) for greek_letter in range(0x0391, 0x3A9)])
-    )
+    access_chars_set = [chr(pua_codepoint) for pua_codepoint in range(0xF0000, 0xFFFFD)]
+
     access_chars = iter(access_chars_set)
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
@@ -1400,12 +1396,13 @@ def build_descriptions_(font):
         }
     with open("glyph_descriptions.md", "w", encoding="utf-8") as md_file:
         md_file.write(
-            "| Id | Char | Glyph name | Description | Variable Axes effect |\n"
+            "| Id | Char | U+hex | Name | Description | Variable Axes effect |\n"
         )
         md_file.write("|-|-|-|-|-|\n")
         for glyph_name, glyph in description_map.items():
+            u_codepoint = f'U+{ord(glyph["character"]):X}' if glyph["character"] else ""
             md_file.write(
-                f'| {glyph["glyph_id"]} | {glyph["character"]} | `{glyph_name}` | {glyph["description"]} | {glyph["axes_effect"]} |\n'
+                f'| {glyph["glyph_id"]} | {glyph["character"]} | {u_codepoint} | `{glyph_name}` | {glyph["description"]} | {glyph["axes_effect"]} |\n'
             )
 
 
