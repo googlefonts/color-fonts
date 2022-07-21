@@ -1,5 +1,5 @@
 | Id | Char | U+hex | Name | Description | Variable Axes effect |
-|-|-|-|-|-|
+|-|-|-|-|-|-|
 | 0 |  |  | `.notdef` | None | None |
 | 1 |  |  | `.null` | None | None |
 | 2 | 󰀀 | U+F0000 | `sweep_-360_0_pad_narrow` | Tests `Paint(Var)SweepGradient`. | `SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle. |
