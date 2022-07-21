@@ -1,6 +1,6 @@
-"""Generate a test font consisting of samples that provide wide coverage for
-COLRv1 Paint* tables, including PaintVar* tables, including such samples that
-are impossible to generate from SVG at this point, for example
+"""Generate two test fonts consisting of samples that provide wide coverage for
+static and variable COLRv1 Paint* tables respectively, including such samples
+that are impossible to generate from SVG at this point, for example
 PaintSweepGradient tests.
 """
 
@@ -29,7 +29,7 @@ import logging
 _UPEM = 1000
 _ASCENT = 950
 _DESCENT = 250
-_FAMILY = "More COLR v1 Samples"
+_FAMILY = "COLRv1 {family_suffix_var_static} Test Glyphs"
 _STYLE = "Regular"
 _PALETTE = {}  # <3 mutable globals
 _MAX_F2DOT14 = 2 - 1 / (2**14)
@@ -1406,6 +1406,19 @@ def build_descriptions_(font):
             )
 
 
+def _make_names(static_variable_suffix):
+    family = _FAMILY.format(family_suffix_var_static=static_variable_suffix)
+    version = datetime.datetime.now().isoformat()
+    return {
+        "familyName": family,
+        "styleName": _STYLE,
+        "uniqueFontIdentifier": " ".join((family, version)),
+        "fullName": " ".join((family, _STYLE)),
+        "version": version,
+        "psName": "-".join((family.replace(" ", ""), _STYLE)),
+    }
+
+
 def main(args=None):
 
     parser = argparse.ArgumentParser(
@@ -1451,16 +1464,6 @@ def main(args=None):
     logger.info(f"Output directory: {build_dir}")
 
     generate_descriptions = options.generate_descriptions
-
-    version = datetime.datetime.now().isoformat()
-    names = {
-        "familyName": _FAMILY,
-        "styleName": _STYLE,
-        "uniqueFontIdentifier": " ".join((_FAMILY, version)),
-        "fullName": " ".join((_FAMILY, _STYLE)),
-        "version": version,
-        "psName": "-".join((_FAMILY.replace(" ", ""), _STYLE)),
-    }
 
     designspace = designspaceLib.DesignSpaceDocument()
 
@@ -1583,24 +1586,27 @@ def main(args=None):
     # Start with the master of all default positions.
     variation_positions = [all_default_positions]
 
-    default_font_builder = _build_font(names, all_default_positions)
+    static_font_builder = _build_font(_make_names("Static"), all_default_positions)
 
     if generate_descriptions:
         logger.info("Building descriptions.")
-        build_descriptions_(default_font_builder.font)
+        build_descriptions_(static_font_builder.font)
 
     script_name = Path(__file__).name
     variable_name = PurePath(__file__).stem + "_variable"
     static_out_file = (build_dir / script_name).with_suffix(".ttf")
     variable_out_file = (build_dir / variable_name).with_suffix(".ttf")
 
-    default_font_builder.save(static_out_file)
+    static_font_builder.save(static_out_file)
     logger.info(f"Static font {static_out_file} written.")
+
+    variable_names = _make_names("Variable")
+    default_variable_builder = _build_font(variable_names, all_default_positions)
 
     designspace.addSourceDescriptor(
         name="All Default",
         location=all_default_locations,
-        font=default_font_builder.font,
+        font=default_variable_builder.font,
     )
 
     # Append the minimum and maximum for each axis as masters, if differing from default.
@@ -1617,7 +1623,7 @@ def main(args=None):
             designspace.addSourceDescriptor(
                 name=master_name,
                 location=location_dict,
-                font=_build_font(names, position_dict).font,
+                font=_build_font(variable_names, position_dict).font,
             )
 
     # Build the variable font.
