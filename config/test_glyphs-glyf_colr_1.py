@@ -966,13 +966,13 @@ def _composite(composite_mode, accessor_char):
     }
 
     return SampleGlyph(
-        glyph_name=f"composite_{composite_mode}",
+        glyph_name=f"composite_{composite_mode.name}",
         accessor=accessor_char,
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         clip_box=(0, 0, _UPEM, _UPEM),
         colr=colr,
-        description=f"Tests `PaintComposite` for mode {composite_mode}.",
+        description=f"Tests `PaintComposite` for mode {composite_mode.name}.",
     )
 
 
@@ -1328,13 +1328,10 @@ def _get_glyph_definitions(position):
         _clip_box("bottom_right", next(access_chars)),
         _clip_box("top_right", next(access_chars)),
         _clip_box("center", next(access_chars)),
-        _composite("DEST_OVER", next(access_chars)),
-        _composite("XOR", next(access_chars)),
-        _composite("OVERLAY", next(access_chars)),
-        _composite("SRC_IN", next(access_chars)),
-        _composite("PLUS", next(access_chars)),
-        _composite("LIGHTEN", next(access_chars)),
-        _composite("MULTIPLY", next(access_chars)),
+        *[
+            _composite(mode, next(access_chars))
+            for mode in ttLib.tables.otTables.CompositeMode
+        ],
         _foreground_color("linear", 1, next(access_chars)),
         _foreground_color("radial", 1, next(access_chars)),
         _foreground_color("sweep", 1, next(access_chars)),
