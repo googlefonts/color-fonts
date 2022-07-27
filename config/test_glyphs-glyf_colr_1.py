@@ -5,6 +5,7 @@ PaintSweepGradient tests.
 """
 
 import datetime
+from abc import *
 from pathlib import Path, PurePath
 from fontTools import designspaceLib
 from fontTools import fontBuilder
@@ -22,6 +23,7 @@ from nanoemoji.colors import css_colors, Color
 from fontTools.misc.transform import Transform
 from string import ascii_letters, digits
 from math import sqrt
+import itertools
 import json
 import argparse
 import logging
@@ -65,6 +67,43 @@ def _cpal(color_str, alpha=1.0):
 
 def _deltaOrZero(axis: str, position: dict):
     return position.get(axis, 0)
+
+
+class TestCategory(ABC):
+    def __init__(self, range_start, range_end):
+        # Used for backwards-compatibility, subclasses should add glyphs here when they are redefined or replaced with a
+        # different meaning.
+        self.burned_codepoint_offsets = []
+        self.range_start = range_start
+        self.range_end = range_end
+        self.test_parameters = self._get_test_parameters()
+
+    @abstractmethod
+    def get_name(self) -> str:
+        return ""
+
+    def make_test_glyphs(self, position) -> list[SampleGlyph]:
+        for accessor, param_set in zip(
+            self._get_accessors(), self._get_test_parameters()
+        ):
+            yield self._make_test_glyph(param_set, position, accessor)
+
+    def get_test_count(self) -> int:
+        return len(self._get_test_parameters())
+
+    @abstractmethod
+    def _make_test_glyph(self, param_set, position, accessor) -> SampleGlyph:
+        pass
+
+    @abstractmethod
+    def _get_test_parameters(self):
+        return []
+
+    def _get_accessors(self):
+        accessors = set(range(0, self.range_end - self.range_start)).difference(
+            self.burned_codepoint_offsets
+        )
+        return [chr(acc + self.range_start) for acc in list(accessors)]
 
 
 def _sample_sweep(
