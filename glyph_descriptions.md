@@ -114,16 +114,16 @@
 | 111 | 󱄄 | U+F1104 | `circle_r250` | None | None |
 | 112 | 󱄅 | U+F1105 | `circle_r300` | None | None |
 | 113 | 󱄆 | U+F1106 | `circle_r350` | None | None |
-| 114 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
-| 115 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
-| 116 | 󰀂 | U+F0002 | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
+| 114 | 󱈀 | U+F1200 | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
+| 115 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
+| 116 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
 | 117 | + | U+2B | `cross_glyph` | None | None |
 | 118 | ▀ | U+2580 | `upem_box_glyph` | None | None |
-| 119 | 󰀃 | U+F0003 | `clip_shade_center` | None | None |
-| 120 | 󰀄 | U+F0004 | `clip_shade_top_left` | None | None |
-| 121 | 󰀅 | U+F0005 | `clip_shade_bottom_left` | None | None |
-| 122 | 󰀆 | U+F0006 | `clip_shade_bottom_right` | None | None |
-| 123 | 󰀇 | U+F0007 | `clip_shade_top_right` | None | None |
-| 124 | 󰀈 | U+F0008 | `inset_clipped_radial_reflect` | None | None |
-| 125 | 󰀉 | U+F0009 | `one` | None | None |
-| 126 | 󰀊 | U+F000A | `zero` | None | None |
+| 119 | 󰀂 | U+F0002 | `clip_shade_center` | None | None |
+| 120 | 󰀃 | U+F0003 | `clip_shade_top_left` | None | None |
+| 121 | 󰀄 | U+F0004 | `clip_shade_bottom_left` | None | None |
+| 122 | 󰀅 | U+F0005 | `clip_shade_bottom_right` | None | None |
+| 123 | 󰀆 | U+F0006 | `clip_shade_top_right` | None | None |
+| 124 | 󰀇 | U+F0007 | `inset_clipped_radial_reflect` | None | None |
+| 125 | 󰀈 | U+F0008 | `one` | None | None |
+| 126 | 󰀉 | U+F0009 | `zero` | None | None |
