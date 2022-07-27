@@ -444,8 +444,6 @@ def _upem_box_glyph():
 def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
     glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
 
-    logger.debug(position)
-
     color_orange = _cpal("orange", 0.7)
     glyph_paint = {
         "Paint": {
