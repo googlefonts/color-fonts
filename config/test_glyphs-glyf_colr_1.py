@@ -1319,40 +1319,47 @@ class PaletteCircles(TestCategory):
             )
 
 
-def _circle_of_size(upem_radius, accessor):
-    glyph_name = f"circle_r{upem_radius}"
+class CircleContours(TestCategory):
+    def get_name(self):
+        return "circle_contours"
 
-    center_x = 500
-    center_y = 600
-    size_x = upem_radius
-    size_y = upem_radius
+    def _get_test_parameters(self):
+        return list(range(50, 400, 50))
 
-    # Drawing 4 quadrants of a circle.
-    approx = 4 * (sqrt(2) - 1) / 3
-    tt_pen = TTGlyphPen(None)
-    pen = Cu2QuPen(other_pen=tt_pen, max_err=_UPEM / 1000)
-    for direction in [(-1, 1), (1, 1), (1, -1), (-1, -1)]:
-        pen.moveTo((center_x - (direction[0] * size_x), center_y))
-        pen.curveTo(
-            (
-                center_x - direction[0] * size_x,
-                center_y - approx * direction[1] * size_y,
-            ),
-            (
-                center_x - approx * direction[0] * size_x,
-                center_y - direction[1] * size_y,
-            ),
-            (center_x, center_y - direction[1] * size_y),
+    def _make_test_glyph(self, upem_radius, position, accessor):
+        glyph_name = f"circle_r{upem_radius}"
+
+        center_x = 500
+        center_y = 600
+        size_x = upem_radius
+        size_y = upem_radius
+
+        # Drawing 4 quadrants of a circle.
+        approx = 4 * (sqrt(2) - 1) / 3
+        tt_pen = TTGlyphPen(None)
+        pen = Cu2QuPen(other_pen=tt_pen, max_err=_UPEM / 1000)
+        for direction in [(-1, 1), (1, 1), (1, -1), (-1, -1)]:
+            pen.moveTo((center_x - (direction[0] * size_x), center_y))
+            pen.curveTo(
+                (
+                    center_x - direction[0] * size_x,
+                    center_y - approx * direction[1] * size_y,
+                ),
+                (
+                    center_x - approx * direction[0] * size_x,
+                    center_y - direction[1] * size_y,
+                ),
+                (center_x, center_y - direction[1] * size_y),
+            )
+            pen.lineTo((center_x, center_y))
+            pen.closePath()
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=tt_pen.glyph(),
         )
-        pen.lineTo((center_x, center_y))
-        pen.closePath()
-
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=tt_pen.glyph(),
-    )
 
 
 def _one_glyph(accessor):
@@ -1477,6 +1484,7 @@ class TestDefinitions:
             ClipBox(0xF0E00, 0x0F0EFF),
             GradientP2Skewed(0xF0F00, 0xF0FFF),
             PaletteCircles(0xF1000, 0xF10FF),
+            CircleContours(0xF1100, 0xF11FF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1511,13 +1519,6 @@ def _get_glyph_definitions(position):
         _clip_shade_glyph("bottom_right", next(access_chars)),
         _clip_shade_glyph("top_right", next(access_chars)),
         _inset_clipped_radial_reflect(next(access_chars)),
-        _circle_of_size(50, next(access_chars)),
-        _circle_of_size(100, next(access_chars)),
-        _circle_of_size(150, next(access_chars)),
-        _circle_of_size(200, next(access_chars)),
-        _circle_of_size(250, next(access_chars)),
-        _circle_of_size(300, next(access_chars)),
-        _circle_of_size(350, next(access_chars)),
         _one_glyph(next(access_chars)),
         _zero_glyph(next(access_chars)),
     ]
