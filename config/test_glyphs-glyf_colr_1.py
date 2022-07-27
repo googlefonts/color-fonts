@@ -328,70 +328,6 @@ class VariableAlpha(TestCategory):
         )
 
 
-def _sample_colr_glyph(accessor):
-    glyph_name = "transformed_sweep"
-    # Paint the sweep shifted and rotated
-    colr = {
-        "Format": ot.PaintFormat.PaintTranslate,
-        "dx": 250,
-        "dy": 0,
-        "Paint": {
-            "Format": ot.PaintFormat.PaintRotateAroundCenter,
-            "centerX": _UPEM / 2,
-            "centerY": _UPEM / 2,
-            "angle": 60,
-            "Paint": {
-                "Format": ot.PaintFormat.PaintColrGlyph,
-                "Glyph": "sweep_-360_0_pad_narrow",
-            },
-        },
-    }
-
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        clip_box=(0, 0, _UPEM, _UPEM),
-        colr=colr,
-    )
-
-
-def _sample_composite_colr_glyph(accessor):
-    glyph_name = "composite_colr_glyph"
-    # Scale down the sweep and use it to cut a hole in the sweep
-    # Transforms combine f(g(x)); build up backwards
-    t = Transform(dx=-500, dy=-500)  # move to origin
-    t = Transform(xx=0.75, yy=0.75).transform(t)
-    t = Transform(dx=500, dy=500).transform(t)
-    t = tuple(t)
-
-    colr = {
-        "Format": ot.PaintFormat.PaintComposite,
-        "CompositeMode": "SRC_OUT",
-        "SourcePaint": {
-            "Format": ot.PaintFormat.PaintColrGlyph,
-            "Glyph": "sweep_-360_0_pad_narrow",
-        },
-        "BackdropPaint": {
-            "Format": ot.PaintFormat.PaintTransform,
-            "Paint": {
-                "Format": ot.PaintFormat.PaintColrGlyph,
-                "Glyph": "sweep_-360_0_pad_narrow",
-            },
-            "Transform": t,
-        },
-    }
-
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        advance=_UPEM,
-        accessor=accessor,
-        glyph=_upem_box_pen().glyph(),
-        colr=colr,
-    )
-
-
 class GradientP2Skewed(TestCategory):
     def get_name(self):
         return "gradient_p2_skewed"
@@ -1527,20 +1463,7 @@ def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
     _reserve_circle_colors()
 
-    access_chars_set = [chr(pua_codepoint) for pua_codepoint in range(0xF0000, 0xFFFFD)]
-
-    test_definitions = TestDefinitions()
-    all_glyphs = list(test_definitions.make_all_glyphs(position))
-    logger.info(all_glyphs)
-
-    access_chars = iter(access_chars_set)
-    glyphs = [
-        *all_glyphs,
-        _sample_colr_glyph(next(access_chars)),
-        _sample_composite_colr_glyph(next(access_chars)),
-        # Non COLR helper glyphs below here.
-    ]
-    return glyphs
+    return list(TestDefinitions().make_all_glyphs(position))
 
 
 def _build_font(names, position):
