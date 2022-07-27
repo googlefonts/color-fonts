@@ -385,48 +385,57 @@ def _sample_composite_colr_glyph(accessor):
     )
 
 
-def _gradient_p2_skewed(accessor_char):
-    glyph_name = f"gradient_p2_skewed"
+class GradientP2Skewed(TestCategory):
+    def get_name(self):
+        return "gradient_p2_skewed"
 
-    pen = TTGlyphPen(None)
-    pen.moveTo((100, 250))
-    pen.lineTo((100, 950))
-    pen.lineTo((1200, 950))
-    pen.lineTo((1200, 250))
-    pen.closePath()
+    def _get_test_parameters(self):
+        # needs dummy entry for generating one glyph
+        return [True]
 
-    colr = {
-        "Format": ot.PaintFormat.PaintGlyph,
-        "Glyph": glyph_name,
-        "Paint": {
-            "Format": ot.PaintFormat.PaintLinearGradient,
-            "ColorLine": {
-                "ColorStop": [
-                    (0, *_cpal("red")),
-                    (0.5, *_cpal("blue")),
-                    (1, *_cpal("yellow")),
-                ],
-                "Extend": ot.ExtendMode.PAD,
+    def _make_test_glyph(self, param_set, position, accessor):
+
+        glyph_name = f"gradient_p2_skewed"
+
+        pen = TTGlyphPen(None)
+        pen.moveTo((100, 250))
+        pen.lineTo((100, 950))
+        pen.lineTo((1200, 950))
+        pen.lineTo((1200, 250))
+        pen.closePath()
+
+        colr = {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": glyph_name,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintLinearGradient,
+                "ColorLine": {
+                    "ColorStop": [
+                        (0, *_cpal("red")),
+                        (0.5, *_cpal("blue")),
+                        (1, *_cpal("yellow")),
+                    ],
+                    "Extend": ot.ExtendMode.PAD,
+                },
+                "x0": 100,
+                "y0": 950,
+                "x1": 2300,
+                "y1": 950,
+                "x2": -1000,
+                "y2": 250,
             },
-            "x0": 100,
-            "y0": 950,
-            "x1": 2300,
-            "y1": 950,
-            "x2": -1000,
-            "y2": 250,
-        },
-    }
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor_char,
-        # Larger advance required for this glyph as it is wider to test the
-        # P2-skewed gradient.
-        advance=1250,
-        glyph=pen.glyph(),
-        clip_box=(100, 250, 1200, 950),
-        colr=colr,
-    )
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            # Larger advance required for this glyph as it is wider to test the
+            # P2-skewed gradient.
+            advance=1250,
+            glyph=pen.glyph(),
+            clip_box=(100, 250, 1200, 950),
+            colr=colr,
+        )
 
 
 def _cross_glyph():
@@ -1227,77 +1236,87 @@ class ForegroundColor(TestCategory):
         )
 
 
-def _colrv0_colored_circles(palette_test_colors, accessor):
-    pen = _upem_box_pen()
-    glyph_name = "colored_circles_v0"
-    color_iter = iter(palette_test_colors)
+class PaletteCircles(TestCategory):
+    def get_name(self):
+        return "color_circles_palette"
 
-    colrv0_layers = [
-        ("circle_r350", next(color_iter)),
-        ("circle_r300", next(color_iter)),
-        ("circle_r250", next(color_iter)),
-        ("circle_r200", next(color_iter)),
-        ("circle_r150", next(color_iter)),
-        ("circle_r100", next(color_iter)),
-        ("circle_r50", next(color_iter)),
-        ("zero", _cpal("black")[0]),
-    ]
+    def _get_test_parameters(self):
+        return ["colrv0", "colrv1"]
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=pen.glyph(),
-        colrv0=colrv0_layers,
-    )
+    def _make_test_glyph(self, version, position, accessor):
+        # Use the previously reserved ones.
+        palette_test_colors = _reserve_circle_colors()
 
+        if version == "colrv0":
+            pen = _upem_box_pen()
+            glyph_name = "colored_circles_v0"
+            color_iter = iter(palette_test_colors)
 
-def _colrv1_colored_circles(palette_test_colors, accessor):
-    pen = _upem_box_pen()
-    glyph_name = "colored_circles_v1"
+            colrv0_layers = [
+                ("circle_r350", next(color_iter)),
+                ("circle_r300", next(color_iter)),
+                ("circle_r250", next(color_iter)),
+                ("circle_r200", next(color_iter)),
+                ("circle_r150", next(color_iter)),
+                ("circle_r100", next(color_iter)),
+                ("circle_r50", next(color_iter)),
+                ("zero", _cpal("black")[0]),
+            ]
 
-    def circle_reference(size, color_index):
-        return {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": f"circle_r{size}",
-            "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_index,
-                "Alpha": 1.0,
-            },
-        }
+            return SampleGlyph(
+                glyph_name=glyph_name,
+                accessor=accessor,
+                advance=_UPEM,
+                glyph=pen.glyph(),
+                colrv0=colrv0_layers,
+            )
 
-    color_iter = iter(palette_test_colors)
+        if version == "colrv1":
+            pen = _upem_box_pen()
+            glyph_name = "colored_circles_v1"
 
-    colrv1 = {
-        "Format": ot.PaintFormat.PaintColrLayers,
-        "Layers": [
-            circle_reference(350, next(color_iter)),
-            circle_reference(300, next(color_iter)),
-            circle_reference(250, next(color_iter)),
-            circle_reference(200, next(color_iter)),
-            circle_reference(150, next(color_iter)),
-            circle_reference(100, next(color_iter)),
-            circle_reference(50, next(color_iter)),
-            {
-                "Format": ot.PaintFormat.PaintGlyph,
-                "Glyph": "one",
-                "Paint": {
-                    "Format": ot.PaintFormat.PaintSolid,
-                    "PaletteIndex": _cpal("black")[0],
-                    "Alpha": 1.0,
-                },
-            },
-        ],
-    }
+            def circle_reference(size, color_index):
+                return {
+                    "Format": ot.PaintFormat.PaintGlyph,
+                    "Glyph": f"circle_r{size}",
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintSolid,
+                        "PaletteIndex": color_index,
+                        "Alpha": 1.0,
+                    },
+                }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=pen.glyph(),
-        colr=colrv1,
-    )
+            color_iter = iter(palette_test_colors)
+
+            colrv1 = {
+                "Format": ot.PaintFormat.PaintColrLayers,
+                "Layers": [
+                    circle_reference(350, next(color_iter)),
+                    circle_reference(300, next(color_iter)),
+                    circle_reference(250, next(color_iter)),
+                    circle_reference(200, next(color_iter)),
+                    circle_reference(150, next(color_iter)),
+                    circle_reference(100, next(color_iter)),
+                    circle_reference(50, next(color_iter)),
+                    {
+                        "Format": ot.PaintFormat.PaintGlyph,
+                        "Glyph": "one",
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintSolid,
+                            "PaletteIndex": _cpal("black")[0],
+                            "Alpha": 1.0,
+                        },
+                    },
+                ],
+            }
+
+            return SampleGlyph(
+                glyph_name=glyph_name,
+                accessor=accessor,
+                advance=_UPEM,
+                glyph=pen.glyph(),
+                colr=colrv1,
+            )
 
 
 def _circle_of_size(upem_radius, accessor):
@@ -1456,6 +1475,8 @@ class TestDefinitions:
             Composite(0xF0C00, 0xF0CFF),
             ForegroundColor(0xF0D00, 0x0F0DFF),
             ClipBox(0xF0E00, 0x0F0EFF),
+            GradientP2Skewed(0xF0F00, 0xF0FFF),
+            PaletteCircles(0xF1000, 0xF10FF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1465,7 +1486,7 @@ class TestDefinitions:
 
 def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
-    palette_test_colors = _reserve_circle_colors()
+    _reserve_circle_colors()
 
     access_chars_set = [chr(pua_codepoint) for pua_codepoint in range(0xF0000, 0xFFFFD)]
 
@@ -1480,9 +1501,6 @@ def _get_glyph_definitions(position):
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
-        _gradient_p2_skewed(next(access_chars)),
-        _colrv0_colored_circles(palette_test_colors, next(access_chars)),
-        _colrv1_colored_circles(palette_test_colors, next(access_chars)),
         _lin_rad_solid_alpha(position, next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
