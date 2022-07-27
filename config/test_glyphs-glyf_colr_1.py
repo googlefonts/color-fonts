@@ -71,8 +71,8 @@ def _deltaOrZero(axis: str, position: dict):
 
 class TestCategory(ABC):
     def __init__(self, range_start, range_end):
-        # Used for backwards-compatibility, subclasses should add glyphs here when they are redefined or replaced with a
-        # different meaning.
+        # Used for backwards-compatibility when glyphs are updated or changed. Subclasses should add glyphs here when
+        # they are redefined or replaced with a different meaning.
         self.burned_codepoint_offsets = []
         self.range_start = range_start
         self.range_end = range_end
@@ -106,75 +106,102 @@ class TestCategory(ABC):
         return [chr(acc + self.range_start) for acc in list(accessors)]
 
 
-def _sample_sweep(
-    start_angle, end_angle, extend_mode_arg, color_line_range, position, accessor
-):
+class Sweep(TestCategory):
+    def get_name(self):
+        return "sweep_varsweep"
 
-    extend_mode_map = {
-        "reflect": ot.ExtendMode.REFLECT,
-        "repeat": ot.ExtendMode.REPEAT,
-        "pad": ot.ExtendMode.PAD,
-    }
+    def _get_test_parameters(self):
+        return list(
+            itertools.product(
+                ["narrow"],
+                ["pad", "reflect", "repeat"],
+                [
+                    (-360, 0),
+                    (0, 90),
+                    (45, 90),
+                    (247.5, 292.5),
+                    (90, 270),
+                    (-270, 270),
+                    (-45, 45),
+                    (315, 45),
+                ],
+            )
+        )
 
-    if extend_mode_arg not in extend_mode_map:
-        return None
+    def _make_test_glyph(self, param_set, position, accessor):
+        start_angle = param_set[2][0]
+        end_angle = param_set[2][1]
+        extend_mode_arg = param_set[1]
+        color_line_range = param_set[0]
 
-    extend_mode = extend_mode_map[extend_mode_arg]
+        extend_mode_map = {
+            "reflect": ot.ExtendMode.REFLECT,
+            "repeat": ot.ExtendMode.REPEAT,
+            "pad": ot.ExtendMode.PAD,
+        }
 
-    # Preparation for allowing testing with a differently configured ColorLine
-    # that has stops at < 0 and > 1.
-    color_line_range_map = {
-        "narrow": {
-            "ColorStop": [
-                (0.25, *_cpal("red")),
-                (1 / 3 * 0.5 + 0.25, *_cpal("yellow")),
-                (2 / 3 * 0.5 + 0.25, *_cpal("green")),
-                (0.75, *_cpal("blue")),
-            ]
-        },
-    }
+        if extend_mode_arg not in extend_mode_map:
+            return None
 
-    if color_line_range not in color_line_range_map:
-        return None
+        extend_mode = extend_mode_map[extend_mode_arg]
 
-    color_line = color_line_range_map[color_line_range]
-
-    glyph_name = f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
-
-    start_angle_addition = _deltaOrZero("SWPS", position)
-    end_angle_addition = _deltaOrZero("SWPE", position)
-    end_angle = max(
-        min(end_angle + end_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE
-    )
-    start_angle = max(
-        min(start_angle + start_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE
-    )
-    colr = {
-        "Format": ot.PaintFormat.PaintGlyph,
-        "Glyph": "circle_r350",
-        "Paint": {
-            "Format": ot.PaintFormat.PaintSweepGradient,
-            "ColorLine": {
-                **color_line,
-                "Extend": extend_mode,
+        # Preparation for allowing testing with a differently configured ColorLine
+        # that has stops at < 0 and > 1.
+        color_line_range_map = {
+            "narrow": {
+                "ColorStop": [
+                    (0.25, *_cpal("red")),
+                    (1 / 3 * 0.5 + 0.25, *_cpal("yellow")),
+                    (2 / 3 * 0.5 + 0.25, *_cpal("green")),
+                    (0.75, *_cpal("blue")),
+                ]
             },
-            "centerX": 500,
-            "centerY": 600,
-            "startAngle": start_angle,
-            "endAngle": end_angle,
-        },
-    }
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        clip_box=(0, 0, _UPEM, _UPEM),
-        colr=colr,
-        description="Tests `Paint(Var)SweepGradient`.",
-        axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle.",
-    )
+        if color_line_range not in color_line_range_map:
+            return None
+
+        color_line = color_line_range_map[color_line_range]
+
+        glyph_name = (
+            f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
+        )
+
+        start_angle_addition = _deltaOrZero("SWPS", position)
+        end_angle_addition = _deltaOrZero("SWPE", position)
+        end_angle = max(
+            min(end_angle + end_angle_addition, _MAX_F2DOT14_ANGLE), _MIN_F2DOT14_ANGLE
+        )
+        start_angle = max(
+            min(start_angle + start_angle_addition, _MAX_F2DOT14_ANGLE),
+            _MIN_F2DOT14_ANGLE,
+        )
+        colr = {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": "circle_r350",
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSweepGradient,
+                "ColorLine": {
+                    **color_line,
+                    "Extend": extend_mode,
+                },
+                "centerX": 500,
+                "centerY": 600,
+                "startAngle": start_angle,
+                "endAngle": end_angle,
+            },
+        }
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            clip_box=(0, 0, _UPEM, _UPEM),
+            colr=colr,
+            description="Tests `Paint(Var)SweepGradient`.",
+            axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle.",
+        )
 
 
 def _lin_rad_solid_alpha(position, accessor):
@@ -1306,17 +1333,29 @@ def _prepare_palette():
     }
 
 
+class TestDefinitions:
+    def __init__(self):
+        self.categories = [Sweep(0xF0400, 0xF04FF)]
+
+    def make_all_glyphs(self, position):
+        for cat in self.categories:
+            yield from cat.make_test_glyphs(position)
+
+
 def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
     palette_test_colors = _reserve_circle_colors()
 
     access_chars_set = [chr(pua_codepoint) for pua_codepoint in range(0xF0000, 0xFFFFD)]
 
+    test_definitions = TestDefinitions()
+    all_glyphs = list(test_definitions.make_all_glyphs(position))
+
     access_chars = iter(access_chars_set)
     glyphs = [
         SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
         SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
-        _sample_sweep(-360, 0, "pad", "narrow", position, next(access_chars)),
+        *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
         _gradient_stops_repeat(0, 1, next(access_chars)),
@@ -1380,32 +1419,6 @@ def _get_glyph_definitions(position):
         _gradient_p2_skewed(next(access_chars)),
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
-        # Sweep with repeat mode pad
-        _sample_sweep(0, 90, "pad", "narrow", position, next(access_chars)),
-        _sample_sweep(45, 90, "pad", "narrow", position, next(access_chars)),
-        _sample_sweep(247.5, 292.5, "pad", "narrow", position, next(access_chars)),
-        _sample_sweep(90, 270, "pad", "narrow", position, next(access_chars)),
-        _sample_sweep(-270, 270, "pad", "narrow", position, next(access_chars)),
-        _sample_sweep(-45, 45, "pad", "narrow", position, next(access_chars)),
-        _sample_sweep(315, 45, "pad", "narrow", position, next(access_chars)),
-        # Sweep with repeat mode reflect
-        _sample_sweep(-360, 0, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(0, 90, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(45, 90, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(247.5, 292.5, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(90, 270, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(-270, 270, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(-45, 45, "reflect", "narrow", position, next(access_chars)),
-        _sample_sweep(315, 45, "reflect", "narrow", position, next(access_chars)),
-        # Sweep with repeat mode repeat
-        _sample_sweep(-360, 0, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(0, 90, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(45, 90, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(247.5, 292.5, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(90, 270, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(-270, 270, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(-45, 45, "repeat", "narrow", position, next(access_chars)),
-        _sample_sweep(315, 45, "repeat", "narrow", position, next(access_chars)),
         _lin_rad_solid_alpha(position, next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
