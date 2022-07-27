@@ -462,12 +462,7 @@ def _cross_glyph():
     pen.lineTo((250, 525))
     pen.endPath()
 
-    return SampleGlyph(
-        glyph_name=_CROSS_GLYPH,
-        advance=_UPEM,
-        glyph=pen.glyph(),
-        accessor="+",
-    )
+    return
 
 
 def _upem_box_pen():
@@ -481,13 +476,91 @@ def _upem_box_pen():
     return pen
 
 
-def _upem_box_glyph():
-    return SampleGlyph(
-        glyph_name=_UPEM_BOX_GLYPH,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        accessor="▀",
-    )
+class UtilContours(TestCategory):
+    def get_name(self):
+        return "util_contours"
+
+    def _get_test_parameters(self):
+        return ["upem_box", "cross", "one", "zero"]
+
+    def _make_test_glyph(self, glyph_type, position, accessor):
+        cross_pen = TTGlyphPen(None)
+        cross_pen.moveTo((475, 525))
+        cross_pen.lineTo((475, 750))
+        cross_pen.lineTo((525, 750))
+        cross_pen.lineTo((525, 525))
+        cross_pen.lineTo((750, 525))
+        cross_pen.lineTo((750, 475))
+        cross_pen.lineTo((525, 475))
+        cross_pen.lineTo((525, 250))
+        cross_pen.lineTo((475, 250))
+        cross_pen.lineTo((475, 475))
+        cross_pen.lineTo((250, 475))
+        cross_pen.lineTo((250, 525))
+        cross_pen.endPath()
+
+        one_pen = TTGlyphPen(None)
+        pen = one_pen.transformPen(one_pen, (0.2, 0, 0, 0.2, 150, 250))
+        # 1 glyph taken from Roboto Regular.
+        pen.moveTo((729, 1464))
+        for line_point in [
+            (729, 0),
+            (544, 0),
+            (544, 1233),
+            (171, 1079),
+            (171, 1264),
+            (700, 1464),
+        ]:
+            pen.lineTo(line_point)
+        pen.closePath()
+
+        zero_pen = TTGlyphPen(None)
+        pen = zero_pen.transformPen(zero_pen, (0.2, 0, 0, 0.2, 150, 250))
+
+        # 0 glyph taken from Roboto Regular
+        pen.moveTo((1035, 622))
+        pen.qCurveTo((1035, 264), (788, -20), (576, -20))
+        pen.qCurveTo((367, -20), (115, 264), (115, 622))
+        pen.lineTo((115, 844))
+        pen.qCurveTo((115, 1201), (365, 1476), (574, 1476))
+        pen.qCurveTo((786, 1476), (1035, 1201), (1035, 844))
+        pen.closePath()
+
+        pen.moveTo((849, 875))
+        pen.qCurveTo((849, 1121), (709, 1325), (574, 1325))
+        pen.qCurveTo((442, 1325), (301, 1121), (301, 875))
+        pen.lineTo((301, 592))
+        pen.qCurveTo((301, 348), (444, 132), (576, 132))
+        pen.qCurveTo((712, 132), (849, 348), (849, 592))
+        pen.closePath()
+
+        glyph_map = {
+            "upem_box": SampleGlyph(
+                glyph_name=_UPEM_BOX_GLYPH,
+                advance=_UPEM,
+                glyph=_upem_box_pen().glyph(),
+                accessor=accessor,
+            ),
+            "cross": SampleGlyph(
+                glyph_name=_CROSS_GLYPH,
+                advance=_UPEM,
+                glyph=cross_pen.glyph(),
+                accessor=accessor,
+            ),
+            "one": SampleGlyph(
+                glyph_name="one",
+                accessor=accessor,
+                advance=_UPEM,
+                glyph=one_pen.glyph(),
+            ),
+            "zero": SampleGlyph(
+                glyph_name="zero",
+                accessor=accessor,
+                advance=_UPEM,
+                glyph=zero_pen.glyph(),
+            ),
+        }
+        return glyph_map[glyph_type]
 
 
 class PaintScale(TestCategory):
@@ -1369,55 +1442,6 @@ class CircleContours(TestCategory):
         )
 
 
-def _one_glyph(accessor):
-    glyph_name = "one"
-
-    draw_pen = TTGlyphPen(None)
-    pen = draw_pen.transformPen(draw_pen, (0.2, 0, 0, 0.2, 150, 250))
-    # 1 glyph taken from Roboto Regular.
-    pen.moveTo((729, 1464))
-    for line_point in [
-        (729, 0),
-        (544, 0),
-        (544, 1233),
-        (171, 1079),
-        (171, 1264),
-        (700, 1464),
-    ]:
-        pen.lineTo(line_point)
-    pen.closePath()
-    return SampleGlyph(
-        glyph_name="one", accessor=accessor, advance=_UPEM, glyph=draw_pen.glyph()
-    )
-
-
-def _zero_glyph(accessor):
-    glyph_name = "zero"
-    draw_pen = TTGlyphPen(None)
-    pen = draw_pen.transformPen(draw_pen, (0.2, 0, 0, 0.2, 150, 250))
-
-    # 0 glyph taken from Roboto Regular
-    pen.moveTo((1035, 622))
-    pen.qCurveTo((1035, 264), (788, -20), (576, -20))
-    pen.qCurveTo((367, -20), (115, 264), (115, 622))
-    pen.lineTo((115, 844))
-    pen.qCurveTo((115, 1201), (365, 1476), (574, 1476))
-    pen.qCurveTo((786, 1476), (1035, 1201), (1035, 844))
-    pen.closePath()
-
-    pen.moveTo((849, 875))
-    pen.qCurveTo((849, 1121), (709, 1325), (574, 1325))
-    pen.qCurveTo((442, 1325), (301, 1121), (301, 875))
-    pen.lineTo((301, 592))
-    pen.qCurveTo((301, 348), (444, 132), (576, 132))
-    pen.qCurveTo((712, 132), (849, 348), (849, 592))
-    pen.closePath()
-
-    return SampleGlyph(
-        glyph_name="zero", accessor=accessor, advance=_UPEM, glyph=draw_pen.glyph()
-    )
-
-
 def _reserve_circle_colors():
     return [
         _cpal("red")[0],
@@ -1493,6 +1517,7 @@ class TestDefinitions:
             PaletteCircles(0xF1000, 0xF10FF),
             CircleContours(0xF1100, 0xF11FF),
             VariableAlpha(0xF1200, 0xF12FF),
+            UtilContours(0xF1300, 0xF13FF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1518,16 +1543,12 @@ def _get_glyph_definitions(position):
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
         # Non COLR helper glyphs below here.
-        _cross_glyph(),
-        _upem_box_glyph(),
         _clip_shade_glyph("center", next(access_chars)),
         _clip_shade_glyph("top_left", next(access_chars)),
         _clip_shade_glyph("bottom_left", next(access_chars)),
         _clip_shade_glyph("bottom_right", next(access_chars)),
         _clip_shade_glyph("top_right", next(access_chars)),
         _inset_clipped_radial_reflect(next(access_chars)),
-        _one_glyph(next(access_chars)),
-        _zero_glyph(next(access_chars)),
     ]
     return glyphs
 
