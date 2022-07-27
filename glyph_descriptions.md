@@ -125,5 +125,3 @@
 | 122 | 󱄅 | U+F1105 | `circle_r300` | None | None |
 | 123 | 󱄆 | U+F1106 | `circle_r350` | None | None |
 | 124 | 󱈀 | U+F1200 | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
-| 125 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
-| 126 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
