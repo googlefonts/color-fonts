@@ -42,88 +42,88 @@
 | 39 | 󰜃 | U+F0703 | `radial_gradient_extend_mode_pad` | Tests Paint(Var)RadialGradient with variable gradient coordinates or variable color lines. | `GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops. |
 | 40 | 󰜄 | U+F0704 | `radial_gradient_extend_mode_repeat` | Tests Paint(Var)RadialGradient with variable gradient coordinates or variable color lines. | `GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops. |
 | 41 | 󰜅 | U+F0705 | `radial_gradient_extend_mode_reflect` | Tests Paint(Var)RadialGradient with variable gradient coordinates or variable color lines. | `GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops. |
-| 42 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
-| 43 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
-| 44 | 󰀂 | U+F0002 | `rotate_10_center_0_0` | Tests `Paint(Var)Rotate`. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
-| 45 | 󰀃 | U+F0003 | `rotate_-10_center_1000_1000` | Tests `Paint(Var)RotateAroundCenter` with center at (1000, 1000).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
-| 46 | 󰀄 | U+F0004 | `rotate_25_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
-| 47 | 󰀅 | U+F0005 | `rotate_-15_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
-| 48 | 󰀆 | U+F0006 | `skew_25_0_center_0_0` | Tests `Paint(Var)Skew` for x angle 25, y angle 0, x center 0, y center 0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
-| 49 | 󰀇 | U+F0007 | `skew_25_0_center_500.0_500.0` | Tests `Paint(Var)SkewAroundCenter` for x angle 25, y angle 0, x center 500.0, y center 500.0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
-| 50 | 󰀈 | U+F0008 | `skew_0_15_center_0_0` | Tests `Paint(Var)Skew` for x angle 0, y angle 15, x center 0, y center 0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
-| 51 | 󰀉 | U+F0009 | `skew_0_15_center_500.0_500.0` | Tests `Paint(Var)SkewAroundCenter` for x angle 0, y angle 15, x center 500.0, y center 500.0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
-| 52 | 󰀊 | U+F000A | `skew_-10_20_center_500.0_500.0` | Tests `Paint(Var)SkewAroundCenter` for x angle -10, y angle 20, x center 500.0, y center 500.0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
-| 53 | 󰀋 | U+F000B | `skew_-10_20_center_1000_1000` | Tests `Paint(Var)SkewAroundCenter` for x angle -10, y angle 20, x center 1000, y center 1000. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
-| 54 | 󰀌 | U+F000C | `transform_matrix_1_0_0_1_125_125` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
-| 55 | 󰀍 | U+F000D | `transform_matrix_1.5_0_0_1.5_0_0` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
-| 56 | 󰀎 | U+F000E | `transform_matrix_0.9659_0.2588_-0.2588_0.9659_0_0` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
-| 57 | 󰀏 | U+F000F | `transform_matrix_1.0_0.0_0.6_1.0_-300.0_0.0` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
-| 58 | 󰀐 | U+F0010 | `translate_0_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 59 | 󰀑 | U+F0011 | `translate_0_100` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 60 | 󰀒 | U+F0012 | `translate_0_-100` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 61 | 󰀓 | U+F0013 | `translate_100_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 62 | 󰀔 | U+F0014 | `translate_-100_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 63 | 󰀕 | U+F0015 | `translate_200_200` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 64 | 󰀖 | U+F0016 | `translate_-200_-200` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 65 | 󰀗 | U+F0017 | `clip_box_top_left` | None | None |
-| 66 | 󰀘 | U+F0018 | `clip_box_bottom_left` | None | None |
-| 67 | 󰀙 | U+F0019 | `clip_box_bottom_right` | None | None |
-| 68 | 󰀚 | U+F001A | `clip_box_top_right` | None | None |
-| 69 | 󰀛 | U+F001B | `clip_box_center` | None | None |
-| 70 | 󰀜 | U+F001C | `composite_CLEAR` | Tests `PaintComposite` for mode CLEAR. | None |
-| 71 | 󰀝 | U+F001D | `composite_SRC` | Tests `PaintComposite` for mode SRC. | None |
-| 72 | 󰀞 | U+F001E | `composite_DEST` | Tests `PaintComposite` for mode DEST. | None |
-| 73 | 󰀟 | U+F001F | `composite_SRC_OVER` | Tests `PaintComposite` for mode SRC_OVER. | None |
-| 74 | 󰀠 | U+F0020 | `composite_DEST_OVER` | Tests `PaintComposite` for mode DEST_OVER. | None |
-| 75 | 󰀡 | U+F0021 | `composite_SRC_IN` | Tests `PaintComposite` for mode SRC_IN. | None |
-| 76 | 󰀢 | U+F0022 | `composite_DEST_IN` | Tests `PaintComposite` for mode DEST_IN. | None |
-| 77 | 󰀣 | U+F0023 | `composite_SRC_OUT` | Tests `PaintComposite` for mode SRC_OUT. | None |
-| 78 | 󰀤 | U+F0024 | `composite_DEST_OUT` | Tests `PaintComposite` for mode DEST_OUT. | None |
-| 79 | 󰀥 | U+F0025 | `composite_SRC_ATOP` | Tests `PaintComposite` for mode SRC_ATOP. | None |
-| 80 | 󰀦 | U+F0026 | `composite_DEST_ATOP` | Tests `PaintComposite` for mode DEST_ATOP. | None |
-| 81 | 󰀧 | U+F0027 | `composite_XOR` | Tests `PaintComposite` for mode XOR. | None |
-| 82 | 󰀨 | U+F0028 | `composite_PLUS` | Tests `PaintComposite` for mode PLUS. | None |
-| 83 | 󰀩 | U+F0029 | `composite_SCREEN` | Tests `PaintComposite` for mode SCREEN. | None |
-| 84 | 󰀪 | U+F002A | `composite_OVERLAY` | Tests `PaintComposite` for mode OVERLAY. | None |
-| 85 | 󰀫 | U+F002B | `composite_DARKEN` | Tests `PaintComposite` for mode DARKEN. | None |
-| 86 | 󰀬 | U+F002C | `composite_LIGHTEN` | Tests `PaintComposite` for mode LIGHTEN. | None |
-| 87 | 󰀭 | U+F002D | `composite_COLOR_DODGE` | Tests `PaintComposite` for mode COLOR_DODGE. | None |
-| 88 | 󰀮 | U+F002E | `composite_COLOR_BURN` | Tests `PaintComposite` for mode COLOR_BURN. | None |
-| 89 | 󰀯 | U+F002F | `composite_HARD_LIGHT` | Tests `PaintComposite` for mode HARD_LIGHT. | None |
-| 90 | 󰀰 | U+F0030 | `composite_SOFT_LIGHT` | Tests `PaintComposite` for mode SOFT_LIGHT. | None |
-| 91 | 󰀱 | U+F0031 | `composite_DIFFERENCE` | Tests `PaintComposite` for mode DIFFERENCE. | None |
-| 92 | 󰀲 | U+F0032 | `composite_EXCLUSION` | Tests `PaintComposite` for mode EXCLUSION. | None |
-| 93 | 󰀳 | U+F0033 | `composite_MULTIPLY` | Tests `PaintComposite` for mode MULTIPLY. | None |
-| 94 | 󰀴 | U+F0034 | `composite_HSL_HUE` | Tests `PaintComposite` for mode HSL_HUE. | None |
-| 95 | 󰀵 | U+F0035 | `composite_HSL_SATURATION` | Tests `PaintComposite` for mode HSL_SATURATION. | None |
-| 96 | 󰀶 | U+F0036 | `composite_HSL_COLOR` | Tests `PaintComposite` for mode HSL_COLOR. | None |
-| 97 | 󰀷 | U+F0037 | `composite_HSL_LUMINOSITY` | Tests `PaintComposite` for mode HSL_LUMINOSITY. | None |
-| 98 | 󰀸 | U+F0038 | `foreground_color_linear_alpha_1` | None | None |
-| 99 | 󰀹 | U+F0039 | `foreground_color_radial_alpha_1` | None | None |
-| 100 | 󰀺 | U+F003A | `foreground_color_sweep_alpha_1` | None | None |
-| 101 | 󰀻 | U+F003B | `foreground_color_solid_alpha_1` | None | None |
-| 102 | 󰀼 | U+F003C | `foreground_color_linear_alpha_0.3` | None | None |
-| 103 | 󰀽 | U+F003D | `foreground_color_radial_alpha_0.3` | None | None |
-| 104 | 󰀾 | U+F003E | `foreground_color_sweep_alpha_0.3` | None | None |
-| 105 | 󰀿 | U+F003F | `foreground_color_solid_alpha_0.3` | None | None |
-| 106 | 󰁀 | U+F0040 | `gradient_p2_skewed` | None | None |
-| 107 | 󰁁 | U+F0041 | `colored_circles_v0` | None | None |
-| 108 | 󰁂 | U+F0042 | `colored_circles_v1` | None | None |
-| 109 | 󰁃 | U+F0043 | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
+| 42 | 󰠀 | U+F0800 | `rotate_10_center_0_0` | Tests `Paint(Var)Rotate`. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 43 | 󰠁 | U+F0801 | `rotate_-10_center_1000_1000` | Tests `Paint(Var)RotateAroundCenter` with center at (1000, 1000).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 44 | 󰠂 | U+F0802 | `rotate_25_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 45 | 󰠃 | U+F0803 | `rotate_-15_center_500.0_500.0` | Tests `Paint(Var)RotateAroundCenter` with center at (500.0, 500.0).. | `ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y. |
+| 46 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
+| 47 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
+| 48 | 󰀂 | U+F0002 | `skew_25_0_center_0_0` | Tests `Paint(Var)Skew` for x angle 25, y angle 0, x center 0, y center 0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
+| 49 | 󰀃 | U+F0003 | `skew_25_0_center_500.0_500.0` | Tests `Paint(Var)SkewAroundCenter` for x angle 25, y angle 0, x center 500.0, y center 500.0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
+| 50 | 󰀄 | U+F0004 | `skew_0_15_center_0_0` | Tests `Paint(Var)Skew` for x angle 0, y angle 15, x center 0, y center 0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
+| 51 | 󰀅 | U+F0005 | `skew_0_15_center_500.0_500.0` | Tests `Paint(Var)SkewAroundCenter` for x angle 0, y angle 15, x center 500.0, y center 500.0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
+| 52 | 󰀆 | U+F0006 | `skew_-10_20_center_500.0_500.0` | Tests `Paint(Var)SkewAroundCenter` for x angle -10, y angle 20, x center 500.0, y center 500.0. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
+| 53 | 󰀇 | U+F0007 | `skew_-10_20_center_1000_1000` | Tests `Paint(Var)SkewAroundCenter` for x angle -10, y angle 20, x center 1000, y center 1000. | `SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively. |
+| 54 | 󰀈 | U+F0008 | `transform_matrix_1_0_0_1_125_125` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
+| 55 | 󰀉 | U+F0009 | `transform_matrix_1.5_0_0_1.5_0_0` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
+| 56 | 󰀊 | U+F000A | `transform_matrix_0.9659_0.2588_-0.2588_0.9659_0_0` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
+| 57 | 󰀋 | U+F000B | `transform_matrix_1.0_0.0_0.6_1.0_-300.0_0.0` | Tests `Paint(Var)Transform`. | `TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates. |
+| 58 | 󰀌 | U+F000C | `translate_0_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 59 | 󰀍 | U+F000D | `translate_0_100` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 60 | 󰀎 | U+F000E | `translate_0_-100` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 61 | 󰀏 | U+F000F | `translate_100_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 62 | 󰀐 | U+F0010 | `translate_-100_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 63 | 󰀑 | U+F0011 | `translate_200_200` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 64 | 󰀒 | U+F0012 | `translate_-200_-200` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
+| 65 | 󰀓 | U+F0013 | `clip_box_top_left` | None | None |
+| 66 | 󰀔 | U+F0014 | `clip_box_bottom_left` | None | None |
+| 67 | 󰀕 | U+F0015 | `clip_box_bottom_right` | None | None |
+| 68 | 󰀖 | U+F0016 | `clip_box_top_right` | None | None |
+| 69 | 󰀗 | U+F0017 | `clip_box_center` | None | None |
+| 70 | 󰀘 | U+F0018 | `composite_CLEAR` | Tests `PaintComposite` for mode CLEAR. | None |
+| 71 | 󰀙 | U+F0019 | `composite_SRC` | Tests `PaintComposite` for mode SRC. | None |
+| 72 | 󰀚 | U+F001A | `composite_DEST` | Tests `PaintComposite` for mode DEST. | None |
+| 73 | 󰀛 | U+F001B | `composite_SRC_OVER` | Tests `PaintComposite` for mode SRC_OVER. | None |
+| 74 | 󰀜 | U+F001C | `composite_DEST_OVER` | Tests `PaintComposite` for mode DEST_OVER. | None |
+| 75 | 󰀝 | U+F001D | `composite_SRC_IN` | Tests `PaintComposite` for mode SRC_IN. | None |
+| 76 | 󰀞 | U+F001E | `composite_DEST_IN` | Tests `PaintComposite` for mode DEST_IN. | None |
+| 77 | 󰀟 | U+F001F | `composite_SRC_OUT` | Tests `PaintComposite` for mode SRC_OUT. | None |
+| 78 | 󰀠 | U+F0020 | `composite_DEST_OUT` | Tests `PaintComposite` for mode DEST_OUT. | None |
+| 79 | 󰀡 | U+F0021 | `composite_SRC_ATOP` | Tests `PaintComposite` for mode SRC_ATOP. | None |
+| 80 | 󰀢 | U+F0022 | `composite_DEST_ATOP` | Tests `PaintComposite` for mode DEST_ATOP. | None |
+| 81 | 󰀣 | U+F0023 | `composite_XOR` | Tests `PaintComposite` for mode XOR. | None |
+| 82 | 󰀤 | U+F0024 | `composite_PLUS` | Tests `PaintComposite` for mode PLUS. | None |
+| 83 | 󰀥 | U+F0025 | `composite_SCREEN` | Tests `PaintComposite` for mode SCREEN. | None |
+| 84 | 󰀦 | U+F0026 | `composite_OVERLAY` | Tests `PaintComposite` for mode OVERLAY. | None |
+| 85 | 󰀧 | U+F0027 | `composite_DARKEN` | Tests `PaintComposite` for mode DARKEN. | None |
+| 86 | 󰀨 | U+F0028 | `composite_LIGHTEN` | Tests `PaintComposite` for mode LIGHTEN. | None |
+| 87 | 󰀩 | U+F0029 | `composite_COLOR_DODGE` | Tests `PaintComposite` for mode COLOR_DODGE. | None |
+| 88 | 󰀪 | U+F002A | `composite_COLOR_BURN` | Tests `PaintComposite` for mode COLOR_BURN. | None |
+| 89 | 󰀫 | U+F002B | `composite_HARD_LIGHT` | Tests `PaintComposite` for mode HARD_LIGHT. | None |
+| 90 | 󰀬 | U+F002C | `composite_SOFT_LIGHT` | Tests `PaintComposite` for mode SOFT_LIGHT. | None |
+| 91 | 󰀭 | U+F002D | `composite_DIFFERENCE` | Tests `PaintComposite` for mode DIFFERENCE. | None |
+| 92 | 󰀮 | U+F002E | `composite_EXCLUSION` | Tests `PaintComposite` for mode EXCLUSION. | None |
+| 93 | 󰀯 | U+F002F | `composite_MULTIPLY` | Tests `PaintComposite` for mode MULTIPLY. | None |
+| 94 | 󰀰 | U+F0030 | `composite_HSL_HUE` | Tests `PaintComposite` for mode HSL_HUE. | None |
+| 95 | 󰀱 | U+F0031 | `composite_HSL_SATURATION` | Tests `PaintComposite` for mode HSL_SATURATION. | None |
+| 96 | 󰀲 | U+F0032 | `composite_HSL_COLOR` | Tests `PaintComposite` for mode HSL_COLOR. | None |
+| 97 | 󰀳 | U+F0033 | `composite_HSL_LUMINOSITY` | Tests `PaintComposite` for mode HSL_LUMINOSITY. | None |
+| 98 | 󰀴 | U+F0034 | `foreground_color_linear_alpha_1` | None | None |
+| 99 | 󰀵 | U+F0035 | `foreground_color_radial_alpha_1` | None | None |
+| 100 | 󰀶 | U+F0036 | `foreground_color_sweep_alpha_1` | None | None |
+| 101 | 󰀷 | U+F0037 | `foreground_color_solid_alpha_1` | None | None |
+| 102 | 󰀸 | U+F0038 | `foreground_color_linear_alpha_0.3` | None | None |
+| 103 | 󰀹 | U+F0039 | `foreground_color_radial_alpha_0.3` | None | None |
+| 104 | 󰀺 | U+F003A | `foreground_color_sweep_alpha_0.3` | None | None |
+| 105 | 󰀻 | U+F003B | `foreground_color_solid_alpha_0.3` | None | None |
+| 106 | 󰀼 | U+F003C | `gradient_p2_skewed` | None | None |
+| 107 | 󰀽 | U+F003D | `colored_circles_v0` | None | None |
+| 108 | 󰀾 | U+F003E | `colored_circles_v1` | None | None |
+| 109 | 󰀿 | U+F003F | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
 | 110 | + | U+2B | `cross_glyph` | None | None |
 | 111 | ▀ | U+2580 | `upem_box_glyph` | None | None |
-| 112 | 󰁄 | U+F0044 | `clip_shade_center` | None | None |
-| 113 | 󰁅 | U+F0045 | `clip_shade_top_left` | None | None |
-| 114 | 󰁆 | U+F0046 | `clip_shade_bottom_left` | None | None |
-| 115 | 󰁇 | U+F0047 | `clip_shade_bottom_right` | None | None |
-| 116 | 󰁈 | U+F0048 | `clip_shade_top_right` | None | None |
-| 117 | 󰁉 | U+F0049 | `inset_clipped_radial_reflect` | None | None |
-| 118 | 󰁊 | U+F004A | `circle_r50` | None | None |
-| 119 | 󰁋 | U+F004B | `circle_r100` | None | None |
-| 120 | 󰁌 | U+F004C | `circle_r150` | None | None |
-| 121 | 󰁍 | U+F004D | `circle_r200` | None | None |
-| 122 | 󰁎 | U+F004E | `circle_r250` | None | None |
-| 123 | 󰁏 | U+F004F | `circle_r300` | None | None |
-| 124 | 󰁐 | U+F0050 | `circle_r350` | None | None |
-| 125 | 󰁑 | U+F0051 | `one` | None | None |
-| 126 | 󰁒 | U+F0052 | `zero` | None | None |
+| 112 | 󰁀 | U+F0040 | `clip_shade_center` | None | None |
+| 113 | 󰁁 | U+F0041 | `clip_shade_top_left` | None | None |
+| 114 | 󰁂 | U+F0042 | `clip_shade_bottom_left` | None | None |
+| 115 | 󰁃 | U+F0043 | `clip_shade_bottom_right` | None | None |
+| 116 | 󰁄 | U+F0044 | `clip_shade_top_right` | None | None |
+| 117 | 󰁅 | U+F0045 | `inset_clipped_radial_reflect` | None | None |
+| 118 | 󰁆 | U+F0046 | `circle_r50` | None | None |
+| 119 | 󰁇 | U+F0047 | `circle_r100` | None | None |
+| 120 | 󰁈 | U+F0048 | `circle_r150` | None | None |
+| 121 | 󰁉 | U+F0049 | `circle_r200` | None | None |
+| 122 | 󰁊 | U+F004A | `circle_r250` | None | None |
+| 123 | 󰁋 | U+F004B | `circle_r300` | None | None |
+| 124 | 󰁌 | U+F004C | `circle_r350` | None | None |
+| 125 | 󰁍 | U+F004D | `one` | None | None |
+| 126 | 󰁎 | U+F004E | `zero` | None | None |

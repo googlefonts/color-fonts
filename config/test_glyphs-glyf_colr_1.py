@@ -676,77 +676,86 @@ class ExtendMode(TestCategory):
         )
 
 
-def _paint_rotate(angle, center_x, center_y, position, accessor):
-    glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
+class PaintRotate(TestCategory):
+    def get_name(self):
+        return "paint_rotate"
 
-    color_orange = _cpal("orange", 0.7)
+    def _get_test_parameters(self):
+        return [
+            (10, 0, 0),
+            (-10, _UPEM, _UPEM),
+            (25, _UPEM / 2, _UPEM / 2),
+            (-15, _UPEM / 2, _UPEM / 2),
+        ]
 
-    angle_addition = _deltaOrZero("ROTA", position)
-    x_addition = _deltaOrZero("ROTX", position)
-    y_addition = _deltaOrZero("ROTY", position)
+    def _make_test_glyph(set, param_set, position, accessor):
+        (angle, center_x, center_y) = param_set
 
-    rotate_angle = min(angle + angle_addition, _MAX_F2DOT14_ANGLE)
+        glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
 
-    glyph_paint = {
-        "Paint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
+        color_orange = _cpal("orange", 0.7)
+
+        angle_addition = _deltaOrZero("ROTA", position)
+        x_addition = _deltaOrZero("ROTX", position)
+        y_addition = _deltaOrZero("ROTY", position)
+
+        rotate_angle = min(angle + angle_addition, _MAX_F2DOT14_ANGLE)
+
+        glyph_paint = {
             "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_orange[0],
-                "Alpha": color_orange[1],
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_orange[0],
+                    "Alpha": color_orange[1],
+                },
             },
-        },
-    }
-
-    description = ""
-    if center_x or center_y:
-        rotated_colr = {
-            "Format": ot.PaintFormat.PaintRotateAroundCenter,
-            "centerX": center_x + x_addition,
-            "centerY": center_y + y_addition,
-            "angle": rotate_angle,
         }
-        description = (
-            f"`Paint(Var)RotateAroundCenter` with center at ({center_x}, {center_y})."
-        )
-    else:
-        rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": rotate_angle}
-        description = "`Paint(Var)Rotate`"
 
-    rotated_colr.update(glyph_paint)
+        description = ""
+        if center_x or center_y:
+            rotated_colr = {
+                "Format": ot.PaintFormat.PaintRotateAroundCenter,
+                "centerX": center_x + x_addition,
+                "centerY": center_y + y_addition,
+                "angle": rotate_angle,
+            }
+            description = f"`Paint(Var)RotateAroundCenter` with center at ({center_x}, {center_y})."
+        else:
+            rotated_colr = {"Format": ot.PaintFormat.PaintRotate, "angle": rotate_angle}
+            description = "`Paint(Var)Rotate`"
 
-    color_blue = _cpal("blue", 0.5)
+        rotated_colr.update(glyph_paint)
 
-    colr = {
-        "Format": ot.PaintFormat.PaintComposite,
-        "CompositeMode": "DEST_OVER",
-        "SourcePaint": rotated_colr,
-        "BackdropPaint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
-            "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_blue[0],
-                "Alpha": color_blue[1],
+        color_blue = _cpal("blue", 0.5)
+
+        colr = {
+            "Format": ot.PaintFormat.PaintComposite,
+            "CompositeMode": "DEST_OVER",
+            "SourcePaint": rotated_colr,
+            "BackdropPaint": {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_blue[0],
+                    "Alpha": color_blue[1],
+                },
             },
-        },
-    }
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        colr=colr,
-        description=f"Tests {description}.",
-        axes_effect="`ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y.",
-    )
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            colr=colr,
+            description=f"Tests {description}.",
+            axes_effect="`ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y.",
+        )
 
-
-def _paint_skew(
-    x_skew_angle, y_skew_angle, center_x, center_y, position, accessor
-):
+def _paint_skew(x_skew_angle, y_skew_angle, center_x, center_y, position, accessor):
     glyph_name = f"skew_{x_skew_angle}_{y_skew_angle}_center_{center_x}_{center_y}"
 
     color_orange = _cpal("orange", 0.7)
@@ -1367,6 +1376,7 @@ class TestDefinitions:
             Sweep(0xF0400, 0xF04FF),
             PaintScale(0xF0600, 0xF06FF),
             ExtendMode(0xF0700, 0xF07FF),
+            PaintRotate(0xF0800, 0xF08FF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1391,10 +1401,6 @@ def _get_glyph_definitions(position):
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
-        _paint_rotate(10, 0, 0, position, next(access_chars)),
-        _paint_rotate(-10, _UPEM, _UPEM, position, next(access_chars)),
-        _paint_rotate(25, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
-        _paint_rotate(-15, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
         _paint_skew(25, 0, 0, 0, position, next(access_chars)),
         _paint_skew(25, 0, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
         _paint_skew(0, 15, 0, 0, position, next(access_chars)),
