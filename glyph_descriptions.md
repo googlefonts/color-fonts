@@ -63,67 +63,67 @@
 | 60 | 󰬄 | U+F0B04 | `translate_-100_0` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
 | 61 | 󰬅 | U+F0B05 | `translate_200_200` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
 | 62 | 󰬆 | U+F0B06 | `translate_-200_-200` | Tests `Paint(Var)Translate`. | `TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate. |
-| 63 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
-| 64 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
-| 65 | 󰀂 | U+F0002 | `clip_box_top_left` | None | None |
-| 66 | 󰀃 | U+F0003 | `clip_box_bottom_left` | None | None |
-| 67 | 󰀄 | U+F0004 | `clip_box_bottom_right` | None | None |
-| 68 | 󰀅 | U+F0005 | `clip_box_top_right` | None | None |
-| 69 | 󰀆 | U+F0006 | `clip_box_center` | None | None |
-| 70 | 󰀇 | U+F0007 | `composite_CLEAR` | Tests `PaintComposite` for mode CLEAR. | None |
-| 71 | 󰀈 | U+F0008 | `composite_SRC` | Tests `PaintComposite` for mode SRC. | None |
-| 72 | 󰀉 | U+F0009 | `composite_DEST` | Tests `PaintComposite` for mode DEST. | None |
-| 73 | 󰀊 | U+F000A | `composite_SRC_OVER` | Tests `PaintComposite` for mode SRC_OVER. | None |
-| 74 | 󰀋 | U+F000B | `composite_DEST_OVER` | Tests `PaintComposite` for mode DEST_OVER. | None |
-| 75 | 󰀌 | U+F000C | `composite_SRC_IN` | Tests `PaintComposite` for mode SRC_IN. | None |
-| 76 | 󰀍 | U+F000D | `composite_DEST_IN` | Tests `PaintComposite` for mode DEST_IN. | None |
-| 77 | 󰀎 | U+F000E | `composite_SRC_OUT` | Tests `PaintComposite` for mode SRC_OUT. | None |
-| 78 | 󰀏 | U+F000F | `composite_DEST_OUT` | Tests `PaintComposite` for mode DEST_OUT. | None |
-| 79 | 󰀐 | U+F0010 | `composite_SRC_ATOP` | Tests `PaintComposite` for mode SRC_ATOP. | None |
-| 80 | 󰀑 | U+F0011 | `composite_DEST_ATOP` | Tests `PaintComposite` for mode DEST_ATOP. | None |
-| 81 | 󰀒 | U+F0012 | `composite_XOR` | Tests `PaintComposite` for mode XOR. | None |
-| 82 | 󰀓 | U+F0013 | `composite_PLUS` | Tests `PaintComposite` for mode PLUS. | None |
-| 83 | 󰀔 | U+F0014 | `composite_SCREEN` | Tests `PaintComposite` for mode SCREEN. | None |
-| 84 | 󰀕 | U+F0015 | `composite_OVERLAY` | Tests `PaintComposite` for mode OVERLAY. | None |
-| 85 | 󰀖 | U+F0016 | `composite_DARKEN` | Tests `PaintComposite` for mode DARKEN. | None |
-| 86 | 󰀗 | U+F0017 | `composite_LIGHTEN` | Tests `PaintComposite` for mode LIGHTEN. | None |
-| 87 | 󰀘 | U+F0018 | `composite_COLOR_DODGE` | Tests `PaintComposite` for mode COLOR_DODGE. | None |
-| 88 | 󰀙 | U+F0019 | `composite_COLOR_BURN` | Tests `PaintComposite` for mode COLOR_BURN. | None |
-| 89 | 󰀚 | U+F001A | `composite_HARD_LIGHT` | Tests `PaintComposite` for mode HARD_LIGHT. | None |
-| 90 | 󰀛 | U+F001B | `composite_SOFT_LIGHT` | Tests `PaintComposite` for mode SOFT_LIGHT. | None |
-| 91 | 󰀜 | U+F001C | `composite_DIFFERENCE` | Tests `PaintComposite` for mode DIFFERENCE. | None |
-| 92 | 󰀝 | U+F001D | `composite_EXCLUSION` | Tests `PaintComposite` for mode EXCLUSION. | None |
-| 93 | 󰀞 | U+F001E | `composite_MULTIPLY` | Tests `PaintComposite` for mode MULTIPLY. | None |
-| 94 | 󰀟 | U+F001F | `composite_HSL_HUE` | Tests `PaintComposite` for mode HSL_HUE. | None |
-| 95 | 󰀠 | U+F0020 | `composite_HSL_SATURATION` | Tests `PaintComposite` for mode HSL_SATURATION. | None |
-| 96 | 󰀡 | U+F0021 | `composite_HSL_COLOR` | Tests `PaintComposite` for mode HSL_COLOR. | None |
-| 97 | 󰀢 | U+F0022 | `composite_HSL_LUMINOSITY` | Tests `PaintComposite` for mode HSL_LUMINOSITY. | None |
-| 98 | 󰀣 | U+F0023 | `foreground_color_linear_alpha_1` | None | None |
-| 99 | 󰀤 | U+F0024 | `foreground_color_radial_alpha_1` | None | None |
-| 100 | 󰀥 | U+F0025 | `foreground_color_sweep_alpha_1` | None | None |
-| 101 | 󰀦 | U+F0026 | `foreground_color_solid_alpha_1` | None | None |
-| 102 | 󰀧 | U+F0027 | `foreground_color_linear_alpha_0.3` | None | None |
-| 103 | 󰀨 | U+F0028 | `foreground_color_radial_alpha_0.3` | None | None |
-| 104 | 󰀩 | U+F0029 | `foreground_color_sweep_alpha_0.3` | None | None |
-| 105 | 󰀪 | U+F002A | `foreground_color_solid_alpha_0.3` | None | None |
-| 106 | 󰀫 | U+F002B | `gradient_p2_skewed` | None | None |
-| 107 | 󰀬 | U+F002C | `colored_circles_v0` | None | None |
-| 108 | 󰀭 | U+F002D | `colored_circles_v1` | None | None |
-| 109 | 󰀮 | U+F002E | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
+| 63 | 󰰀 | U+F0C00 | `composite_CLEAR` | Tests `PaintComposite` for mode CLEAR. | None |
+| 64 | 󰰁 | U+F0C01 | `composite_SRC` | Tests `PaintComposite` for mode SRC. | None |
+| 65 | 󰰂 | U+F0C02 | `composite_DEST` | Tests `PaintComposite` for mode DEST. | None |
+| 66 | 󰰃 | U+F0C03 | `composite_SRC_OVER` | Tests `PaintComposite` for mode SRC_OVER. | None |
+| 67 | 󰰄 | U+F0C04 | `composite_DEST_OVER` | Tests `PaintComposite` for mode DEST_OVER. | None |
+| 68 | 󰰅 | U+F0C05 | `composite_SRC_IN` | Tests `PaintComposite` for mode SRC_IN. | None |
+| 69 | 󰰆 | U+F0C06 | `composite_DEST_IN` | Tests `PaintComposite` for mode DEST_IN. | None |
+| 70 | 󰰇 | U+F0C07 | `composite_SRC_OUT` | Tests `PaintComposite` for mode SRC_OUT. | None |
+| 71 | 󰰈 | U+F0C08 | `composite_DEST_OUT` | Tests `PaintComposite` for mode DEST_OUT. | None |
+| 72 | 󰰉 | U+F0C09 | `composite_SRC_ATOP` | Tests `PaintComposite` for mode SRC_ATOP. | None |
+| 73 | 󰰊 | U+F0C0A | `composite_DEST_ATOP` | Tests `PaintComposite` for mode DEST_ATOP. | None |
+| 74 | 󰰋 | U+F0C0B | `composite_XOR` | Tests `PaintComposite` for mode XOR. | None |
+| 75 | 󰰌 | U+F0C0C | `composite_PLUS` | Tests `PaintComposite` for mode PLUS. | None |
+| 76 | 󰰍 | U+F0C0D | `composite_SCREEN` | Tests `PaintComposite` for mode SCREEN. | None |
+| 77 | 󰰎 | U+F0C0E | `composite_OVERLAY` | Tests `PaintComposite` for mode OVERLAY. | None |
+| 78 | 󰰏 | U+F0C0F | `composite_DARKEN` | Tests `PaintComposite` for mode DARKEN. | None |
+| 79 | 󰰐 | U+F0C10 | `composite_LIGHTEN` | Tests `PaintComposite` for mode LIGHTEN. | None |
+| 80 | 󰰑 | U+F0C11 | `composite_COLOR_DODGE` | Tests `PaintComposite` for mode COLOR_DODGE. | None |
+| 81 | 󰰒 | U+F0C12 | `composite_COLOR_BURN` | Tests `PaintComposite` for mode COLOR_BURN. | None |
+| 82 | 󰰓 | U+F0C13 | `composite_HARD_LIGHT` | Tests `PaintComposite` for mode HARD_LIGHT. | None |
+| 83 | 󰰔 | U+F0C14 | `composite_SOFT_LIGHT` | Tests `PaintComposite` for mode SOFT_LIGHT. | None |
+| 84 | 󰰕 | U+F0C15 | `composite_DIFFERENCE` | Tests `PaintComposite` for mode DIFFERENCE. | None |
+| 85 | 󰰖 | U+F0C16 | `composite_EXCLUSION` | Tests `PaintComposite` for mode EXCLUSION. | None |
+| 86 | 󰰗 | U+F0C17 | `composite_MULTIPLY` | Tests `PaintComposite` for mode MULTIPLY. | None |
+| 87 | 󰰘 | U+F0C18 | `composite_HSL_HUE` | Tests `PaintComposite` for mode HSL_HUE. | None |
+| 88 | 󰰙 | U+F0C19 | `composite_HSL_SATURATION` | Tests `PaintComposite` for mode HSL_SATURATION. | None |
+| 89 | 󰰚 | U+F0C1A | `composite_HSL_COLOR` | Tests `PaintComposite` for mode HSL_COLOR. | None |
+| 90 | 󰰛 | U+F0C1B | `composite_HSL_LUMINOSITY` | Tests `PaintComposite` for mode HSL_LUMINOSITY. | None |
+| 91 | 󰴀 | U+F0D00 | `foreground_color_linear_alpha_1` | None | None |
+| 92 | 󰴁 | U+F0D01 | `foreground_color_linear_alpha_0.3` | None | None |
+| 93 | 󰴂 | U+F0D02 | `foreground_color_radial_alpha_1` | None | None |
+| 94 | 󰴃 | U+F0D03 | `foreground_color_radial_alpha_0.3` | None | None |
+| 95 | 󰴄 | U+F0D04 | `foreground_color_sweep_alpha_1` | None | None |
+| 96 | 󰴅 | U+F0D05 | `foreground_color_sweep_alpha_0.3` | None | None |
+| 97 | 󰴆 | U+F0D06 | `foreground_color_solid_alpha_1` | None | None |
+| 98 | 󰴇 | U+F0D07 | `foreground_color_solid_alpha_0.3` | None | None |
+| 99 | 󰀀 | U+F0000 | `transformed_sweep` | None | None |
+| 100 | 󰀁 | U+F0001 | `composite_colr_glyph` | None | None |
+| 101 | 󰀂 | U+F0002 | `clip_box_top_left` | None | None |
+| 102 | 󰀃 | U+F0003 | `clip_box_bottom_left` | None | None |
+| 103 | 󰀄 | U+F0004 | `clip_box_bottom_right` | None | None |
+| 104 | 󰀅 | U+F0005 | `clip_box_top_right` | None | None |
+| 105 | 󰀆 | U+F0006 | `clip_box_center` | None | None |
+| 106 | 󰀇 | U+F0007 | `gradient_p2_skewed` | None | None |
+| 107 | 󰀈 | U+F0008 | `colored_circles_v0` | None | None |
+| 108 | 󰀉 | U+F0009 | `colored_circles_v1` | None | None |
+| 109 | 󰀊 | U+F000A | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
 | 110 | + | U+2B | `cross_glyph` | None | None |
 | 111 | ▀ | U+2580 | `upem_box_glyph` | None | None |
-| 112 | 󰀯 | U+F002F | `clip_shade_center` | None | None |
-| 113 | 󰀰 | U+F0030 | `clip_shade_top_left` | None | None |
-| 114 | 󰀱 | U+F0031 | `clip_shade_bottom_left` | None | None |
-| 115 | 󰀲 | U+F0032 | `clip_shade_bottom_right` | None | None |
-| 116 | 󰀳 | U+F0033 | `clip_shade_top_right` | None | None |
-| 117 | 󰀴 | U+F0034 | `inset_clipped_radial_reflect` | None | None |
-| 118 | 󰀵 | U+F0035 | `circle_r50` | None | None |
-| 119 | 󰀶 | U+F0036 | `circle_r100` | None | None |
-| 120 | 󰀷 | U+F0037 | `circle_r150` | None | None |
-| 121 | 󰀸 | U+F0038 | `circle_r200` | None | None |
-| 122 | 󰀹 | U+F0039 | `circle_r250` | None | None |
-| 123 | 󰀺 | U+F003A | `circle_r300` | None | None |
-| 124 | 󰀻 | U+F003B | `circle_r350` | None | None |
-| 125 | 󰀼 | U+F003C | `one` | None | None |
-| 126 | 󰀽 | U+F003D | `zero` | None | None |
+| 112 | 󰀋 | U+F000B | `clip_shade_center` | None | None |
+| 113 | 󰀌 | U+F000C | `clip_shade_top_left` | None | None |
+| 114 | 󰀍 | U+F000D | `clip_shade_bottom_left` | None | None |
+| 115 | 󰀎 | U+F000E | `clip_shade_bottom_right` | None | None |
+| 116 | 󰀏 | U+F000F | `clip_shade_top_right` | None | None |
+| 117 | 󰀐 | U+F0010 | `inset_clipped_radial_reflect` | None | None |
+| 118 | 󰀑 | U+F0011 | `circle_r50` | None | None |
+| 119 | 󰀒 | U+F0012 | `circle_r100` | None | None |
+| 120 | 󰀓 | U+F0013 | `circle_r150` | None | None |
+| 121 | 󰀔 | U+F0014 | `circle_r200` | None | None |
+| 122 | 󰀕 | U+F0015 | `circle_r250` | None | None |
+| 123 | 󰀖 | U+F0016 | `circle_r300` | None | None |
+| 124 | 󰀗 | U+F0017 | `circle_r350` | None | None |
+| 125 | 󰀘 | U+F0018 | `one` | None | None |
+| 126 | 󰀙 | U+F0019 | `zero` | None | None |

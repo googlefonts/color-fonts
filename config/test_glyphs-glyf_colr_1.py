@@ -903,20 +903,20 @@ class PaintTransform(TestCategory):
         )
 
 
-
 class PaintTranslate(TestCategory):
-
     def get_name(self):
         return "paint_translate"
 
     def _get_test_parameters(self):
-        return [(0, 0),
-        (0, 100),
-        (0, -100),
-        (100, 0),
-        (-100, 0),
-        (200, 200),
-        (-200, -200),]
+        return [
+            (0, 0),
+            (0, 100),
+            (0, -100),
+            (100, 0),
+            (-100, 0),
+            (200, 200),
+            (-200, -200),
+        ]
 
     def _make_test_glyph(self, param_set, position, accessor):
         (dx, dy) = param_set
@@ -1057,148 +1057,162 @@ def _clip_box(position, accessor):
     )
 
 
-def _composite(composite_mode, accessor):
+class Composite(TestCategory):
+    def get_name(self):
+        return "composite_mode"
 
-    color_black = _cpal("black", 1)
-    color_blue = _cpal("#68c7e8", 1)
-    color_yellow = _cpal("#ffdc01", 1)
+    def _get_test_parameters(self):
+        return list(ttLib.tables.otTables.CompositeMode)
 
-    colr = {
-        "Format": ot.PaintFormat.PaintColrLayers,
-        "Layers": [
-            {
-                "Format": ot.PaintFormat.PaintGlyph,
-                "Glyph": _CROSS_GLYPH,
-                "Paint": {
-                    "Format": ot.PaintFormat.PaintSolid,
-                    "PaletteIndex": color_black[0],
-                    "Alpha": color_black[1],
-                },
-            },
-            {
-                "Format": ot.PaintFormat.PaintComposite,
-                "CompositeMode": composite_mode,
-                "SourcePaint": {
-                    "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
-                    "centerX": _UPEM / 3 * 2,
-                    "centerY": _UPEM / 3,
-                    "scale": 1 / 2,
+    def _make_test_glyph(self, composite_mode, position, accessor):
+        color_black = _cpal("black", 1)
+        color_blue = _cpal("#68c7e8", 1)
+        color_yellow = _cpal("#ffdc01", 1)
+
+        colr = {
+            "Format": ot.PaintFormat.PaintColrLayers,
+            "Layers": [
+                {
+                    "Format": ot.PaintFormat.PaintGlyph,
+                    "Glyph": _CROSS_GLYPH,
                     "Paint": {
-                        "Format": ot.PaintFormat.PaintGlyph,
-                        "Glyph": _UPEM_BOX_GLYPH,
+                        "Format": ot.PaintFormat.PaintSolid,
+                        "PaletteIndex": color_black[0],
+                        "Alpha": color_black[1],
+                    },
+                },
+                {
+                    "Format": ot.PaintFormat.PaintComposite,
+                    "CompositeMode": composite_mode,
+                    "SourcePaint": {
+                        "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
+                        "centerX": _UPEM / 3 * 2,
+                        "centerY": _UPEM / 3,
+                        "scale": 1 / 2,
                         "Paint": {
-                            "Format": ot.PaintFormat.PaintSolid,
-                            "PaletteIndex": color_blue[0],
-                            "Alpha": color_blue[1],
+                            "Format": ot.PaintFormat.PaintGlyph,
+                            "Glyph": _UPEM_BOX_GLYPH,
+                            "Paint": {
+                                "Format": ot.PaintFormat.PaintSolid,
+                                "PaletteIndex": color_blue[0],
+                                "Alpha": color_blue[1],
+                            },
+                        },
+                    },
+                    "BackdropPaint": {
+                        "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
+                        "centerX": _UPEM / 3,
+                        "centerY": _UPEM / 3 * 2,
+                        "scale": 1 / 2,
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintGlyph,
+                            "Glyph": _UPEM_BOX_GLYPH,
+                            "Paint": {
+                                "Format": ot.PaintFormat.PaintSolid,
+                                "PaletteIndex": color_yellow[0],
+                                "Alpha": color_yellow[1],
+                            },
                         },
                     },
                 },
-                "BackdropPaint": {
-                    "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
-                    "centerX": _UPEM / 3,
-                    "centerY": _UPEM / 3 * 2,
-                    "scale": 1 / 2,
-                    "Paint": {
-                        "Format": ot.PaintFormat.PaintGlyph,
-                        "Glyph": _UPEM_BOX_GLYPH,
-                        "Paint": {
-                            "Format": ot.PaintFormat.PaintSolid,
-                            "PaletteIndex": color_yellow[0],
-                            "Alpha": color_yellow[1],
-                        },
-                    },
+            ],
+        }
+
+        return SampleGlyph(
+            glyph_name=f"composite_{composite_mode.name}",
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            clip_box=(0, 0, _UPEM, _UPEM),
+            colr=colr,
+            description=f"Tests `PaintComposite` for mode {composite_mode.name}.",
+        )
+
+
+class ForegroundColor(TestCategory):
+    def get_name(self):
+        return "foreground_color"
+
+    def _get_test_parameters(self):
+        return list(itertools.product(["linear", "radial", "sweep", "solid"], [1, 0.3]))
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        (fill_type, foreground_alpha) = param_set
+
+        FOREGROUND_PALETTE_INDEX = 0xFFFF
+
+        fill_type_map = {
+            "solid": {
+                "Format": ot.PaintFormat.PaintSolid,
+                "PaletteIndex": FOREGROUND_PALETTE_INDEX,
+                "Alpha": foreground_alpha,
+            },
+            "linear": {
+                "Format": ot.PaintFormat.PaintLinearGradient,
+                "ColorLine": {
+                    "ColorStop": [
+                        (0.0, *_cpal("orange")),
+                        (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                        (1.0, *_cpal("orange")),
+                    ]
                 },
+                "x0": 100,
+                "y0": 250,
+                "x1": 900,
+                "y1": 250,
+                "x2": 100,
+                "y2": 300,
             },
-        ],
-    }
-
-    return SampleGlyph(
-        glyph_name=f"composite_{composite_mode.name}",
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        clip_box=(0, 0, _UPEM, _UPEM),
-        colr=colr,
-        description=f"Tests `PaintComposite` for mode {composite_mode.name}.",
-    )
-
-
-def _foreground_color(fill_type, foreground_alpha, accessor):
-
-    FOREGROUND_PALETTE_INDEX = 0xFFFF
-
-    fill_type_map = {
-        "solid": {
-            "Format": ot.PaintFormat.PaintSolid,
-            "PaletteIndex": FOREGROUND_PALETTE_INDEX,
-            "Alpha": foreground_alpha,
-        },
-        "linear": {
-            "Format": ot.PaintFormat.PaintLinearGradient,
-            "ColorLine": {
-                "ColorStop": [
-                    (0.0, *_cpal("orange")),
-                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
-                    (1.0, *_cpal("orange")),
-                ]
+            "radial": {
+                "Format": ot.PaintFormat.PaintRadialGradient,
+                "ColorLine": {
+                    "ColorStop": [
+                        (0.0, *_cpal("orange")),
+                        (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                        (1.0, *_cpal("orange")),
+                    ]
+                },
+                "x0": 500,
+                "y0": 600,
+                "r0": 50,
+                "x1": 500,
+                "y1": 600,
+                "r1": 450,
             },
-            "x0": 100,
-            "y0": 250,
-            "x1": 900,
-            "y1": 250,
-            "x2": 100,
-            "y2": 300,
-        },
-        "radial": {
-            "Format": ot.PaintFormat.PaintRadialGradient,
-            "ColorLine": {
-                "ColorStop": [
-                    (0.0, *_cpal("orange")),
-                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
-                    (1.0, *_cpal("orange")),
-                ]
+            "sweep": {
+                "Format": ot.PaintFormat.PaintSweepGradient,
+                "ColorLine": {
+                    "ColorStop": [
+                        (0.0, *_cpal("orange")),
+                        (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
+                        (1.0, *_cpal("orange")),
+                    ]
+                },
+                "centerX": 500,
+                "centerY": 600,
+                "startAngle": -180,
+                "endAngle": 270,
             },
-            "x0": 500,
-            "y0": 600,
-            "r0": 50,
-            "x1": 500,
-            "y1": 600,
-            "r1": 450,
-        },
-        "sweep": {
-            "Format": ot.PaintFormat.PaintSweepGradient,
-            "ColorLine": {
-                "ColorStop": [
-                    (0.0, *_cpal("orange")),
-                    (0.5, FOREGROUND_PALETTE_INDEX, foreground_alpha),
-                    (1.0, *_cpal("orange")),
-                ]
-            },
-            "centerX": 500,
-            "centerY": 600,
-            "startAngle": -180,
-            "endAngle": 270,
-        },
-    }
+        }
 
-    glyph_name = f"foreground_color_{fill_type}_alpha_{foreground_alpha}"
+        glyph_name = f"foreground_color_{fill_type}_alpha_{foreground_alpha}"
 
-    pen = _upem_box_pen()
+        pen = _upem_box_pen()
 
-    colr = {
-        "Format": ot.PaintFormat.PaintGlyph,
-        "Glyph": glyph_name,
-        "Paint": fill_type_map[fill_type],
-    }
+        colr = {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": glyph_name,
+            "Paint": fill_type_map[fill_type],
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=pen.glyph(),
-        clip_box=(100, 250, 900, 950),
-        colr=colr,
-    )
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=pen.glyph(),
+            clip_box=(100, 250, 900, 950),
+            colr=colr,
+        )
 
 
 def _colrv0_colored_circles(palette_test_colors, accessor):
@@ -1426,7 +1440,9 @@ class TestDefinitions:
             PaintRotate(0xF0800, 0xF08FF),
             PaintSkew(0xF0900, 0xF09FF),
             PaintTransform(0xF0A00, 0xF0AFF),
-            PaintTranslate(0XF0B00, 0xF0BFF),
+            PaintTranslate(0xF0B00, 0xF0BFF),
+            Composite(0xF0C00, 0xF0CFF),
+            ForegroundColor(0xF0D00, 0x0F0DFF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1456,18 +1472,6 @@ def _get_glyph_definitions(position):
         _clip_box("bottom_right", next(access_chars)),
         _clip_box("top_right", next(access_chars)),
         _clip_box("center", next(access_chars)),
-        *[
-            _composite(mode, next(access_chars))
-            for mode in ttLib.tables.otTables.CompositeMode
-        ],
-        _foreground_color("linear", 1, next(access_chars)),
-        _foreground_color("radial", 1, next(access_chars)),
-        _foreground_color("sweep", 1, next(access_chars)),
-        _foreground_color("solid", 1, next(access_chars)),
-        _foreground_color("linear", 0.3, next(access_chars)),
-        _foreground_color("radial", 0.3, next(access_chars)),
-        _foreground_color("sweep", 0.3, next(access_chars)),
-        _foreground_color("solid", 0.3, next(access_chars)),
         _gradient_p2_skewed(next(access_chars)),
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
