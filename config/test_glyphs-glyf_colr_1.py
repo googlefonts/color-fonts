@@ -252,73 +252,80 @@ class GradientStopsRepeat(TestCategory):
         )
 
 
-def _lin_rad_solid_alpha(position, accessor):
-    glyph_name = "solid_colorline_alpha"
+class VariableAlpha(TestCategory):
+    def get_name(self):
+        return "variable_alpha"
 
-    solid_alpha = 1
-    gradient_alphas = [1, 1]
+    def _get_test_parameters(self):
+        return [True]
 
-    solid_alpha += _deltaOrZero("APH1", position)
-    gradient_alphas[0] += _deltaOrZero("APH2", position)
-    gradient_alphas[1] += _deltaOrZero("APH3", position)
+    def _make_test_glyph(self, param_set, position, accessor):
+        glyph_name = "solid_colorline_alpha"
 
-    color_solid = _cpal("green", solid_alpha)
+        solid_alpha = 1
+        gradient_alphas = [1, 1]
 
-    colr = {
-        "Format": ot.PaintFormat.PaintColrLayers,
-        "Layers": [
-            {
-                "Format": ot.PaintFormat.PaintTranslate,
-                "dx": 150,
-                "dy": 0,
-                "Paint": {
-                    "Format": ot.PaintFormat.PaintGlyph,
-                    "Glyph": "circle_r350",
+        solid_alpha += _deltaOrZero("APH1", position)
+        gradient_alphas[0] += _deltaOrZero("APH2", position)
+        gradient_alphas[1] += _deltaOrZero("APH3", position)
+
+        color_solid = _cpal("green", solid_alpha)
+
+        colr = {
+            "Format": ot.PaintFormat.PaintColrLayers,
+            "Layers": [
+                {
+                    "Format": ot.PaintFormat.PaintTranslate,
+                    "dx": 150,
+                    "dy": 0,
                     "Paint": {
-                        "Format": ot.PaintFormat.PaintSolid,
-                        "PaletteIndex": color_solid[0],
-                        "Alpha": color_solid[1],
-                    },
-                },
-            },
-            {
-                "Format": ot.PaintFormat.PaintTranslate,
-                "dx": -150,
-                "dy": 0,
-                "Paint": {
-                    "Format": ot.PaintFormat.PaintGlyph,
-                    "Glyph": "circle_r350",
-                    "Paint": {
-                        "Format": ot.PaintFormat.PaintLinearGradient,
-                        "x0": 500,
-                        "y0": 250,
-                        "x1": 500,
-                        "y1": 950,
-                        "x2": 600,
-                        "y2": 250,
-                        "ColorLine": {
-                            "ColorStop": [
-                                (0, *_cpal("red", gradient_alphas[0])),
-                                (1, *_cpal("blue", gradient_alphas[1])),
-                            ],
-                            "Extend": ot.ExtendMode.REPEAT,
+                        "Format": ot.PaintFormat.PaintGlyph,
+                        "Glyph": "circle_r350",
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintSolid,
+                            "PaletteIndex": color_solid[0],
+                            "Alpha": color_solid[1],
                         },
                     },
                 },
-            },
-        ],
-    }
+                {
+                    "Format": ot.PaintFormat.PaintTranslate,
+                    "dx": -150,
+                    "dy": 0,
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintGlyph,
+                        "Glyph": "circle_r350",
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintLinearGradient,
+                            "x0": 500,
+                            "y0": 250,
+                            "x1": 500,
+                            "y1": 950,
+                            "x2": 600,
+                            "y2": 250,
+                            "ColorLine": {
+                                "ColorStop": [
+                                    (0, *_cpal("red", gradient_alphas[0])),
+                                    (1, *_cpal("blue", gradient_alphas[1])),
+                                ],
+                                "Extend": ot.ExtendMode.REPEAT,
+                            },
+                        },
+                    },
+                },
+            ],
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        clip_box=(0, 0, _UPEM, _UPEM),
-        colr=colr,
-        description="Tests variable alpha in linear gradient color stops, and in PaintVarSolid.",
-        axes_effect="`APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values.",
-    )
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            clip_box=(0, 0, _UPEM, _UPEM),
+            colr=colr,
+            description="Tests variable alpha in linear gradient color stops, and in PaintVarSolid.",
+            axes_effect="`APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values.",
+        )
 
 
 def _sample_colr_glyph(accessor):
@@ -1485,6 +1492,7 @@ class TestDefinitions:
             GradientP2Skewed(0xF0F00, 0xF0FFF),
             PaletteCircles(0xF1000, 0xF10FF),
             CircleContours(0xF1100, 0xF11FF),
+            VariableAlpha(0xF1200, 0xF12FF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1509,7 +1517,6 @@ def _get_glyph_definitions(position):
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
-        _lin_rad_solid_alpha(position, next(access_chars)),
         # Non COLR helper glyphs below here.
         _cross_glyph(),
         _upem_box_glyph(),
