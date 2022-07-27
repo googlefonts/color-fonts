@@ -1021,40 +1021,52 @@ def _inset_clipped_radial_reflect(accessor):
     )
 
 
-def _clip_box(position, accessor):
+class ClipBox(TestCategory):
+    def get_name(self):
+        return "clipbox"
 
-    other_glyph_colr = {
-        "Format": ot.PaintFormat.PaintColrGlyph,
-        "Glyph": "inset_clipped_radial_reflect",
-    }
+    def _get_test_parameters(self):
+        return [
+            ("top_left"),
+            ("bottom_left"),
+            ("bottom_right"),
+            ("top_right"),
+            ("center"),
+        ]
 
-    shade_color = _cpal("gray", 0.4)
+    def _make_test_glyph(self, clip_corner, position, accessor):
+        other_glyph_colr = {
+            "Format": ot.PaintFormat.PaintColrGlyph,
+            "Glyph": "inset_clipped_radial_reflect",
+        }
 
-    colr = {
-        "Format": ot.PaintFormat.PaintComposite,
-        "CompositeMode": "SRC_OVER",
-        "SourcePaint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": f"clip_shade_{position}",
-            "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": shade_color[0],
-                "Alpha": shade_color[1],
+        shade_color = _cpal("gray", 0.4)
+
+        colr = {
+            "Format": ot.PaintFormat.PaintComposite,
+            "CompositeMode": "SRC_OVER",
+            "SourcePaint": {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": f"clip_shade_{clip_corner}",
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": shade_color[0],
+                    "Alpha": shade_color[1],
+                },
             },
-        },
-        "BackdropPaint": other_glyph_colr,
-    }
+            "BackdropPaint": other_glyph_colr,
+        }
 
-    (x_min, y_min, x_max, y_max) = clip_position_map[position]
+        (x_min, y_min, x_max, y_max) = clip_position_map[clip_corner]
 
-    return SampleGlyph(
-        glyph_name=f"clip_box_{position}",
-        accessor=accessor,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        clip_box=(x_min, y_min, x_max, y_max),
-        colr=colr,
-    )
+        return SampleGlyph(
+            glyph_name=f"clip_box_{clip_corner}",
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            clip_box=(x_min, y_min, x_max, y_max),
+            colr=colr,
+        )
 
 
 class Composite(TestCategory):
@@ -1443,6 +1455,7 @@ class TestDefinitions:
             PaintTranslate(0xF0B00, 0xF0BFF),
             Composite(0xF0C00, 0xF0CFF),
             ForegroundColor(0xF0D00, 0x0F0DFF),
+            ClipBox(0xF0E00, 0x0F0EFF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1467,11 +1480,6 @@ def _get_glyph_definitions(position):
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
-        _clip_box("top_left", next(access_chars)),
-        _clip_box("bottom_left", next(access_chars)),
-        _clip_box("bottom_right", next(access_chars)),
-        _clip_box("top_right", next(access_chars)),
-        _clip_box("center", next(access_chars)),
         _gradient_p2_skewed(next(access_chars)),
         _colrv0_colored_circles(palette_test_colors, next(access_chars)),
         _colrv1_colored_circles(palette_test_colors, next(access_chars)),
