@@ -676,7 +676,7 @@ class ExtendMode(TestCategory):
         )
 
 
-def _paint_rotate(angle, center_x, center_y, position, accessor_char):
+def _paint_rotate(angle, center_x, center_y, position, accessor):
     glyph_name = f"rotate_{angle}_center_{center_x}_{center_y}"
 
     color_orange = _cpal("orange", 0.7)
@@ -735,7 +735,7 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
@@ -745,7 +745,7 @@ def _paint_rotate(angle, center_x, center_y, position, accessor_char):
 
 
 def _paint_skew(
-    x_skew_angle, y_skew_angle, center_x, center_y, position, accessor_char
+    x_skew_angle, y_skew_angle, center_x, center_y, position, accessor
 ):
     glyph_name = f"skew_{x_skew_angle}_{y_skew_angle}_center_{center_x}_{center_y}"
 
@@ -799,7 +799,7 @@ def _paint_skew(
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         colr=colr,
@@ -926,7 +926,7 @@ clip_position_map = {
 # A composited glyph which shades the intended clip box without
 # defining a clip box for itself. Useful in testing ClipBoxes to see whether
 # only the shaded portion is drawn or other parts of the glyph peek out.
-def _clip_shade_glyph(position, accessor_char):
+def _clip_shade_glyph(position, accessor):
     if not position in clip_position_map:
         return None
 
@@ -943,13 +943,13 @@ def _clip_shade_glyph(position, accessor_char):
         glyph_name=f"clip_shade_{position}",
         advance=_UPEM,
         glyph=clip_pen.glyph(),
-        accessor=accessor_char,
+        accessor=accessor,
     )
 
 
 # A clone (PaintColrGlyph) of the radial_gradient_extend_mode_reflect glyph,
 # clipped with a smaller clip box in order to test nested clip boxes.
-def _inset_clipped_radial_reflect(accessor_char):
+def _inset_clipped_radial_reflect(accessor):
     colr = {
         "Format": ot.PaintFormat.PaintColrGlyph,
         "Glyph": "radial_gradient_extend_mode_reflect",
@@ -957,7 +957,7 @@ def _inset_clipped_radial_reflect(accessor_char):
 
     return SampleGlyph(
         glyph_name="inset_clipped_radial_reflect",
-        accessor=accessor_char,
+        accessor=accessor,
         glyph=_upem_box_pen().glyph(),
         advance=_UPEM,
         clip_box=(_UPEM / 10, _UPEM / 10, _UPEM - _UPEM / 10, _UPEM - _UPEM / 10),
@@ -965,7 +965,7 @@ def _inset_clipped_radial_reflect(accessor_char):
     )
 
 
-def _clip_box(position, accessor_char):
+def _clip_box(position, accessor):
 
     other_glyph_colr = {
         "Format": ot.PaintFormat.PaintColrGlyph,
@@ -993,7 +993,7 @@ def _clip_box(position, accessor_char):
 
     return SampleGlyph(
         glyph_name=f"clip_box_{position}",
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         clip_box=(x_min, y_min, x_max, y_max),
@@ -1001,7 +1001,7 @@ def _clip_box(position, accessor_char):
     )
 
 
-def _composite(composite_mode, accessor_char):
+def _composite(composite_mode, accessor):
 
     color_black = _cpal("black", 1)
     color_blue = _cpal("#68c7e8", 1)
@@ -1058,7 +1058,7 @@ def _composite(composite_mode, accessor_char):
 
     return SampleGlyph(
         glyph_name=f"composite_{composite_mode.name}",
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=_upem_box_pen().glyph(),
         clip_box=(0, 0, _UPEM, _UPEM),
@@ -1067,7 +1067,7 @@ def _composite(composite_mode, accessor_char):
     )
 
 
-def _foreground_color(fill_type, foreground_alpha, accessor_char):
+def _foreground_color(fill_type, foreground_alpha, accessor):
 
     FOREGROUND_PALETTE_INDEX = 0xFFFF
 
@@ -1137,7 +1137,7 @@ def _foreground_color(fill_type, foreground_alpha, accessor_char):
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=pen.glyph(),
         clip_box=(100, 250, 900, 950),
@@ -1145,7 +1145,7 @@ def _foreground_color(fill_type, foreground_alpha, accessor_char):
     )
 
 
-def _colrv0_colored_circles(palette_test_colors, accessor_char):
+def _colrv0_colored_circles(palette_test_colors, accessor):
     pen = _upem_box_pen()
     glyph_name = "colored_circles_v0"
     color_iter = iter(palette_test_colors)
@@ -1163,14 +1163,14 @@ def _colrv0_colored_circles(palette_test_colors, accessor_char):
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=pen.glyph(),
         colrv0=colrv0_layers,
     )
 
 
-def _colrv1_colored_circles(palette_test_colors, accessor_char):
+def _colrv1_colored_circles(palette_test_colors, accessor):
     pen = _upem_box_pen()
     glyph_name = "colored_circles_v1"
 
@@ -1211,14 +1211,14 @@ def _colrv1_colored_circles(palette_test_colors, accessor_char):
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=pen.glyph(),
         colr=colrv1,
     )
 
 
-def _circle_of_size(upem_radius, accessor_char):
+def _circle_of_size(upem_radius, accessor):
     glyph_name = f"circle_r{upem_radius}"
 
     center_x = 500
@@ -1248,13 +1248,13 @@ def _circle_of_size(upem_radius, accessor_char):
 
     return SampleGlyph(
         glyph_name=glyph_name,
-        accessor=accessor_char,
+        accessor=accessor,
         advance=_UPEM,
         glyph=tt_pen.glyph(),
     )
 
 
-def _one_glyph(accessor_char):
+def _one_glyph(accessor):
     glyph_name = "one"
 
     draw_pen = TTGlyphPen(None)
@@ -1272,11 +1272,11 @@ def _one_glyph(accessor_char):
         pen.lineTo(line_point)
     pen.closePath()
     return SampleGlyph(
-        glyph_name="one", accessor=accessor_char, advance=_UPEM, glyph=draw_pen.glyph()
+        glyph_name="one", accessor=accessor, advance=_UPEM, glyph=draw_pen.glyph()
     )
 
 
-def _zero_glyph(accessor_char):
+def _zero_glyph(accessor):
     glyph_name = "zero"
     draw_pen = TTGlyphPen(None)
     pen = draw_pen.transformPen(draw_pen, (0.2, 0, 0, 0.2, 150, 250))
@@ -1299,7 +1299,7 @@ def _zero_glyph(accessor_char):
     pen.closePath()
 
     return SampleGlyph(
-        glyph_name="zero", accessor=accessor_char, advance=_UPEM, glyph=draw_pen.glyph()
+        glyph_name="zero", accessor=accessor, advance=_UPEM, glyph=draw_pen.glyph()
     )
 
 
