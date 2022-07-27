@@ -76,7 +76,6 @@ class TestCategory(ABC):
         self.burned_codepoint_offsets = []
         self.range_start = range_start
         self.range_end = range_end
-        self.test_parameters = self._get_test_parameters()
 
     @abstractmethod
     def get_name(self) -> str:
@@ -201,6 +200,55 @@ class Sweep(TestCategory):
             colr=colr,
             description="Tests `Paint(Var)SweepGradient`.",
             axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle.",
+        )
+
+
+class GradientStopsRepeat(TestCategory):
+    def get_name(self):
+        return "gradient_stops_repeat"
+
+    def _get_test_parameters(self):
+        return [(0, 1), (0.2, 0.8), (0, 1.5), (0.5, 1.5)]
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        (first_stop, second_stop) = param_set
+        glyph_name = f"linear_repeat_{first_stop}_{second_stop}"
+        pen = TTGlyphPen(None)
+        pen.moveTo((100, 250))
+        pen.lineTo((100, 950))
+        pen.lineTo((900, 950))
+        pen.lineTo((900, 250))
+        pen.closePath()
+
+        colr = {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": glyph_name,
+            "Paint": {
+                "Format": ot.PaintFormat.PaintLinearGradient,
+                "ColorLine": {
+                    "ColorStop": [
+                        (first_stop, *_cpal("red")),
+                        (second_stop, *_cpal("blue")),
+                    ],
+                    "Extend": ot.ExtendMode.REPEAT,
+                },
+                "x0": 100,
+                "y0": 250,
+                "x1": 900,
+                "y1": 250,
+                "x2": 100,
+                "y2": 300,
+            },
+        }
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=pen.glyph(),
+            clip_box=(100, 250, 900, 950),
+            colr=colr,
+            description=f"Tests `PaintLinearGradient` repeat modes for color stops {first_stop}, {second_stop}.",
         )
 
 
@@ -337,48 +385,6 @@ def _sample_composite_colr_glyph(accessor):
     )
 
 
-def _gradient_stops_repeat(first_stop, second_stop, accessor_char):
-    glyph_name = f"linear_repeat_{first_stop}_{second_stop}"
-
-    pen = TTGlyphPen(None)
-    pen.moveTo((100, 250))
-    pen.lineTo((100, 950))
-    pen.lineTo((900, 950))
-    pen.lineTo((900, 250))
-    pen.closePath()
-
-    colr = {
-        "Format": ot.PaintFormat.PaintGlyph,
-        "Glyph": glyph_name,
-        "Paint": {
-            "Format": ot.PaintFormat.PaintLinearGradient,
-            "ColorLine": {
-                "ColorStop": [
-                    (first_stop, *_cpal("red")),
-                    (second_stop, *_cpal("blue")),
-                ],
-                "Extend": ot.ExtendMode.REPEAT,
-            },
-            "x0": 100,
-            "y0": 250,
-            "x1": 900,
-            "y1": 250,
-            "x2": 100,
-            "y2": 300,
-        },
-    }
-
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor_char,
-        advance=_UPEM,
-        glyph=pen.glyph(),
-        clip_box=(100, 250, 900, 950),
-        colr=colr,
-        description=f"Tests `PaintLinearGradient` repeat modes for color stops {first_stop}, {second_stop}.",
-    )
-
-
 def _gradient_p2_skewed(accessor_char):
     glyph_name = f"gradient_p2_skewed"
 
@@ -468,185 +474,206 @@ def _upem_box_glyph():
     )
 
 
-def _paint_scale(scale_x, scale_y, center_x, center_y, position, accessor_char):
-    glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
+class PaintScale(TestCategory):
+    def get_name(self):
+        return "paint_scale"
 
-    color_orange = _cpal("orange", 0.7)
-    glyph_paint = {
-        "Paint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
+    def _get_test_parameters(self):
+        return [
+            (0.5, 1.5, _UPEM / 2, _UPEM / 2),
+            (1.5, 1.5, _UPEM / 2, _UPEM / 2),
+            (0.5, 1.5, 0, 0),
+            (1.5, 1.5, 0, 0),
+            (0.5, 1.5, _UPEM, _UPEM),
+            (1.5, 1.5, _UPEM, _UPEM),
+        ]
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        (scale_x, scale_y, center_x, center_y) = param_set
+
+        glyph_name = f"scale_{scale_x}_{scale_y}_center_{center_x}_{center_y}"
+
+        color_orange = _cpal("orange", 0.7)
+        glyph_paint = {
             "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_orange[0],
-                "Alpha": color_orange[1],
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_orange[0],
+                    "Alpha": color_orange[1],
+                },
             },
-        },
-    }
+        }
 
-    # Can't apply deltas before as the original values are used for determining
-    # which Paint format to choose.
-    description = ""
-    if center_x or center_y:
-        if scale_x != scale_y:
-            scaled_colr = {
-                "Format": ot.PaintFormat.PaintScaleAroundCenter,
-                "scaleX": scale_x,
-                "scaleY": scale_y,
-                "centerX": center_x,
-                "centerY": center_y,
-            }
-            description = "`Paint(Var)ScaleAroundCenter`"
+        # Can't apply deltas before as the original values are used for determining
+        # which Paint format to choose.
+        description = ""
+        if center_x or center_y:
+            if scale_x != scale_y:
+                scaled_colr = {
+                    "Format": ot.PaintFormat.PaintScaleAroundCenter,
+                    "scaleX": scale_x,
+                    "scaleY": scale_y,
+                    "centerX": center_x,
+                    "centerY": center_y,
+                }
+                description = "`Paint(Var)ScaleAroundCenter`"
+            else:
+                scaled_colr = {
+                    "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
+                    "scale": scale_x,
+                    "centerX": center_x,
+                    "centerY": center_y,
+                }
+                description = "`Paint(Var)ScaleUniformAroundCenter`"
         else:
-            scaled_colr = {
-                "Format": ot.PaintFormat.PaintScaleUniformAroundCenter,
-                "scale": scale_x,
-                "centerX": center_x,
-                "centerY": center_y,
-            }
-            description = "`Paint(Var)ScaleUniformAroundCenter`"
-    else:
-        if scale_x != scale_y:
-            scaled_colr = {
-                "Format": ot.PaintFormat.PaintScale,
-                "scaleX": scale_x,
-                "scaleY": scale_y,
-            }
-            description = "`Paint(Var)Scale`"
-        else:
-            scaled_colr = {
-                "Format": ot.PaintFormat.PaintScaleUniform,
-                "scale": scale_x,
-            }
-            description = "`Paint(Var)ScaleUniform`"
+            if scale_x != scale_y:
+                scaled_colr = {
+                    "Format": ot.PaintFormat.PaintScale,
+                    "scaleX": scale_x,
+                    "scaleY": scale_y,
+                }
+                description = "`Paint(Var)Scale`"
+            else:
+                scaled_colr = {
+                    "Format": ot.PaintFormat.PaintScaleUniform,
+                    "scale": scale_x,
+                }
+                description = "`Paint(Var)ScaleUniform`"
 
-    if "centerX" in scaled_colr:
-        scaled_colr["centerX"] += _deltaOrZero("SCOX", position)
-    if "centerY" in scaled_colr:
-        scaled_colr["centerY"] += _deltaOrZero("SCOY", position)
-    if "scale" in scaled_colr:
-        scaled_colr["scale"] += _deltaOrZero("SCSX", position)
-    if "scaleX" in scaled_colr:
-        scaled_colr["scaleX"] += _deltaOrZero("SCSX", position)
-    if "scaleY" in scaled_colr:
-        scaled_colr["scaleY"] += _deltaOrZero("SCSY", position)
+        if "centerX" in scaled_colr:
+            scaled_colr["centerX"] += _deltaOrZero("SCOX", position)
+        if "centerY" in scaled_colr:
+            scaled_colr["centerY"] += _deltaOrZero("SCOY", position)
+        if "scale" in scaled_colr:
+            scaled_colr["scale"] += _deltaOrZero("SCSX", position)
+        if "scaleX" in scaled_colr:
+            scaled_colr["scaleX"] += _deltaOrZero("SCSX", position)
+        if "scaleY" in scaled_colr:
+            scaled_colr["scaleY"] += _deltaOrZero("SCSY", position)
 
-    scaled_colr.update(glyph_paint)
+        scaled_colr.update(glyph_paint)
 
-    color_blue = _cpal("blue", 0.5)
+        color_blue = _cpal("blue", 0.5)
 
-    colr = {
-        "Format": ot.PaintFormat.PaintComposite,
-        "CompositeMode": "DEST_OVER",
-        "SourcePaint": scaled_colr,
-        "BackdropPaint": {
+        colr = {
+            "Format": ot.PaintFormat.PaintComposite,
+            "CompositeMode": "DEST_OVER",
+            "SourcePaint": scaled_colr,
+            "BackdropPaint": {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_blue[0],
+                    "Alpha": color_blue[1],
+                },
+            },
+        }
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            colr=colr,
+            description=f"Tests {description}.",
+            axes_effect="`SCOX` shifts center x offset, `SCOY` shifts center Y offfset, `SCSX` changes x or uniform scale factor, `SCSY` changes y scale factor.",
+        )
+
+
+class ExtendMode(TestCategory):
+    def get_name(self):
+        return "extend_mode"
+
+    def _get_test_parameters(self):
+        return list(
+            itertools.product(["linear", "radial"], ["pad", "repeat", "reflect"])
+        )
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        (gradient_format, extend_mode) = param_set
+        format_map = {
+            "linear": ot.PaintFormat.PaintLinearGradient,
+            "radial": ot.PaintFormat.PaintRadialGradient,
+        }
+
+        if gradient_format not in format_map:
+            return None
+
+        selected_format = format_map[gradient_format]
+
+        description = f"Paint(Var){gradient_format.capitalize()}Gradient"
+
+        extend_mode_map = {
+            "reflect": ot.ExtendMode.REFLECT,
+            "repeat": ot.ExtendMode.REPEAT,
+            "pad": ot.ExtendMode.PAD,
+        }
+
+        if extend_mode not in extend_mode_map:
+            return None
+
+        coordinates = {
+            ot.PaintFormat.PaintLinearGradient: {
+                "x0": 0,
+                "y0": 1024,
+                "x1": 307,
+                "y1": 1024,
+                "x2": 0,
+                "y2": 717,
+            },
+            ot.PaintFormat.PaintRadialGradient: {
+                "x0": 166,
+                "y0": 768,
+                "r0": 0,
+                "x1": 166,
+                "y1": 768,
+                "r1": 256,
+            },
+        }
+
+        glyph_name = f"{gradient_format}_gradient_extend_mode_{extend_mode}"
+
+        color_stop_positions = [0.0, 0.5, 1.0]
+        for i in range(0, 3):
+            axis = f"COL{i+1}"
+            color_stop_positions[i] += _deltaOrZero(axis, position)
+
+        # Gradient coordinates variations.
+        coordinates = coordinates[selected_format]
+        for key in coordinates.keys():
+            axis = f"GR{key.upper()}"
+            coordinates[key] += _deltaOrZero(axis, position)
+
+        colr = {
             "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
+            "Glyph": _UPEM_BOX_GLYPH,
             "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_blue[0],
-                "Alpha": color_blue[1],
+                "Format": selected_format,
+                "ColorLine": {
+                    "ColorStop": [
+                        (color_stop_positions[0], *_cpal("green")),
+                        (color_stop_positions[1], *_cpal("white")),
+                        (color_stop_positions[2], *_cpal("red")),
+                    ],
+                    "Extend": extend_mode_map[extend_mode],
+                },
+                **coordinates,
             },
-        },
-    }
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor_char,
-        advance=_UPEM,
-        glyph=_upem_box_pen().glyph(),
-        colr=colr,
-        description=f"Tests {description}.",
-        axes_effect="`SCOX` shifts center x offset, `SCOY` shifts center Y offfset, `SCSX` changes x or uniform scale factor, `SCSY` changes y scale factor.",
-    )
-
-
-def _extend_modes(gradient_format, extend_mode, position, accessor_char):
-
-    format_map = {
-        "linear": ot.PaintFormat.PaintLinearGradient,
-        "radial": ot.PaintFormat.PaintRadialGradient,
-    }
-
-    if gradient_format not in format_map:
-        return None
-
-    selected_format = format_map[gradient_format]
-
-    description = (
-        "`Paint(Var)LinearGradient`"
-        if gradient_format == "linear"
-        else "`Paint(Var)RadialGradient`"
-    )
-
-    extend_mode_map = {
-        "reflect": ot.ExtendMode.REFLECT,
-        "repeat": ot.ExtendMode.REPEAT,
-        "pad": ot.ExtendMode.PAD,
-    }
-
-    if extend_mode not in extend_mode_map:
-        return None
-
-    coordinates = {
-        ot.PaintFormat.PaintLinearGradient: {
-            "x0": 0,
-            "y0": 1024,
-            "x1": 307,
-            "y1": 1024,
-            "x2": 0,
-            "y2": 717,
-        },
-        ot.PaintFormat.PaintRadialGradient: {
-            "x0": 166,
-            "y0": 768,
-            "r0": 0,
-            "x1": 166,
-            "y1": 768,
-            "r1": 256,
-        },
-    }
-
-    glyph_name = f"{gradient_format}_gradient_extend_mode_{extend_mode}"
-
-    color_stop_positions = [0.0, 0.5, 1.0]
-    for i in range(0, 3):
-        axis = f"COL{i+1}"
-        color_stop_positions[i] += _deltaOrZero(axis, position)
-
-    # Gradient coordinates variations.
-    coordinates = coordinates[selected_format]
-    for key in coordinates.keys():
-        axis = f"GR{key.upper()}"
-        coordinates[key] += _deltaOrZero(axis, position)
-
-    colr = {
-        "Format": ot.PaintFormat.PaintGlyph,
-        "Glyph": _UPEM_BOX_GLYPH,
-        "Paint": {
-            "Format": selected_format,
-            "ColorLine": {
-                "ColorStop": [
-                    (color_stop_positions[0], *_cpal("green")),
-                    (color_stop_positions[1], *_cpal("white")),
-                    (color_stop_positions[2], *_cpal("red")),
-                ],
-                "Extend": extend_mode_map[extend_mode],
-            },
-            **coordinates,
-        },
-    }
-
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        accessor=accessor_char,
-        glyph=_upem_box_pen().glyph(),
-        advance=_UPEM,
-        clip_box=(0, 0, _UPEM, _UPEM),
-        colr=colr,
-        description=f"Tests {description} with variable gradient coordinates or variable color lines.",
-        axes_effect="`GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops.",
-    )
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            glyph=_upem_box_pen().glyph(),
+            advance=_UPEM,
+            clip_box=(0, 0, _UPEM, _UPEM),
+            colr=colr,
+            description=f"Tests {description} with variable gradient coordinates or variable color lines.",
+            axes_effect="`GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops.",
+        )
 
 
 def _paint_rotate(angle, center_x, center_y, position, accessor_char):
@@ -1335,7 +1362,12 @@ def _prepare_palette():
 
 class TestDefinitions:
     def __init__(self):
-        self.categories = [Sweep(0xF0400, 0xF04FF)]
+        self.categories = [
+            GradientStopsRepeat(0xF0500, 0xF05FF),
+            Sweep(0xF0400, 0xF04FF),
+            PaintScale(0xF0600, 0xF06FF),
+            ExtendMode(0xF0700, 0xF07FF),
+        ]
 
     def make_all_glyphs(self, position):
         for cat in self.categories:
@@ -1350,6 +1382,7 @@ def _get_glyph_definitions(position):
 
     test_definitions = TestDefinitions()
     all_glyphs = list(test_definitions.make_all_glyphs(position))
+    logger.info(all_glyphs)
 
     access_chars = iter(access_chars_set)
     glyphs = [
@@ -1358,22 +1391,6 @@ def _get_glyph_definitions(position):
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
-        _gradient_stops_repeat(0, 1, next(access_chars)),
-        _gradient_stops_repeat(0.2, 0.8, next(access_chars)),
-        _gradient_stops_repeat(0, 1.5, next(access_chars)),
-        _gradient_stops_repeat(0.5, 1.5, next(access_chars)),
-        _paint_scale(0.5, 1.5, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
-        _paint_scale(1.5, 1.5, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
-        _paint_scale(0.5, 1.5, 0, 0, position, next(access_chars)),
-        _paint_scale(1.5, 1.5, 0, 0, position, next(access_chars)),
-        _paint_scale(0.5, 1.5, _UPEM, _UPEM, position, next(access_chars)),
-        _paint_scale(1.5, 1.5, _UPEM, _UPEM, position, next(access_chars)),
-        _extend_modes("linear", "pad", position, next(access_chars)),
-        _extend_modes("linear", "repeat", position, next(access_chars)),
-        _extend_modes("linear", "reflect", position, next(access_chars)),
-        _extend_modes("radial", "pad", position, next(access_chars)),
-        _extend_modes("radial", "repeat", position, next(access_chars)),
-        _extend_modes("radial", "reflect", position, next(access_chars)),
         _paint_rotate(10, 0, 0, position, next(access_chars)),
         _paint_rotate(-10, _UPEM, _UPEM, position, next(access_chars)),
         _paint_rotate(25, _UPEM / 2, _UPEM / 2, position, next(access_chars)),
