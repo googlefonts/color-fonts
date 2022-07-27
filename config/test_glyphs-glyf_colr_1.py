@@ -461,7 +461,7 @@ class UtilContours(TestCategory):
         return "util_contours"
 
     def _get_test_parameters(self):
-        return ["upem_box", "cross", "one", "zero"]
+        return [".notdef", ".null", "upem_box", "cross", "one", "zero"]
 
     def _make_test_glyph(self, glyph_type, position, accessor):
         cross_pen = TTGlyphPen(None)
@@ -515,6 +515,12 @@ class UtilContours(TestCategory):
         pen.closePath()
 
         glyph_map = {
+            ".notdef": SampleGlyph(
+                glyph_name=".notdef", accessor=accessor, advance=600, glyph=Glyph()
+            ),
+            ".null": SampleGlyph(
+                glyph_name=".null", accessor=accessor, advance=0, glyph=Glyph()
+            ),
             "upem_box": SampleGlyph(
                 glyph_name=_UPEM_BOX_GLYPH,
                 advance=_UPEM,
@@ -1039,71 +1045,82 @@ class PaintTranslate(TestCategory):
         )
 
 
-clip_position_map = {
-    "top_left": (0, _UPEM / 2, _UPEM / 2, _UPEM),
-    "bottom_left": (0, 0, _UPEM / 2, _UPEM / 2),
-    "bottom_right": (_UPEM / 2, 0, _UPEM, _UPEM / 2),
-    "top_right": (_UPEM / 2, _UPEM / 2, _UPEM, _UPEM),
-    "center": (_UPEM / 4, _UPEM / 4, _UPEM / 4 * 3, _UPEM / 4 * 3),
-}
-
-
-# A composited glyph which shades the intended clip box without
-# defining a clip box for itself. Useful in testing ClipBoxes to see whether
-# only the shaded portion is drawn or other parts of the glyph peek out.
-def _clip_shade_glyph(position, accessor):
-    if not position in clip_position_map:
-        return None
-
-    (x_min, y_min, x_max, y_max) = clip_position_map[position]
-
-    clip_pen = TTGlyphPen(None)
-    clip_pen.moveTo((x_min, y_min))
-    clip_pen.lineTo((x_min, y_max))
-    clip_pen.lineTo((x_max, y_max))
-    clip_pen.lineTo((x_max, y_min))
-    clip_pen.closePath()
-
-    return SampleGlyph(
-        glyph_name=f"clip_shade_{position}",
-        advance=_UPEM,
-        glyph=clip_pen.glyph(),
-        accessor=accessor,
-    )
-
-
-# A clone (PaintColrGlyph) of the radial_gradient_extend_mode_reflect glyph,
-# clipped with a smaller clip box in order to test nested clip boxes.
-def _inset_clipped_radial_reflect(accessor):
-    colr = {
-        "Format": ot.PaintFormat.PaintColrGlyph,
-        "Glyph": "radial_gradient_extend_mode_reflect",
+class ClipBox(TestCategory):
+    clip_position_map = {
+        "top_left": (0, _UPEM / 2, _UPEM / 2, _UPEM),
+        "bottom_left": (0, 0, _UPEM / 2, _UPEM / 2),
+        "bottom_right": (_UPEM / 2, 0, _UPEM, _UPEM / 2),
+        "top_right": (_UPEM / 2, _UPEM / 2, _UPEM, _UPEM),
+        "center": (_UPEM / 4, _UPEM / 4, _UPEM / 4 * 3, _UPEM / 4 * 3),
     }
 
-    return SampleGlyph(
-        glyph_name="inset_clipped_radial_reflect",
-        accessor=accessor,
-        glyph=_upem_box_pen().glyph(),
-        advance=_UPEM,
-        clip_box=(_UPEM / 10, _UPEM / 10, _UPEM - _UPEM / 10, _UPEM - _UPEM / 10),
-        colr=colr,
-    )
-
-
-class ClipBox(TestCategory):
     def get_name(self):
         return "clipbox"
 
     def _get_test_parameters(self):
         return [
-            ("top_left"),
-            ("bottom_left"),
-            ("bottom_right"),
-            ("top_right"),
-            ("center"),
+            *itertools.product(
+                ["clipped", "shaded"],
+                [
+                    "top_left",
+                    "bottom_left",
+                    "bottom_right",
+                    "top_right",
+                    "center",
+                ],
+            ),
+            "inset_clipped_radial",
         ]
 
-    def _make_test_glyph(self, clip_corner, position, accessor):
+    # A clone (PaintColrGlyph) of the radial_gradient_extend_mode_reflect glyph,
+    # clipped with a smaller clip box in order to test nested clip boxes.
+    def _inset_clipped_radial_reflect(self, accessor):
+        colr = {
+            "Format": ot.PaintFormat.PaintColrGlyph,
+            "Glyph": "radial_gradient_extend_mode_reflect",
+        }
+
+        return SampleGlyph(
+            glyph_name="inset_clipped_radial_reflect",
+            accessor=accessor,
+            glyph=_upem_box_pen().glyph(),
+            advance=_UPEM,
+            clip_box=(_UPEM / 10, _UPEM / 10, _UPEM - _UPEM / 10, _UPEM - _UPEM / 10),
+            colr=colr,
+        )
+
+    # A composited glyph which shades the intended clip box without
+    # defining a clip box for itself. Useful in testing ClipBoxes to see whether
+    # only the shaded portion is drawn or other parts of the glyph peek out.
+    def _clip_shade_glyph(self, clip_corner, accessor):
+        if not clip_corner in self.clip_position_map:
+            return None
+
+        (x_min, y_min, x_max, y_max) = self.clip_position_map[clip_corner]
+
+        clip_pen = TTGlyphPen(None)
+        clip_pen.moveTo((x_min, y_min))
+        clip_pen.lineTo((x_min, y_max))
+        clip_pen.lineTo((x_max, y_max))
+        clip_pen.lineTo((x_max, y_min))
+        clip_pen.closePath()
+
+        return SampleGlyph(
+            glyph_name=f"clip_shade_{clip_corner}",
+            advance=_UPEM,
+            glyph=clip_pen.glyph(),
+            accessor=accessor,
+        )
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        if param_set == "inset_clipped_radial":
+            return self._inset_clipped_radial_reflect(accessor)
+
+        (shaded_clipped, clip_corner) = param_set
+
+        if shaded_clipped == "shaded":
+            return self._clip_shade_glyph(clip_corner, accessor)
+
         other_glyph_colr = {
             "Format": ot.PaintFormat.PaintColrGlyph,
             "Glyph": "inset_clipped_radial_reflect",
@@ -1126,7 +1143,7 @@ class ClipBox(TestCategory):
             "BackdropPaint": other_glyph_colr,
         }
 
-        (x_min, y_min, x_max, y_max) = clip_position_map[clip_corner]
+        (x_min, y_min, x_max, y_max) = self.clip_position_map[clip_corner]
 
         return SampleGlyph(
             glyph_name=f"clip_box_{clip_corner}",
@@ -1482,6 +1499,8 @@ def _prepare_palette():
 class TestDefinitions:
     def __init__(self):
         self.categories = [
+            # UtilContours has .notdef and null and should be first so that .notdef becomes glyph id 0.
+            UtilContours(0xF1300, 0xF13FF),
             GradientStopsRepeat(0xF0500, 0xF05FF),
             Sweep(0xF0400, 0xF04FF),
             PaintScale(0xF0600, 0xF06FF),
@@ -1497,7 +1516,6 @@ class TestDefinitions:
             PaletteCircles(0xF1000, 0xF10FF),
             CircleContours(0xF1100, 0xF11FF),
             VariableAlpha(0xF1200, 0xF12FF),
-            UtilContours(0xF1300, 0xF13FF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1517,18 +1535,10 @@ def _get_glyph_definitions(position):
 
     access_chars = iter(access_chars_set)
     glyphs = [
-        SampleGlyph(glyph_name=".notdef", accessor="", advance=600, glyph=Glyph()),
-        SampleGlyph(glyph_name=".null", accessor="", advance=0, glyph=Glyph()),
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
         # Non COLR helper glyphs below here.
-        _clip_shade_glyph("center", next(access_chars)),
-        _clip_shade_glyph("top_left", next(access_chars)),
-        _clip_shade_glyph("bottom_left", next(access_chars)),
-        _clip_shade_glyph("bottom_right", next(access_chars)),
-        _clip_shade_glyph("top_right", next(access_chars)),
-        _inset_clipped_radial_reflect(next(access_chars)),
     ]
     return glyphs
 
