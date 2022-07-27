@@ -833,110 +833,141 @@ class PaintSkew(TestCategory):
         )
 
 
-def _paint_transform(xx, xy, yx, yy, dx, dy, position, accessor):
-    glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
+class PaintTransform(TestCategory):
+    def get_name(self):
+        return "paint_transform"
 
-    t = (
-        xx + _deltaOrZero("TRXX", position),
-        xy + _deltaOrZero("TRXY", position),
-        yx + _deltaOrZero("TRYX", position),
-        yy + _deltaOrZero("TRYY", position),
-        dx + _deltaOrZero("TRDX", position),
-        dy + _deltaOrZero("TRDY", position),
-    )
-    color_orange = _cpal("orange", 0.7)
+    def _get_test_parameters(self):
+        return [
+            (1, 0, 0, 1, 125, 125),
+            (1.5, 0, 0, 1.5, 0, 0),
+            # Rotation 15 degrees counterclockwise
+            (0.9659, 0.2588, -0.2588, 0.9659, 0, 0),
+            # y-shear around center pivot point
+            (1.0, 0.0, 0.6, 1.0, -300.0, 0.0),
+        ]
 
-    transformed_colr = {
-        "Format": ot.PaintFormat.PaintTransform,
-        "Paint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
+    def _make_test_glyph(self, param_set, position, accessor):
+        (xx, xy, yx, yy, dx, dy) = param_set
+        glyph_name = f"transform_matrix_{xx}_{xy}_{yx}_{yy}_{dx}_{dy}"
+
+        t = (
+            xx + _deltaOrZero("TRXX", position),
+            xy + _deltaOrZero("TRXY", position),
+            yx + _deltaOrZero("TRYX", position),
+            yy + _deltaOrZero("TRYY", position),
+            dx + _deltaOrZero("TRDX", position),
+            dy + _deltaOrZero("TRDY", position),
+        )
+        color_orange = _cpal("orange", 0.7)
+
+        transformed_colr = {
+            "Format": ot.PaintFormat.PaintTransform,
             "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_orange[0],
-                "Alpha": color_orange[1],
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_orange[0],
+                    "Alpha": color_orange[1],
+                },
             },
-        },
-        "Transform": t,
-    }
+            "Transform": t,
+        }
 
-    color_blue = _cpal("blue", 0.5)
+        color_blue = _cpal("blue", 0.5)
 
-    colr = {
-        "Format": ot.PaintFormat.PaintComposite,
-        "CompositeMode": "DEST_OVER",
-        "SourcePaint": transformed_colr,
-        "BackdropPaint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
+        colr = {
+            "Format": ot.PaintFormat.PaintComposite,
+            "CompositeMode": "DEST_OVER",
+            "SourcePaint": transformed_colr,
+            "BackdropPaint": {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_blue[0],
+                    "Alpha": color_blue[1],
+                },
+            },
+        }
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            advance=_UPEM,
+            accessor=accessor,
+            glyph=_upem_box_pen().glyph(),
+            colr=colr,
+            description="Tests `Paint(Var)Transform`.",
+            axes_effect="`TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates.",
+        )
+
+
+
+class PaintTranslate(TestCategory):
+
+    def get_name(self):
+        return "paint_translate"
+
+    def _get_test_parameters(self):
+        return [(0, 0),
+        (0, 100),
+        (0, -100),
+        (100, 0),
+        (-100, 0),
+        (200, 200),
+        (-200, -200),]
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        (dx, dy) = param_set
+        glyph_name = f"translate_{dx}_{dy}"
+
+        dx += _deltaOrZero("TLDX", position)
+        dy += _deltaOrZero("TLDY", position)
+
+        color_orange = _cpal("orange", 0.7)
+
+        transformed_colr = {
+            "Format": ot.PaintFormat.PaintTranslate,
             "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_blue[0],
-                "Alpha": color_blue[1],
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_orange[0],
+                    "Alpha": color_orange[1],
+                },
             },
-        },
-    }
+            "dx": dx,
+            "dy": dy,
+        }
 
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        advance=_UPEM,
-        accessor=accessor,
-        glyph=_upem_box_pen().glyph(),
-        colr=colr,
-        description="Tests `Paint(Var)Transform`.",
-        axes_effect="`TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates.",
-    )
+        color_blue = _cpal("blue", 0.5)
 
-
-def _paint_translate(dx, dy, position, accessor):
-    glyph_name = f"translate_{dx}_{dy}"
-
-    dx += _deltaOrZero("TLDX", position)
-    dy += _deltaOrZero("TLDY", position)
-
-    color_orange = _cpal("orange", 0.7)
-
-    transformed_colr = {
-        "Format": ot.PaintFormat.PaintTranslate,
-        "Paint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
-            "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_orange[0],
-                "Alpha": color_orange[1],
+        colr = {
+            "Format": ot.PaintFormat.PaintComposite,
+            "CompositeMode": "DEST_OVER",
+            "SourcePaint": transformed_colr,
+            "BackdropPaint": {
+                "Format": ot.PaintFormat.PaintGlyph,
+                "Glyph": _CROSS_GLYPH,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintSolid,
+                    "PaletteIndex": color_blue[0],
+                    "Alpha": color_blue[1],
+                },
             },
-        },
-        "dx": dx,
-        "dy": dy,
-    }
+        }
 
-    color_blue = _cpal("blue", 0.5)
-
-    colr = {
-        "Format": ot.PaintFormat.PaintComposite,
-        "CompositeMode": "DEST_OVER",
-        "SourcePaint": transformed_colr,
-        "BackdropPaint": {
-            "Format": ot.PaintFormat.PaintGlyph,
-            "Glyph": _CROSS_GLYPH,
-            "Paint": {
-                "Format": ot.PaintFormat.PaintSolid,
-                "PaletteIndex": color_blue[0],
-                "Alpha": color_blue[1],
-            },
-        },
-    }
-
-    return SampleGlyph(
-        glyph_name=glyph_name,
-        advance=_UPEM,
-        accessor=accessor,
-        glyph=_upem_box_pen().glyph(),
-        colr=colr,
-        description="Tests `Paint(Var)Translate`.",
-        axes_effect="`TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate.",
-    )
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            advance=_UPEM,
+            accessor=accessor,
+            glyph=_upem_box_pen().glyph(),
+            colr=colr,
+            description="Tests `Paint(Var)Translate`.",
+            axes_effect="`TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate.",
+        )
 
 
 clip_position_map = {
@@ -1394,6 +1425,8 @@ class TestDefinitions:
             ExtendMode(0xF0700, 0xF07FF),
             PaintRotate(0xF0800, 0xF08FF),
             PaintSkew(0xF0900, 0xF09FF),
+            PaintTransform(0xF0A00, 0xF0AFF),
+            PaintTranslate(0XF0B00, 0xF0BFF),
         ]
 
     def make_all_glyphs(self, position):
@@ -1418,21 +1451,6 @@ def _get_glyph_definitions(position):
         *all_glyphs,
         _sample_colr_glyph(next(access_chars)),
         _sample_composite_colr_glyph(next(access_chars)),
-        _paint_transform(1, 0, 0, 1, 125, 125, position, next(access_chars)),
-        _paint_transform(1.5, 0, 0, 1.5, 0, 0, position, next(access_chars)),
-        _paint_transform(
-            0.9659, 0.2588, -0.2588, 0.9659, 0, 0, position, next(access_chars)
-        ),  # Rotation 15 degrees counterclockwise
-        _paint_transform(
-            1.0, 0.0, 0.6, 1.0, -300.0, 0.0, position, next(access_chars)
-        ),  # y-shear around center pivot point
-        _paint_translate(0, 0, position, next(access_chars)),
-        _paint_translate(0, 100, position, next(access_chars)),
-        _paint_translate(0, -100, position, next(access_chars)),
-        _paint_translate(100, 0, position, next(access_chars)),
-        _paint_translate(-100, 0, position, next(access_chars)),
-        _paint_translate(200, 200, position, next(access_chars)),
-        _paint_translate(-200, -200, position, next(access_chars)),
         _clip_box("top_left", next(access_chars)),
         _clip_box("bottom_left", next(access_chars)),
         _clip_box("bottom_right", next(access_chars)),
