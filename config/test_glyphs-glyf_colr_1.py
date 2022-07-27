@@ -445,26 +445,6 @@ class GradientP2Skewed(TestCategory):
         )
 
 
-def _cross_glyph():
-
-    pen = TTGlyphPen(None)
-    pen.moveTo((475, 525))
-    pen.lineTo((475, 750))
-    pen.lineTo((525, 750))
-    pen.lineTo((525, 525))
-    pen.lineTo((750, 525))
-    pen.lineTo((750, 475))
-    pen.lineTo((525, 475))
-    pen.lineTo((525, 250))
-    pen.lineTo((475, 250))
-    pen.lineTo((475, 475))
-    pen.lineTo((250, 475))
-    pen.lineTo((250, 525))
-    pen.endPath()
-
-    return
-
-
 def _upem_box_pen():
     pen = TTGlyphPen(None)
     pen.moveTo((0, 0))
