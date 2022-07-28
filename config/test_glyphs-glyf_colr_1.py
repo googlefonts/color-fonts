@@ -87,6 +87,9 @@ class TestCategory(ABC):
         ):
             yield self._make_test_glyph(param_set, position, accessor)
 
+    def get_axis_definitions(self):
+        return []
+
     def get_test_count(self) -> int:
         return len(self._get_test_parameters())
 
@@ -108,6 +111,24 @@ class TestCategory(ABC):
 class Sweep(TestCategory):
     def get_name(self):
         return "sweep_varsweep"
+
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="SWPS",
+                name="Sweep Start Angle Offset",
+                minimum=-90,
+                default=0,
+                maximum=90,
+            ),
+            dict(
+                tag="SWPE",
+                name="Sweep End Angle Offset",
+                minimum=-90,
+                default=0,
+                maximum=90,
+            ),
+        ]
 
     def _get_test_parameters(self):
         return list(
@@ -255,6 +276,31 @@ class GradientStopsRepeat(TestCategory):
 class VariableAlpha(TestCategory):
     def get_name(self):
         return "variable_alpha"
+
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="APH1",
+                name="Alpha axis, PaintSolid",
+                minimum=-1,
+                default=0,
+                maximum=0,
+            ),
+            dict(
+                tag="APH2",
+                name="Alpha axis, ColorStop 0",
+                minimum=-1,
+                default=0,
+                maximum=0,
+            ),
+            dict(
+                tag="APH3",
+                name="Alpha axis, ColorStop 1",
+                minimum=-1,
+                default=0,
+                maximum=0,
+            ),
+        ]
 
     def _get_test_parameters(self):
         return [True]
@@ -489,6 +535,38 @@ class PaintScale(TestCategory):
     def get_name(self):
         return "paint_scale"
 
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="SCOX",
+                name="Scale tests, center x offset",
+                minimum=-200,
+                default=0,
+                maximum=200,
+            ),
+            dict(
+                tag="SCOY",
+                name="Scale tests, center y offset",
+                minimum=-200,
+                default=0,
+                maximum=200,
+            ),
+            dict(
+                tag="SCSX",
+                name="Scale tests, x or uniform scale",
+                minimum=_MIN_F2DOT14,
+                default=0,
+                maximum=_MAX_F2DOT14,
+            ),
+            dict(
+                tag="SCSY",
+                name="Scale tests, y scale",
+                minimum=_MIN_F2DOT14,
+                default=0,
+                maximum=_MAX_F2DOT14,
+            ),
+        ]
+
     def _get_test_parameters(self):
         return [
             (0.5, 1.5, _UPEM / 2, _UPEM / 2),
@@ -598,6 +676,47 @@ class ExtendMode(TestCategory):
     def get_name(self):
         return "extend_mode"
 
+    def get_axis_definitions(self):
+
+        axis_defs = []
+        gradient_coords = ["x0", "y0", "x1", "y1", "x2", "y2", "r0", "r1"]
+        for coord in gradient_coords:
+            axis_defs.append(
+                dict(
+                    tag=f"GR{coord.upper()}",
+                    name=f"Gradient coords, {coord}",
+                    minimum=-1000,
+                    default=0,
+                    maximum=1000,
+                )
+            )
+
+        axis_defs += [
+            dict(
+                tag="COL1",
+                name="Extend tests color stop offset 1",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
+            dict(
+                tag="COL2",
+                name="Extend tests color stop offset 2",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
+            dict(
+                tag="COL3",
+                name="Extend tests color stop offset 3",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
+        ]
+
+        return axis_defs
+
     def _get_test_parameters(self):
         return list(
             itertools.product(["linear", "radial"], ["pad", "repeat", "reflect"])
@@ -691,6 +810,31 @@ class PaintRotate(TestCategory):
     def get_name(self):
         return "paint_rotate"
 
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="ROTA",
+                name="Var Rotate Angle Offset",
+                minimum=0,
+                default=0,
+                maximum=_MAX_F2DOT14_ANGLE,
+            ),
+            dict(
+                tag="ROTX",
+                name="Var Rotate Center X Offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="ROTY",
+                name="Var Rotate Center Y Offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+        ]
+
     def _get_test_parameters(self):
         return [
             (10, 0, 0),
@@ -771,6 +915,38 @@ class PaintSkew(TestCategory):
     def get_name(self):
         return "paint_skew"
 
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="SKXA",
+                name="Var Skew X Angle Offset",
+                minimum=-90,
+                default=0,
+                maximum=90,
+            ),
+            dict(
+                tag="SKYA",
+                name="Var Skew Y Angle Offset",
+                minimum=-90,
+                default=0,
+                maximum=90,
+            ),
+            dict(
+                tag="SKCX",
+                name="Var Skew Center X Offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="SKCY",
+                name="Var Skew Center Y Offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+        ]
+
     def _get_test_parameters(self):
         return [
             (25, 0, 0, 0),
@@ -848,6 +1024,19 @@ class PaintTransform(TestCategory):
     def get_name(self):
         return "paint_transform"
 
+    def get_axis_definitions(self):
+        transform_matrix = ["xx", "yx", "xy", "yy", "dx", "dy"]
+        return [
+            dict(
+                tag=f"TR{transform_scalar.upper()}",
+                name=f"Transform scalars, {transform_scalar}",
+                minimum=-2 if not "d" in transform_scalar else -500,
+                default=0,
+                maximum=2 if not "d" in transform_scalar else 500,
+            )
+            for transform_scalar in transform_matrix
+        ]
+
     def _get_test_parameters(self):
         return [
             (1, 0, 0, 1, 125, 125),
@@ -917,6 +1106,24 @@ class PaintTransform(TestCategory):
 class PaintTranslate(TestCategory):
     def get_name(self):
         return "paint_translate"
+
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="TLDX",
+                name="Var Translate dx Offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="TLDY",
+                name="Var Translate dy Offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+        ]
 
     def _get_test_parameters(self):
         return [
@@ -1458,6 +1665,13 @@ class TestDefinitions:
         for cat in self.categories:
             yield from cat.make_test_glyphs(position)
 
+    def get_all_axis_definitions(self):
+        return list(
+            itertools.chain.from_iterable(
+                [cat.get_axis_definitions() for cat in self.categories]
+            )
+        )
+
 
 def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
@@ -1600,167 +1814,7 @@ def main(args=None):
 
     designspace = designspaceLib.DesignSpaceDocument()
 
-    axis_defs = [
-        dict(
-            tag="SWPS",
-            name="Sweep Start Angle Offset",
-            minimum=-90,
-            default=0,
-            maximum=90,
-        ),
-        dict(
-            tag="SWPE",
-            name="Sweep End Angle Offset",
-            minimum=-90,
-            default=0,
-            maximum=90,
-        ),
-        dict(
-            tag="ROTA",
-            name="Var Rotate Angle Offset",
-            minimum=0,
-            default=0,
-            maximum=_MAX_F2DOT14_ANGLE,
-        ),
-        dict(
-            tag="ROTX",
-            name="Var Rotate Center X Offset",
-            minimum=-500,
-            default=0,
-            maximum=500,
-        ),
-        dict(
-            tag="ROTY",
-            name="Var Rotate Center Y Offset",
-            minimum=-500,
-            default=0,
-            maximum=500,
-        ),
-        dict(
-            tag="COL1",
-            name="Extend tests color stop offset 1",
-            minimum=-2,
-            default=0,
-            maximum=2,
-        ),
-        dict(
-            tag="COL2",
-            name="Extend tests color stop offset 2",
-            minimum=-2,
-            default=0,
-            maximum=2,
-        ),
-        dict(
-            tag="COL3",
-            name="Extend tests color stop offset 3",
-            minimum=-2,
-            default=0,
-            maximum=2,
-        ),
-        dict(
-            tag="SCOX",
-            name="Scale tests, center x offset",
-            minimum=-200,
-            default=0,
-            maximum=200,
-        ),
-        dict(
-            tag="SCOY",
-            name="Scale tests, center y offset",
-            minimum=-200,
-            default=0,
-            maximum=200,
-        ),
-        dict(
-            tag="SCSX",
-            name="Scale tests, x or uniform scale",
-            minimum=_MIN_F2DOT14,
-            default=0,
-            maximum=_MAX_F2DOT14,
-        ),
-        dict(
-            tag="SCSY",
-            name="Scale tests, y scale",
-            minimum=_MIN_F2DOT14,
-            default=0,
-            maximum=_MAX_F2DOT14,
-        ),
-        dict(
-            tag="APH1", name="Alpha axis, PaintSolid", minimum=-1, default=0, maximum=0
-        ),
-        dict(
-            tag="APH2", name="Alpha axis, ColorStop 0", minimum=-1, default=0, maximum=0
-        ),
-        dict(
-            tag="APH3", name="Alpha axis, ColorStop 1", minimum=-1, default=0, maximum=0
-        ),
-        dict(
-            tag="TLDX",
-            name="Var Translate dx Offset",
-            minimum=-500,
-            default=0,
-            maximum=500,
-        ),
-        dict(
-            tag="TLDY",
-            name="Var Translate dy Offset",
-            minimum=-500,
-            default=0,
-            maximum=500,
-        ),
-        dict(
-            tag="SKXA",
-            name="Var Skew X Angle Offset",
-            minimum=-90,
-            default=0,
-            maximum=90,
-        ),
-        dict(
-            tag="SKYA",
-            name="Var Skew Y Angle Offset",
-            minimum=-90,
-            default=0,
-            maximum=90,
-        ),
-        dict(
-            tag="SKCX",
-            name="Var Skew Center X Offset",
-            minimum=-500,
-            default=0,
-            maximum=500,
-        ),
-        dict(
-            tag="SKCY",
-            name="Var Skew Center Y Offset",
-            minimum=-500,
-            default=0,
-            maximum=500,
-        ),
-    ]
-
-    gradient_coords = ["x0", "y0", "x1", "y1", "x2", "y2", "r0", "r1"]
-    for coord in gradient_coords:
-        axis_defs.append(
-            dict(
-                tag=f"GR{coord.upper()}",
-                name=f"Gradient coords, {coord}",
-                minimum=-1000,
-                default=0,
-                maximum=1000,
-            )
-        )
-
-    transform_matrix = ["xx", "yx", "xy", "yy", "dx", "dy"]
-    for transform_scalar in transform_matrix:
-        axis_defs.append(
-            dict(
-                tag=f"TR{transform_scalar.upper()}",
-                name=f"Transform scalars, {transform_scalar}",
-                minimum=-2 if not "d" in transform_scalar else -500,
-                default=0,
-                maximum=2 if not "d" in transform_scalar else 500,
-            )
-        )
+    axis_defs = TestDefinitions().get_all_axis_definitions()
 
     logger.debug(json.dumps(axis_defs))
 
