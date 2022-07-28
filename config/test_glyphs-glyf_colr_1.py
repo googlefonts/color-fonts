@@ -1218,6 +1218,10 @@ class ClipBox(TestCategory):
             "inset_clipped_radial",
         ]
 
+    def get_codepoints(self) -> list[str]:
+        # Only return the glyphs needed for testing, not the ones for constructing the test glyphs themselves.
+        return self._get_accessors()[: len(self.clip_position_map)]
+
     # A clone (PaintColrGlyph) of the radial_gradient_extend_mode_reflect glyph,
     # clipped with a smaller clip box in order to test nested clip boxes.
     def _inset_clipped_radial_reflect(self, accessor):
@@ -1646,22 +1650,22 @@ class TestDefinitions:
     def __init__(self):
         self.categories = [
             # UtilContours has .notdef and null and should be first so that .notdef becomes glyph id 0.
-            UtilContours(0xF1300, 0xF13FF),
-            GradientStopsRepeat(0xF0500, 0xF05FF),
-            Sweep(0xF0400, 0xF04FF),
-            PaintScale(0xF0600, 0xF06FF),
-            ExtendMode(0xF0700, 0xF07FF),
-            PaintRotate(0xF0800, 0xF08FF),
-            PaintSkew(0xF0900, 0xF09FF),
-            PaintTransform(0xF0A00, 0xF0AFF),
-            PaintTranslate(0xF0B00, 0xF0BFF),
-            Composite(0xF0C00, 0xF0CFF),
-            ForegroundColor(0xF0D00, 0x0F0DFF),
-            ClipBox(0xF0E00, 0x0F0EFF),
-            GradientP2Skewed(0xF0F00, 0xF0FFF),
-            PaletteCircles(0xF1000, 0xF10FF),
-            CircleContours(0xF1100, 0xF11FF),
-            VariableAlpha(0xF1200, 0xF12FF),
+            UtilContours(0xFE000, 0xFE100),
+            GradientStopsRepeat(0xF0100, 0xF0200),
+            Sweep(0xF0200, 0xF0300),
+            PaintScale(0xF0300, 0xF0400),
+            ExtendMode(0xF0500, 0xF0600),
+            PaintRotate(0xF0600, 0xF0700),
+            PaintSkew(0xF0700, 0xF0800),
+            PaintTransform(0xF0800, 0xF0900),
+            PaintTranslate(0xF0900, 0xF0A00),
+            Composite(0xF0A00, 0xF0B00),
+            ForegroundColor(0xF0B00, 0x0F0C00),
+            ClipBox(0xF0C00, 0x0F0D00),
+            GradientP2Skewed(0xF0D00, 0xF0E00),
+            PaletteCircles(0xF0E00, 0xF0F00),
+            CircleContours(0xF0F00, 0xF1000),
+            VariableAlpha(0xF1000, 0xF1100),
         ]
 
     def make_all_glyphs(self, position):
@@ -1763,11 +1767,11 @@ def build_descriptions_(font):
         # Append C++ struct containing relevant code points for each test section.
         md_file.write("\n\n# C++ Code for test groups\n\n")
         md_file.write("```\n")
-        md_file.write("struct ColrV1TestDefinitions {\n")
+        md_file.write("namespace ColrV1TestDefinitions {\n")
         category_codepoints = TestDefinitions().get_codepoints_for_categories()
         for category in category_codepoints.items():
             md_file.write(
-                f"    uint64_t {category[0]}[] = {{ {', '.join([hex(ord(codepoint)) for codepoint in category[1]])} }};\n"
+                f"    const uint32_t {category[0]}[] = {{ {', '.join([hex(ord(codepoint)) for codepoint in category[1]])} }};\n"
             )
         md_file.write("};\n")
         md_file.write("```\n")
