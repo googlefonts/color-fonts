@@ -93,6 +93,9 @@ class TestCategory(ABC):
     def get_test_count(self) -> int:
         return len(self._get_test_parameters())
 
+    def get_codepoints(self) -> list[str]:
+        return self._get_accessors()[: self.get_test_count()]
+
     @abstractmethod
     def _make_test_glyph(self, param_set, position, accessor) -> SampleGlyph:
         pass
@@ -1672,6 +1675,12 @@ class TestDefinitions:
             )
         )
 
+    def get_codepoints_for_categories(self):
+        group_codepoints = dict()
+        for cat in self.categories:
+            group_codepoints[cat.get_name()] = cat.get_codepoints()
+        return group_codepoints
+
 
 def _get_glyph_definitions(position):
     # Place these first in the global primary palette.
@@ -1751,6 +1760,17 @@ def build_descriptions_(font):
             md_file.write(
                 f'| {glyph["glyph_id"]} | {glyph["character"]} | {u_codepoint} | `{glyph_name}` | {glyph["description"]} | {glyph["axes_effect"]} |\n'
             )
+        # Append C++ struct containing relevant code points for each test section.
+        md_file.write("\n\n# C++ Code for test groups\n\n")
+        md_file.write("```\n")
+        md_file.write("struct ColrV1TestDefinitions {\n")
+        category_codepoints = TestDefinitions().get_codepoints_for_categories()
+        for category in category_codepoints.items():
+            md_file.write(
+                f"    uint64_t {category[0]}[] = {{ {', '.join([hex(ord(codepoint)) for codepoint in category[1]])} }};\n"
+            )
+        md_file.write("};\n")
+        md_file.write("```\n")
 
 
 def _make_names(static_variable_suffix):
