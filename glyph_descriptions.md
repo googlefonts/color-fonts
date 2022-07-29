@@ -103,17 +103,17 @@
 | 100 | 󰬅 | U+F0B05 | `foreground_color_sweep_alpha_0.3` | None | None |
 | 101 | 󰬆 | U+F0B06 | `foreground_color_solid_alpha_1` | None | None |
 | 102 | 󰬇 | U+F0B07 | `foreground_color_solid_alpha_0.3` | None | None |
-| 103 | 󰰀 | U+F0C00 | `clip_box_top_left` | None | None |
-| 104 | 󰰁 | U+F0C01 | `clip_box_bottom_left` | None | None |
-| 105 | 󰰂 | U+F0C02 | `clip_box_bottom_right` | None | None |
-| 106 | 󰰃 | U+F0C03 | `clip_box_top_right` | None | None |
-| 107 | 󰰄 | U+F0C04 | `clip_box_center` | None | None |
-| 108 | 󰰅 | U+F0C05 | `clip_shade_top_left` | None | None |
-| 109 | 󰰆 | U+F0C06 | `clip_shade_bottom_left` | None | None |
-| 110 | 󰰇 | U+F0C07 | `clip_shade_bottom_right` | None | None |
-| 111 | 󰰈 | U+F0C08 | `clip_shade_top_right` | None | None |
-| 112 | 󰰉 | U+F0C09 | `clip_shade_center` | None | None |
-| 113 | 󰰊 | U+F0C0A | `inset_clipped_radial_reflect` | None | None |
+| 103 | 󰰀 | U+F0C00 | `clip_box_top_left` | Tests `(Var)ClipBox`. | `CLXI` shifts ClipBox `x_min`, `CLYI` shifts `y_min`, `CLXA` shifts `x_max`, `CLYA` shifts `y_max`. |
+| 104 | 󰰁 | U+F0C01 | `clip_box_bottom_left` | Tests `(Var)ClipBox`. | `CLXI` shifts ClipBox `x_min`, `CLYI` shifts `y_min`, `CLXA` shifts `x_max`, `CLYA` shifts `y_max`. |
+| 105 | 󰰂 | U+F0C02 | `clip_box_bottom_right` | Tests `(Var)ClipBox`. | `CLXI` shifts ClipBox `x_min`, `CLYI` shifts `y_min`, `CLXA` shifts `x_max`, `CLYA` shifts `y_max`. |
+| 106 | 󰰃 | U+F0C03 | `clip_box_top_right` | Tests `(Var)ClipBox`. | `CLXI` shifts ClipBox `x_min`, `CLYI` shifts `y_min`, `CLXA` shifts `x_max`, `CLYA` shifts `y_max`. |
+| 107 | 󰰄 | U+F0C04 | `clip_box_center` | Tests `(Var)ClipBox`. | `CLXI` shifts ClipBox `x_min`, `CLYI` shifts `y_min`, `CLXA` shifts `x_max`, `CLYA` shifts `y_max`. |
+| 108 | 󰰅 | U+F0C05 | `clip_shade_top_left` | Helper for clip box tests. | None |
+| 109 | 󰰆 | U+F0C06 | `clip_shade_bottom_left` | Helper for clip box tests. | None |
+| 110 | 󰰇 | U+F0C07 | `clip_shade_bottom_right` | Helper for clip box tests. | None |
+| 111 | 󰰈 | U+F0C08 | `clip_shade_top_right` | Helper for clip box tests. | None |
+| 112 | 󰰉 | U+F0C09 | `clip_shade_center` | Helper for clip box tests. | None |
+| 113 | 󰰊 | U+F0C0A | `inset_clipped_radial_reflect` | Inner helper glyph for clip box tests. | None |
 | 114 | 󰴀 | U+F0D00 | `gradient_p2_skewed` | None | None |
 | 115 | 󰸀 | U+F0E00 | `colored_circles_v0` | None | None |
 | 116 | 󰸁 | U+F0E01 | `colored_circles_v1` | None | None |

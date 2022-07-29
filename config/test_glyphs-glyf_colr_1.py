@@ -13,7 +13,7 @@ from fontTools import ttLib
 from fontTools import varLib
 from fontTools.colorLib import builder as colorBuilder
 from fontTools.colorLib.builder import ColorPaletteType
-from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen, TTGlyphPointPen
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
 import sys
@@ -1200,6 +1200,53 @@ class ClipBox(TestCategory):
         "center": (_UPEM / 4, _UPEM / 4, _UPEM / 4 * 3, _UPEM / 4 * 3),
     }
 
+    def get_axis_definitions(self):
+        return [
+            dict(
+                tag="CLXI",
+                name="ClipBox xMin offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="CLYI",
+                name="ClipBox yMin offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="CLXA",
+                name="ClipBox xMax offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="CLYA",
+                name="ClipBox yMax offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+            dict(
+                tag="CLIO",
+                name="ClipBox inner glyph inset offset",
+                minimum=-500,
+                default=0,
+                maximum=500,
+            ),
+        ]
+
+    def _clip_box_coordinates(self, corner, position):
+        x_min, y_min, x_max, y_max = self.clip_position_map[corner]
+        x_min += _deltaOrZero("CLXI", position)
+        y_min += _deltaOrZero("CLYI", position)
+        x_max += _deltaOrZero("CLXA", position)
+        y_max += _deltaOrZero("CLYA", position)
+        return (x_min, y_min, x_max, y_max)
+
     def get_name(self):
         return "clipbox"
 
@@ -1224,52 +1271,60 @@ class ClipBox(TestCategory):
 
     # A clone (PaintColrGlyph) of the radial_gradient_extend_mode_reflect glyph,
     # clipped with a smaller clip box in order to test nested clip boxes.
-    def _inset_clipped_radial_reflect(self, accessor):
+    def _inset_clipped_radial_reflect(self, position, accessor):
         colr = {
             "Format": ot.PaintFormat.PaintColrGlyph,
             "Glyph": "radial_gradient_extend_mode_reflect",
         }
+
+        offset = _UPEM / 10 + _deltaOrZero("CLIO", position)
 
         return SampleGlyph(
             glyph_name="inset_clipped_radial_reflect",
             accessor=accessor,
             glyph=_upem_box_pen().glyph(),
             advance=_UPEM,
-            clip_box=(_UPEM / 10, _UPEM / 10, _UPEM - _UPEM / 10, _UPEM - _UPEM / 10),
+            clip_box=(offset, offset, _UPEM - offset, _UPEM - offset),
+            description="Inner helper glyph for clip box tests.",
             colr=colr,
         )
 
     # A composited glyph which shades the intended clip box without
     # defining a clip box for itself. Useful in testing ClipBoxes to see whether
     # only the shaded portion is drawn or other parts of the glyph peek out.
-    def _clip_shade_glyph(self, clip_corner, accessor):
+    def _clip_shade_glyph(self, clip_corner, position, accessor):
         if not clip_corner in self.clip_position_map:
             return None
 
-        (x_min, y_min, x_max, y_max) = self.clip_position_map[clip_corner]
+        (x_min, y_min, x_max, y_max) = self._clip_box_coordinates(clip_corner, position)
 
-        clip_pen = TTGlyphPen(None)
-        clip_pen.moveTo((x_min, y_min))
-        clip_pen.lineTo((x_min, y_max))
-        clip_pen.lineTo((x_max, y_max))
-        clip_pen.lineTo((x_max, y_min))
-        clip_pen.closePath()
+        # Not using TTGlyphPen here as end tuple identical to start point might be removed by that pen, leading to
+        # incompatible masters.
+        clip_pen = TTGlyphPointPen(None)
+
+        clip_pen.beginPath()
+        clip_pen.addPoint((x_min, y_min), segmentType="line")
+        clip_pen.addPoint((x_min, y_max), segmentType="line")
+        clip_pen.addPoint((x_max, y_max), segmentType="line")
+        clip_pen.addPoint((x_max, y_min), segmentType="line")
+        clip_pen.endPath()
 
         return SampleGlyph(
             glyph_name=f"clip_shade_{clip_corner}",
             advance=_UPEM,
             glyph=clip_pen.glyph(),
+            description="Helper for clip box tests.",
             accessor=accessor,
         )
 
     def _make_test_glyph(self, param_set, position, accessor):
         if param_set == "inset_clipped_radial":
-            return self._inset_clipped_radial_reflect(accessor)
+            return self._inset_clipped_radial_reflect(position, accessor)
 
         (shaded_clipped, clip_corner) = param_set
 
         if shaded_clipped == "shaded":
-            return self._clip_shade_glyph(clip_corner, accessor)
+            return self._clip_shade_glyph(clip_corner, position, accessor)
 
         other_glyph_colr = {
             "Format": ot.PaintFormat.PaintColrGlyph,
@@ -1293,15 +1348,17 @@ class ClipBox(TestCategory):
             "BackdropPaint": other_glyph_colr,
         }
 
-        (x_min, y_min, x_max, y_max) = self.clip_position_map[clip_corner]
+        clip_box_coordinates = self._clip_box_coordinates(clip_corner, position)
 
         return SampleGlyph(
             glyph_name=f"clip_box_{clip_corner}",
             accessor=accessor,
             advance=_UPEM,
             glyph=_upem_box_pen().glyph(),
-            clip_box=(x_min, y_min, x_max, y_max),
+            clip_box=clip_box_coordinates,
             colr=colr,
+            description="Tests `(Var)ClipBox`.",
+            axes_effect="`CLXI` shifts ClipBox `x_min`, `CLYI` shifts `y_min`, `CLXA` shifts `x_max`, `CLYA` shifts `y_max`.",
         )
 
 
