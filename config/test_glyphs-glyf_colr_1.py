@@ -805,7 +805,7 @@ class ExtendMode(TestCategory):
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description=f"Tests {description} with variable gradient coordinates or variable color lines.",
-            axes_effect="`GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COLR` shift color stops.",
+            axes_effect="`GRX0`, `GRY0`, `GRX1`, `GRY1`, `GRX2`, `GRY2`, `GRR0`, `GRR1` affect respective gradient coordinates. `COL1`, `COL2`, `COL3` shift color stops.",
         )
 
 
