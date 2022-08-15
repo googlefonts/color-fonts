@@ -131,22 +131,55 @@ class Sweep(TestCategory):
                 default=0,
                 maximum=90,
             ),
+            dict(
+                tag="SWC1",
+                name="Sweep tests color stop offset 1",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
+            dict(
+                tag="SWC2",
+                name="Sweep tests color stop offset 2",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
+            dict(
+                tag="SWC3",
+                name="Sweep tests color stop offset 3",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
+            dict(
+                tag="SWC4",
+                name="Sweep tests color stop offset 4",
+                minimum=-2,
+                default=0,
+                maximum=2,
+            ),
         ]
 
     def _get_test_parameters(self):
         return list(
             itertools.product(
-                ["narrow"],
+                # "narrow" and "wide" refer to the color stops being defined on an interval narrower or wider than 0-1 respectively.
+                ["narrow", "wide"],
                 ["pad", "reflect", "repeat"],
                 [
-                    (-360, 0),
+                    (0, 360),
+                    (60, 300),
                     (0, 90),
+                    (90, 0),
                     (45, 90),
+                    (90, 45),
                     (247.5, 292.5),
-                    (90, 270),
-                    (-270, 270),
                     (-45, 45),
-                    (315, 45),
+                    (45, -45),
+                    (270, 440),
+                    (440, 270),
+                    (-180, 360 + 180),
                 ],
             )
         )
@@ -173,10 +206,18 @@ class Sweep(TestCategory):
         color_line_range_map = {
             "narrow": {
                 "ColorStop": [
-                    (0.25, *_cpal("red")),
-                    (1 / 3 * 0.5 + 0.25, *_cpal("yellow")),
-                    (2 / 3 * 0.5 + 0.25, *_cpal("green")),
-                    (0.75, *_cpal("blue")),
+                    (0.25, *_cpal("linen")),
+                    (1 / 3 * 0.5 + 0.25, *_cpal("blue")),
+                    (2 / 3 * 0.5 + 0.25, *_cpal("red")),
+                    (0.75, *_cpal("darkslategray")),
+                ]
+            },
+            "wide": {
+                "ColorStop": [
+                    (-0.25, *_cpal("linen")),
+                    (1 / 3 * 1.5, *_cpal("blue")),
+                    (2 / 3 * 1.5, *_cpal("red")),
+                    (1.25, *_cpal("darkslategray")),
                 ]
             },
         }
@@ -185,6 +226,12 @@ class Sweep(TestCategory):
             return None
 
         color_line = color_line_range_map[color_line_range]
+        # Add variable color stop shift.
+        for i in range(0, 4):
+            color_line["ColorStop"][i] = (
+                color_line["ColorStop"][i][0] + _deltaOrZero(f"SWC{i+1}", position),
+                color_line["ColorStop"][i][1],
+            )
 
         glyph_name = (
             f"sweep_{start_angle}_{end_angle}_{extend_mode_arg}_{color_line_range}"
@@ -223,7 +270,7 @@ class Sweep(TestCategory):
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description="Tests `Paint(Var)SweepGradient`.",
-            axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle.",
+            axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle, `SWC1`-`SWC4` shift color stop positions.",
         )
 
 
