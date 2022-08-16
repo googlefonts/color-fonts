@@ -769,14 +769,18 @@ class ExtendMode(TestCategory):
 
     def _get_test_parameters(self):
         return list(
-            itertools.product(["linear", "radial"], ["pad", "repeat", "reflect"])
+            itertools.product(
+                ["linear", "radial_contained", "radial_horizontal"],
+                ["pad", "repeat", "reflect"],
+            )
         )
 
     def _make_test_glyph(self, param_set, position, accessor):
         (gradient_format, extend_mode) = param_set
         format_map = {
             "linear": ot.PaintFormat.PaintLinearGradient,
-            "radial": ot.PaintFormat.PaintRadialGradient,
+            "radial_contained": ot.PaintFormat.PaintRadialGradient,
+            "radial_horizontal": ot.PaintFormat.PaintRadialGradient,
         }
 
         if gradient_format not in format_map:
@@ -784,7 +788,12 @@ class ExtendMode(TestCategory):
 
         selected_format = format_map[gradient_format]
 
-        description = f"Paint(Var){gradient_format.capitalize()}Gradient"
+        description_map = {
+            "linear": "Paint(Var)LinearGradient",
+            "radial_contained": "Paint(Var)RadialGradient (one circle contained within the other)",
+            "radial_horizontal": "Paint(Var)RadialGradient (horizontal cone)",
+        }
+        description = description_map[gradient_format]
 
         extend_mode_map = {
             "reflect": ot.ExtendMode.REFLECT,
@@ -795,8 +804,8 @@ class ExtendMode(TestCategory):
         if extend_mode not in extend_mode_map:
             return None
 
-        coordinates = {
-            ot.PaintFormat.PaintLinearGradient: {
+        coordinates_map = {
+            "linear": {
                 "x0": 0,
                 "y0": 1024,
                 "x1": 307,
@@ -804,13 +813,21 @@ class ExtendMode(TestCategory):
                 "x2": 0,
                 "y2": 717,
             },
-            ot.PaintFormat.PaintRadialGradient: {
+            "radial_contained": {
                 "x0": 166,
                 "y0": 768,
                 "r0": 0,
                 "x1": 166,
                 "y1": 768,
                 "r1": 256,
+            },
+            "radial_horizontal": {
+                "x0": 400,
+                "y0": 500,
+                "r0": 100,
+                "x1": 700,
+                "y1": 500,
+                "r1": 200,
             },
         }
 
@@ -822,7 +839,7 @@ class ExtendMode(TestCategory):
             color_stop_positions[i] += _deltaOrZero(axis, position)
 
         # Gradient coordinates variations.
-        coordinates = coordinates[selected_format]
+        coordinates = coordinates_map[gradient_format]
         for key in coordinates.keys():
             axis = f"GR{key.upper()}"
             coordinates[key] += _deltaOrZero(axis, position)
@@ -1321,7 +1338,7 @@ class ClipBox(TestCategory):
     def _inset_clipped_radial_reflect(self, position, accessor):
         colr = {
             "Format": ot.PaintFormat.PaintColrGlyph,
-            "Glyph": "radial_gradient_extend_mode_reflect",
+            "Glyph": "radial_contained_gradient_extend_mode_reflect",
         }
 
         offset = _UPEM / 10 + _deltaOrZero("CLIO", position)
