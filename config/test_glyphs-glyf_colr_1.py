@@ -1800,11 +1800,14 @@ class TestDefinitions:
             )
         )
 
-    def get_codepoints_for_categories(self):
-        group_codepoints = dict()
+    def get_codepoints_axes_for_categories(self):
+        group_codepoints_axes = dict()
         for cat in self.categories:
-            group_codepoints[cat.get_name()] = cat.get_codepoints()
-        return group_codepoints
+            group_codepoints_axes[cat.get_name()] = {
+                "codepoints": cat.get_codepoints(),
+                "axes": cat.get_axis_definitions(),
+            }
+        return group_codepoints_axes
 
 
 def _get_glyph_definitions(position):
@@ -1889,12 +1892,17 @@ def build_descriptions_(font):
         md_file.write("\n\n# C++ Code for test groups\n\n")
         md_file.write("```\n")
         md_file.write("namespace ColrV1TestDefinitions {\n")
-        category_codepoints = TestDefinitions().get_codepoints_for_categories()
-        for category in category_codepoints.items():
+        category_codepoints_axes = (
+            TestDefinitions().get_codepoints_axes_for_categories()
+        )
+        for category in category_codepoints_axes.items():
             md_file.write(
-                f"    const uint32_t {category[0]}[] = {{ {', '.join([hex(ord(codepoint)) for codepoint in category[1]])} }};\n"
+                f"    const uint32_t {category[0]}[] = {{ {', '.join([hex(ord(codepoint)) for codepoint in category[1]['codepoints']])} }};\n"
             )
         md_file.write("};\n")
+        md_file.write("\n")
+        md_file.write(json.dumps(category_codepoints_axes))
+        md_file.write("\n")
         md_file.write("```\n")
 
 
