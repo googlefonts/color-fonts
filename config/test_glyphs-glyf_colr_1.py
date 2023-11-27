@@ -433,7 +433,6 @@ class GradientP2Skewed(TestCategory):
         return [True]
 
     def _make_test_glyph(self, param_set, position, accessor):
-
         glyph_name = f"gradient_p2_skewed"
 
         pen = TTGlyphPen(None)
@@ -727,7 +726,6 @@ class ExtendMode(TestCategory):
         return "extend_mode"
 
     def get_axis_definitions(self):
-
         axis_defs = []
         gradient_coords = ["x0", "y0", "x1", "y1", "x2", "y2", "r0", "r1"]
         for coord in gradient_coords:
@@ -1584,6 +1582,37 @@ class ForegroundColor(TestCategory):
         )
 
 
+class PaintColrGlyphCycle(TestCategory):
+    def get_name(self):
+        return "paintcolrglyph_cycle"
+
+    def _get_test_parameters(self):
+        return list(["first", "second"])
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        glyph_order = param_set
+
+        glyph_name = f"paintcolrglyph_cycle_{glyph_order}"
+
+        pen = _upem_box_pen()
+
+        glyph_reference = "second" if glyph_order == "first" else "first"
+        colr = {
+            "Format": ot.PaintFormat.PaintColrGlyph,
+            "Glyph": f"paintcolrglyph_cycle_{glyph_reference}",
+        }
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=pen.glyph(),
+            clip_box=(100, 250, 900, 950),
+            colr=colr,
+            description="Creates a cyclic dependency via two glyphs with PaintColrGlyph paints that reference each other.",
+        )
+
+
 class PaletteCircles(TestCategory):
     def get_name(self):
         return "color_circles_palette"
@@ -1787,6 +1816,7 @@ class TestDefinitions:
             PaletteCircles(0xF0E00, 0xF0F00),
             CircleContours(0xF0F00, 0xF1000),
             VariableAlpha(0xF1000, 0xF1100),
+            PaintColrGlyphCycle(0xF1100, 0xF1200),
         ]
 
     def make_all_glyphs(self, position):
@@ -1912,7 +1942,6 @@ def _make_names(static_variable_suffix):
 
 
 def main(args=None):
-
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
