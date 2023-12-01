@@ -178,6 +178,7 @@
 | 175 | 󱀀 | U+F1000 | `solid_colorline_alpha` | Tests variable alpha in linear gradient color stops, and in PaintVarSolid. | `APH1` affects PaintVarSolid alpha, `APH2` and `APH3` modify linear gradient alpha values. |
 | 176 | 󱄀 | U+F1100 | `paintcolrglyph_cycle_first` | Creates a cyclic dependency via two glyphs with PaintColrGlyph paints that reference each other. | None |
 | 177 | 󱄁 | U+F1101 | `paintcolrglyph_cycle_second` | Creates a cyclic dependency via two glyphs with PaintColrGlyph paints that reference each other. | None |
+| 178 | 󱈀 | U+F1200 | `no_cycle_multi_colrglyph` | Tests cycle detection in implementations to check that paints are correctly removed from a visited set when they are neighbors. | None |
 
 
 # C++ Code for test groups
@@ -201,5 +202,6 @@ namespace ColrV1TestDefinitions {
     const uint32_t circle_contours[] = { 0xf0f00, 0xf0f01, 0xf0f02, 0xf0f03, 0xf0f04, 0xf0f05, 0xf0f06 };
     const uint32_t variable_alpha[] = { 0xf1000 };
     const uint32_t paintcolrglyph_cycle[] = { 0xf1100, 0xf1101 };
+    const uint32_t no_cycle_multi_colrglyph[] = { 0xf1200 };
 };
 ```

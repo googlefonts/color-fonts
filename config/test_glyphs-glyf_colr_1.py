@@ -1607,9 +1607,60 @@ class PaintColrGlyphCycle(TestCategory):
             accessor=accessor,
             advance=_UPEM,
             glyph=pen.glyph(),
-            clip_box=(100, 250, 900, 950),
+            clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description="Creates a cyclic dependency via two glyphs with PaintColrGlyph paints that reference each other.",
+        )
+
+
+class AdjacentPaintColrGlyphs(TestCategory):
+    def get_name(self):
+        return "no_cycle_multi_colrglyph"
+
+    def _get_test_parameters(self):
+        return [True]
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        glyph_name = "no_cycle_multi_colrglyph"
+
+        transformed_layers = []
+        scale = 1
+        center_x = _UPEM / 2
+        center_y = 600
+
+        for i in range(0, 5):
+            layer = {
+                "Format": ot.PaintFormat.PaintScaleAroundCenter,
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintRotateAroundCenter,
+                    "angle": 180 if i % 2 == 0 else -180,
+                    "centerX": center_x,
+                    "centerY": center_y,
+                    "Paint": {
+                        "Format": ot.PaintFormat.PaintColrGlyph,
+                        "Glyph": "solid_colorline_alpha",
+                    },
+                },
+                "scaleX": scale,
+                "scaleY": scale,
+                "centerX": center_x,
+                "centerY": center_y,
+            }
+            transformed_layers.append(layer)
+            scale -= 0.18
+
+        color_blue = _cpal("blue", 0.5)
+
+        colr = {"Format": ot.PaintFormat.PaintColrLayers, "Layers": transformed_layers}
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            advance=_UPEM,
+            accessor=accessor,
+            clip_box=(0, 0, _UPEM, _UPEM),
+            glyph=_upem_box_pen().glyph(),
+            colr=colr,
+            description="Tests cycle detection in implementations to check that paints are correctly removed from a visited set when they are neighbors.",
         )
 
 
@@ -1817,6 +1868,7 @@ class TestDefinitions:
             CircleContours(0xF0F00, 0xF1000),
             VariableAlpha(0xF1000, 0xF1100),
             PaintColrGlyphCycle(0xF1100, 0xF1200),
+            AdjacentPaintColrGlyphs(0xF1200, 0xF1300),
         ]
 
     def make_all_glyphs(self, position):
