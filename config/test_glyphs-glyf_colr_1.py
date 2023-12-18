@@ -82,9 +82,8 @@ class TestCategory(ABC):
         return ""
 
     def make_test_glyphs(self, position) -> list[SampleGlyph]:
-        for accessor, param_set in zip(
-            self._get_accessors(), self._get_test_parameters()
-        ):
+        zipped_params = zip(self._get_accessors(), self._get_test_parameters())
+        for accessor, param_set in zipped_params:
             yield self._make_test_glyph(param_set, position, accessor)
 
     def get_axis_definitions(self):
@@ -271,6 +270,116 @@ class Sweep(TestCategory):
             colr=colr,
             description="Tests `Paint(Var)SweepGradient`.",
             axes_effect="`SWPS` shifts sweep start angle, `SWPE` shifts sweep end angle, `SWC1`-`SWC4` shift color stop positions.",
+        )
+
+
+class SweepCoincident(TestCategory):
+    def get_name(self):
+        return "sweep_coincident"
+
+    def get_axis_definitions(self):
+        return []
+
+    def _get_test_parameters(self):
+        parameter_list = list(
+            itertools.product(
+                # "angles" means the angles are coinciding, "stops" means the stops are coinciding.
+                ["angles", "stops"],
+                ["forward", "reverse"],
+                # "blue_red" mean blue and red are the outer colors, otherwise linen and darkslategray are the outer colors.
+                ["blue_red", "linen_gray"],
+                ["pad", "reflect", "repeat"],
+            )
+        )
+        return parameter_list
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        test_type_arg = param_set[0]
+        reversed_arg = param_set[1]
+        color_order_arg = param_set[2]
+        extend_mode_arg = param_set[3]
+
+        if reversed_arg != "reverse" and reversed_arg != "forward":
+            return None
+
+        extend_mode_map = {
+            "reflect": ot.ExtendMode.REFLECT,
+            "repeat": ot.ExtendMode.REPEAT,
+            "pad": ot.ExtendMode.PAD,
+        }
+        if extend_mode_arg not in extend_mode_map:
+            return None
+        extend_mode = extend_mode_map[extend_mode_arg]
+
+        color_order_map = {
+            "blue_red": [
+                _cpal("blue"),
+                _cpal("linen"),
+                _cpal("darkslategray"),
+                _cpal("red"),
+            ],
+            "linen_gray": [
+                _cpal("linen"),
+                _cpal("blue"),
+                _cpal("red"),
+                _cpal("darkslategray"),
+            ],
+        }
+        if color_order_arg not in color_order_map:
+            return None
+        color_order = color_order_map[color_order_arg]
+
+        start_angle = 45
+        end_angle = 90
+
+        # Angles requested to be coincident.
+        if test_type_arg == "angles":
+            start_angle = 90
+            if reversed_arg == "reverse":
+                start_angle, end_angle = end_angle, start_angle
+
+        color_stops = [0, 1 / 3, 2 / 3, 1]
+
+        if test_type_arg == "stops":
+            color_stops = [0.5, 0.5, 0.5, 0.5]
+            if reversed_arg == "reverse":
+                color_order.reverse()
+
+        color_line = {
+            "ColorStop": [(x[0], *x[1]) for x in zip(color_stops, color_order)]
+        }
+
+        glyph_name = f"sweep_coincident_{test_type_arg}_{reversed_arg}_{color_order_arg}_{extend_mode_arg}"
+
+        colr = {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": "circle_r350",
+            "Paint": {
+                "Format": ot.PaintFormat.PaintSweepGradient,
+                "ColorLine": {
+                    **color_line,
+                    "Extend": extend_mode,
+                },
+                "centerX": 500,
+                "centerY": 600,
+                "startAngle": start_angle,
+                "endAngle": end_angle,
+            },
+        }
+
+        reversed_string = " in reversed order" if reversed_arg == "reverse" else ""
+        color_string = ", colors blue & red." if color_order_arg == "blue_red" else ", colors linen & darkslategray."
+        test_description = f'Tests PaintSweepGradient with coincident {test_type_arg}{reversed_string}{color_string}'
+
+        return SampleGlyph(
+            glyph_name=glyph_name,
+            accessor=accessor,
+            advance=_UPEM,
+            glyph=_upem_box_pen().glyph(),
+            clip_box=(0, 0, _UPEM, _UPEM),
+            colr=colr,
+            description=test_description,
+            axes_effect="",
         )
 
 
@@ -1869,6 +1978,7 @@ class TestDefinitions:
             VariableAlpha(0xF1000, 0xF1100),
             PaintColrGlyphCycle(0xF1100, 0xF1200),
             AdjacentPaintColrGlyphs(0xF1200, 0xF1300),
+            SweepCoincident(0xF1300, 0xF1400),
         ]
 
     def make_all_glyphs(self, position):

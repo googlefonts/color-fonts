@@ -179,6 +179,30 @@
 | 176 | 󱄀 | U+F1100 | `paintcolrglyph_cycle_first` | Creates a cyclic dependency via two glyphs with PaintColrGlyph paints that reference each other. | None |
 | 177 | 󱄁 | U+F1101 | `paintcolrglyph_cycle_second` | Creates a cyclic dependency via two glyphs with PaintColrGlyph paints that reference each other. | None |
 | 178 | 󱈀 | U+F1200 | `no_cycle_multi_colrglyph` | Tests cycle detection in implementations to check that paints are correctly removed from a visited set when they are neighbors. | None |
+| 179 | 󱌀 | U+F1300 | `sweep_coincident_angles_forward_blue_red_pad` | Tests PaintSweepGradient with coincident angles, colors blue & red. |  |
+| 180 | 󱌁 | U+F1301 | `sweep_coincident_angles_forward_blue_red_reflect` | Tests PaintSweepGradient with coincident angles, colors blue & red. |  |
+| 181 | 󱌂 | U+F1302 | `sweep_coincident_angles_forward_blue_red_repeat` | Tests PaintSweepGradient with coincident angles, colors blue & red. |  |
+| 182 | 󱌃 | U+F1303 | `sweep_coincident_angles_forward_linen_gray_pad` | Tests PaintSweepGradient with coincident angles, colors linen & darkslategray. |  |
+| 183 | 󱌄 | U+F1304 | `sweep_coincident_angles_forward_linen_gray_reflect` | Tests PaintSweepGradient with coincident angles, colors linen & darkslategray. |  |
+| 184 | 󱌅 | U+F1305 | `sweep_coincident_angles_forward_linen_gray_repeat` | Tests PaintSweepGradient with coincident angles, colors linen & darkslategray. |  |
+| 185 | 󱌆 | U+F1306 | `sweep_coincident_angles_reverse_blue_red_pad` | Tests PaintSweepGradient with coincident angles in reversed order, colors blue & red. |  |
+| 186 | 󱌇 | U+F1307 | `sweep_coincident_angles_reverse_blue_red_reflect` | Tests PaintSweepGradient with coincident angles in reversed order, colors blue & red. |  |
+| 187 | 󱌈 | U+F1308 | `sweep_coincident_angles_reverse_blue_red_repeat` | Tests PaintSweepGradient with coincident angles in reversed order, colors blue & red. |  |
+| 188 | 󱌉 | U+F1309 | `sweep_coincident_angles_reverse_linen_gray_pad` | Tests PaintSweepGradient with coincident angles in reversed order, colors linen & darkslategray. |  |
+| 189 | 󱌊 | U+F130A | `sweep_coincident_angles_reverse_linen_gray_reflect` | Tests PaintSweepGradient with coincident angles in reversed order, colors linen & darkslategray. |  |
+| 190 | 󱌋 | U+F130B | `sweep_coincident_angles_reverse_linen_gray_repeat` | Tests PaintSweepGradient with coincident angles in reversed order, colors linen & darkslategray. |  |
+| 191 | 󱌌 | U+F130C | `sweep_coincident_stops_forward_blue_red_pad` | Tests PaintSweepGradient with coincident stops, colors blue & red. |  |
+| 192 | 󱌍 | U+F130D | `sweep_coincident_stops_forward_blue_red_reflect` | Tests PaintSweepGradient with coincident stops, colors blue & red. |  |
+| 193 | 󱌎 | U+F130E | `sweep_coincident_stops_forward_blue_red_repeat` | Tests PaintSweepGradient with coincident stops, colors blue & red. |  |
+| 194 | 󱌏 | U+F130F | `sweep_coincident_stops_forward_linen_gray_pad` | Tests PaintSweepGradient with coincident stops, colors linen & darkslategray. |  |
+| 195 | 󱌐 | U+F1310 | `sweep_coincident_stops_forward_linen_gray_reflect` | Tests PaintSweepGradient with coincident stops, colors linen & darkslategray. |  |
+| 196 | 󱌑 | U+F1311 | `sweep_coincident_stops_forward_linen_gray_repeat` | Tests PaintSweepGradient with coincident stops, colors linen & darkslategray. |  |
+| 197 | 󱌒 | U+F1312 | `sweep_coincident_stops_reverse_blue_red_pad` | Tests PaintSweepGradient with coincident stops in reversed order, colors blue & red. |  |
+| 198 | 󱌓 | U+F1313 | `sweep_coincident_stops_reverse_blue_red_reflect` | Tests PaintSweepGradient with coincident stops in reversed order, colors blue & red. |  |
+| 199 | 󱌔 | U+F1314 | `sweep_coincident_stops_reverse_blue_red_repeat` | Tests PaintSweepGradient with coincident stops in reversed order, colors blue & red. |  |
+| 200 | 󱌕 | U+F1315 | `sweep_coincident_stops_reverse_linen_gray_pad` | Tests PaintSweepGradient with coincident stops in reversed order, colors linen & darkslategray. |  |
+| 201 | 󱌖 | U+F1316 | `sweep_coincident_stops_reverse_linen_gray_reflect` | Tests PaintSweepGradient with coincident stops in reversed order, colors linen & darkslategray. |  |
+| 202 | 󱌗 | U+F1317 | `sweep_coincident_stops_reverse_linen_gray_repeat` | Tests PaintSweepGradient with coincident stops in reversed order, colors linen & darkslategray. |  |
 
 
 # C++ Code for test groups
@@ -203,5 +227,6 @@ namespace ColrV1TestDefinitions {
     const uint32_t variable_alpha[] = { 0xf1000 };
     const uint32_t paintcolrglyph_cycle[] = { 0xf1100, 0xf1101 };
     const uint32_t no_cycle_multi_colrglyph[] = { 0xf1200 };
+    const uint32_t sweep_coincident[] = { 0xf1300, 0xf1301, 0xf1302, 0xf1303, 0xf1304, 0xf1305, 0xf1306, 0xf1307, 0xf1308, 0xf1309, 0xf130a, 0xf130b, 0xf130c, 0xf130d, 0xf130e, 0xf130f, 0xf1310, 0xf1311, 0xf1312, 0xf1313, 0xf1314, 0xf1315, 0xf1316, 0xf1317 };
 };
 ```
