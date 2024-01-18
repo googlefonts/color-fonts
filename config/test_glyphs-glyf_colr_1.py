@@ -42,6 +42,8 @@ _MIN_F2DOT14_ANGLE = _MIN_F2DOT14 * 180 + 180
 _CROSS_GLYPH = "cross_glyph"
 _UPEM_BOX_GLYPH = "upem_box_glyph"
 
+RECTANGLE_TOP = 250 + (600 * sqrt(3)) / 2
+
 SHAPES = {
     "upem_box": [
         ("moveTo", ((0, 0),)),
@@ -147,6 +149,34 @@ SHAPES = {
                 (849, 592),
             ),
         ),
+        ("closePath", ()),
+    ],
+    "triangle": [
+        ("moveTo", ((200, 250),)),
+        ("lineTo", ((500, RECTANGLE_TOP),)),
+        ("lineTo", ((800, 250),)),
+        ("closePath", ()),
+    ],
+    "negative_cross": [
+        ("moveTo", ((0, 0),)),
+        ("lineTo", ((_UPEM / 2 - 5, 0),)),
+        ("lineTo", ((_UPEM / 2 - 5, _UPEM / 2 - 5),)),
+        ("lineTo", ((0, _UPEM / 2 - 5),)),
+        ("closePath", ()),
+        ("moveTo", ((_UPEM / 2 + 5, 0),)),
+        ("lineTo", ((_UPEM, 0),)),
+        ("lineTo", ((_UPEM, _UPEM / 2 - 5),)),
+        ("lineTo", ((_UPEM / 2 + 5, _UPEM / 2 - 5),)),
+        ("closePath", ()),
+        ("moveTo", ((_UPEM / 2 + 5, _UPEM / 2 + 5),)),
+        ("lineTo", ((_UPEM, _UPEM / 2 + 5),)),
+        ("lineTo", ((_UPEM, _UPEM),)),
+        ("lineTo", ((_UPEM / 2 + 5, _UPEM),)),
+        ("closePath", ()),
+        ("moveTo", ((0, _UPEM / 2 + 5),)),
+        ("lineTo", ((_UPEM / 2 - 5, _UPEM / 2 + 5),)),
+        ("lineTo", ((_UPEM / 2 - 5, _UPEM),)),
+        ("lineTo", ((0, _UPEM),)),
         ("closePath", ()),
     ],
 }
@@ -723,6 +753,8 @@ class UtilContours(TestCategory):
             "cross",
             "one",
             "zero",
+            "triangle",
+            "negative_cross",
         ]
 
     def _make_test_glyph(self, glyph_type, position, accessor):
@@ -758,6 +790,18 @@ class UtilContours(TestCategory):
                 accessor=accessor,
                 advance=_UPEM,
                 glyph=_get_shape_pen("zero", digits_transform).glyph(),
+            ),
+            "triangle": SampleGlyph(
+                glyph_name="triangle",
+                advance=_UPEM,
+                accessor=accessor,
+                glyph=_get_shape_pen("triangle").glyph(),
+            ),
+            "negative_cross": SampleGlyph(
+                glyph_name="negative_cross",
+                advance=_UPEM,
+                accessor=accessor,
+                glyph=_get_shape_pen("negative_cross").glyph(),
             ),
         }
         return glyph_map[glyph_type]
@@ -1847,6 +1891,78 @@ class AdjacentPaintColrGlyphs(TestCategory):
         )
 
 
+class PaintGlyphNestedPaints(TestCategory):
+    def get_name(self):
+        return "paint_glyph_nested"
+
+    def _get_test_parameters(self):
+        transform_options = ["identity", "translate", "rotate_origin", "rotate_center"]
+        return list(itertools.product(transform_options, transform_options))
+
+    def _make_test_glyph(self, param_set, position, accessor):
+        (paintglyph_transform, fill_transform) = param_set
+
+        transform_map = {
+            "identity": {"Format": ot.PaintFormat.PaintTranslate, "dx": 0, "dy": 0},
+            "translate": {
+                "Format": ot.PaintFormat.PaintTranslate,
+                "dx": 120,
+                "dy": 120,
+            },
+            "rotate_origin": {
+                "Format": ot.PaintFormat.PaintRotate,
+                "angle": 10,
+            },
+            "rotate_center": {
+                "Format": ot.PaintFormat.PaintRotateAroundCenter,
+                "centerX": 500,
+                "centerY": (RECTANGLE_TOP - 250) / 2 + 250,
+                "angle": 60,
+            },
+        }
+
+        colr_glyph = {
+            "Format": ot.PaintFormat.PaintGlyph,
+            "Glyph": "negative_cross",
+            "Paint": {
+                **transform_map[paintglyph_transform],
+                "Paint": {
+                    "Format": ot.PaintFormat.PaintGlyph,
+                    "Glyph": "triangle",
+                    "Paint": {
+                        **transform_map[fill_transform],
+                        "Paint": {
+                            "Format": ot.PaintFormat.PaintLinearGradient,
+                            "ColorLine": {
+                                "ColorStop": [
+                                    (0, *_cpal("red")),
+                                    (1, *_cpal("blue")),
+                                ],
+                                "Extend": ot.ExtendMode.REPEAT,
+                            },
+                            "x0": 650,
+                            "y0": (RECTANGLE_TOP - 250) / 2 + 250,
+                            "x1": 200,
+                            "y1": 250,
+                            "x2": 800,
+                            "y2": 250,
+                        },
+                    },
+                },
+            },
+        }
+
+        return SampleGlyph(
+            glyph_name=f"paint_glyph_nested_{paintglyph_transform}_{fill_transform}",
+            advance=_UPEM,
+            accessor=accessor,
+            clip_box=(0, 0, _UPEM, _UPEM),
+            glyph=_get_shape_pen("upem_box").glyph(),
+            colr=colr_glyph,
+            description="Tests nested PaintGlyphs with inner transform on the gradient.",
+        )
+
+
 class PaletteCircles(TestCategory):
     def get_name(self):
         return "color_circles_palette"
@@ -2053,6 +2169,7 @@ class TestDefinitions:
             PaintColrGlyphCycle(0xF1100, 0xF1200),
             AdjacentPaintColrGlyphs(0xF1200, 0xF1300),
             SweepCoincident(0xF1300, 0xF1400),
+            PaintGlyphNestedPaints(0xF1400, 0xF1500),
         ]
 
     def make_all_glyphs(self, position):
