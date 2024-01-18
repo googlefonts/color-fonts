@@ -698,9 +698,7 @@ class GradientP2Skewed(TestCategory):
         )
 
 
-def _get_shape_pen(shape_name: str, transform: tuple = None) -> list[tuple]:
-    if shape_name not in SHAPES:
-        return []
+def _get_shape_pen(shape_name: str, transform: tuple = None) -> TTGlyphPen:
     shape_list = SHAPES[shape_name]
     tt_pen = TTGlyphPen(None)
     draw_pen = tt_pen
