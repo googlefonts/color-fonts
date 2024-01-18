@@ -13,7 +13,7 @@ from fontTools import ttLib
 from fontTools import varLib
 from fontTools.colorLib import builder as colorBuilder
 from fontTools.colorLib.builder import ColorPaletteType
-from fontTools.pens.ttGlyphPen import TTGlyphPen, TTGlyphPointPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen, TTGlyphPointPen, TransformPen
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
 import sys
@@ -41,6 +41,115 @@ _MIN_F2DOT14_ANGLE = _MIN_F2DOT14 * 180 + 180
 
 _CROSS_GLYPH = "cross_glyph"
 _UPEM_BOX_GLYPH = "upem_box_glyph"
+
+SHAPES = {
+    "upem_box": [
+        ("moveTo", ((0, 0),)),
+        ("lineTo", ((0, _UPEM),)),
+        ("lineTo", ((_UPEM, _UPEM),)),
+        ("lineTo", ((_UPEM, 0),)),
+        ("closePath", ()),
+    ],
+    "cross": [
+        ("moveTo", ((475, 525),)),
+        ("lineTo", ((475, 750),)),
+        ("lineTo", ((525, 750),)),
+        ("lineTo", ((525, 525),)),
+        ("lineTo", ((750, 525),)),
+        ("lineTo", ((750, 475),)),
+        ("lineTo", ((525, 475),)),
+        ("lineTo", ((525, 250),)),
+        ("lineTo", ((475, 250),)),
+        ("lineTo", ((475, 475),)),
+        ("lineTo", ((250, 475),)),
+        ("lineTo", ((250, 525),)),
+        ("endPath", ()),
+    ],
+    # 1 glyph taken from Roboto Regular.
+    "one": [
+        ("moveTo", ((729, 1464),)),
+        ("lineTo", ((729, 0),)),
+        ("lineTo", ((544, 0),)),
+        ("lineTo", ((544, 1233),)),
+        ("lineTo", ((171, 1079),)),
+        ("lineTo", ((171, 1264),)),
+        ("lineTo", ((700, 1464),)),
+        ("closePath", ()),
+    ],
+    # 0 glyph taken from Roboto Regular
+    "zero": [
+        ("moveTo", ((1035, 622),)),
+        (
+            "qCurveTo",
+            (
+                (1035, 264),
+                (788, -20),
+                (576, -20),
+            ),
+        ),
+        (
+            "qCurveTo",
+            (
+                (367, -20),
+                (115, 264),
+                (115, 622),
+            ),
+        ),
+        ("lineTo", ((115, 844),)),
+        (
+            "qCurveTo",
+            (
+                (115, 1201),
+                (365, 1476),
+                (574, 1476),
+            ),
+        ),
+        (
+            "qCurveTo",
+            (
+                (786, 1476),
+                (1035, 1201),
+                (1035, 844),
+            ),
+        ),
+        ("closePath", ()),
+        ("moveTo", ((849, 875),)),
+        (
+            "qCurveTo",
+            (
+                (849, 1121),
+                (709, 1325),
+                (574, 1325),
+            ),
+        ),
+        (
+            "qCurveTo",
+            (
+                (442, 1325),
+                (301, 1121),
+                (301, 875),
+            ),
+        ),
+        ("lineTo", ((301, 592),)),
+        (
+            "qCurveTo",
+            (
+                (301, 348),
+                (444, 132),
+                (576, 132),
+            ),
+        ),
+        (
+            "qCurveTo",
+            (
+                (712, 132),
+                (849, 348),
+                (849, 592),
+            ),
+        ),
+        ("closePath", ()),
+    ],
+}
 
 
 logger = logging.getLogger()
@@ -265,7 +374,7 @@ class Sweep(TestCategory):
             glyph_name=glyph_name,
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description="Tests `Paint(Var)SweepGradient`.",
@@ -368,14 +477,18 @@ class SweepCoincident(TestCategory):
         }
 
         reversed_string = " in reversed order" if reversed_arg == "reverse" else ""
-        color_string = ", colors blue & red." if color_order_arg == "blue_red" else ", colors linen & darkslategray."
-        test_description = f'Tests PaintSweepGradient with coincident {test_type_arg}{reversed_string}{color_string}'
+        color_string = (
+            ", colors blue & red."
+            if color_order_arg == "blue_red"
+            else ", colors linen & darkslategray."
+        )
+        test_description = f"Tests PaintSweepGradient with coincident {test_type_arg}{reversed_string}{color_string}"
 
         return SampleGlyph(
             glyph_name=glyph_name,
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description=test_description,
@@ -525,7 +638,7 @@ class VariableAlpha(TestCategory):
             glyph_name=glyph_name,
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description="Tests variable alpha in linear gradient color stops, and in PaintVarSolid.",
@@ -585,15 +698,17 @@ class GradientP2Skewed(TestCategory):
         )
 
 
-def _upem_box_pen():
-    pen = TTGlyphPen(None)
-    pen.moveTo((0, 0))
-    pen.lineTo((0, _UPEM))
-    pen.lineTo((_UPEM, _UPEM))
-    pen.lineTo((_UPEM, 0))
-    pen.closePath()
-
-    return pen
+def _get_shape_pen(shape_name: str, transform: tuple = None) -> TTGlyphPen:
+    shape_list = SHAPES[shape_name]
+    tt_pen = TTGlyphPen(None)
+    draw_pen = tt_pen
+    if transform:
+        draw_pen = TransformPen(tt_pen, transform)
+    for operator, args in shape_list:
+        getattr(draw_pen, operator)(
+            *args,
+        )
+    return tt_pen
 
 
 class UtilContours(TestCategory):
@@ -601,58 +716,17 @@ class UtilContours(TestCategory):
         return "util_contours"
 
     def _get_test_parameters(self):
-        return [".notdef", ".null", "upem_box", "cross", "one", "zero"]
+        return [
+            ".notdef",
+            ".null",
+            "upem_box",
+            "cross",
+            "one",
+            "zero",
+        ]
 
     def _make_test_glyph(self, glyph_type, position, accessor):
-        cross_pen = TTGlyphPen(None)
-        cross_pen.moveTo((475, 525))
-        cross_pen.lineTo((475, 750))
-        cross_pen.lineTo((525, 750))
-        cross_pen.lineTo((525, 525))
-        cross_pen.lineTo((750, 525))
-        cross_pen.lineTo((750, 475))
-        cross_pen.lineTo((525, 475))
-        cross_pen.lineTo((525, 250))
-        cross_pen.lineTo((475, 250))
-        cross_pen.lineTo((475, 475))
-        cross_pen.lineTo((250, 475))
-        cross_pen.lineTo((250, 525))
-        cross_pen.endPath()
-
-        one_pen = TTGlyphPen(None)
-        pen = one_pen.transformPen(one_pen, (0.2, 0, 0, 0.2, 150, 250))
-        # 1 glyph taken from Roboto Regular.
-        pen.moveTo((729, 1464))
-        for line_point in [
-            (729, 0),
-            (544, 0),
-            (544, 1233),
-            (171, 1079),
-            (171, 1264),
-            (700, 1464),
-        ]:
-            pen.lineTo(line_point)
-        pen.closePath()
-
-        zero_pen = TTGlyphPen(None)
-        pen = zero_pen.transformPen(zero_pen, (0.2, 0, 0, 0.2, 150, 250))
-
-        # 0 glyph taken from Roboto Regular
-        pen.moveTo((1035, 622))
-        pen.qCurveTo((1035, 264), (788, -20), (576, -20))
-        pen.qCurveTo((367, -20), (115, 264), (115, 622))
-        pen.lineTo((115, 844))
-        pen.qCurveTo((115, 1201), (365, 1476), (574, 1476))
-        pen.qCurveTo((786, 1476), (1035, 1201), (1035, 844))
-        pen.closePath()
-
-        pen.moveTo((849, 875))
-        pen.qCurveTo((849, 1121), (709, 1325), (574, 1325))
-        pen.qCurveTo((442, 1325), (301, 1121), (301, 875))
-        pen.lineTo((301, 592))
-        pen.qCurveTo((301, 348), (444, 132), (576, 132))
-        pen.qCurveTo((712, 132), (849, 348), (849, 592))
-        pen.closePath()
+        digits_transform = (0.2, 0, 0, 0.2, 150, 250)
 
         glyph_map = {
             ".notdef": SampleGlyph(
@@ -664,26 +738,26 @@ class UtilContours(TestCategory):
             "upem_box": SampleGlyph(
                 glyph_name=_UPEM_BOX_GLYPH,
                 advance=_UPEM,
-                glyph=_upem_box_pen().glyph(),
+                glyph=_get_shape_pen("upem_box").glyph(),
                 accessor=accessor,
             ),
             "cross": SampleGlyph(
                 glyph_name=_CROSS_GLYPH,
                 advance=_UPEM,
-                glyph=cross_pen.glyph(),
+                glyph=_get_shape_pen("cross").glyph(),
                 accessor=accessor,
             ),
             "one": SampleGlyph(
                 glyph_name="one",
                 accessor=accessor,
                 advance=_UPEM,
-                glyph=one_pen.glyph(),
+                glyph=_get_shape_pen("one", digits_transform).glyph(),
             ),
             "zero": SampleGlyph(
                 glyph_name="zero",
                 accessor=accessor,
                 advance=_UPEM,
-                glyph=zero_pen.glyph(),
+                glyph=_get_shape_pen("zero", digits_transform).glyph(),
             ),
         }
         return glyph_map[glyph_type]
@@ -823,7 +897,7 @@ class PaintScale(TestCategory):
             glyph_name=glyph_name,
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             colr=colr,
             description=f"Tests {description}.",
             axes_effect="`SCOX` shifts center x offset, `SCOY` shifts center Y offfset, `SCSX` changes x or uniform scale factor, `SCSY` changes y scale factor.",
@@ -971,7 +1045,7 @@ class ExtendMode(TestCategory):
         return SampleGlyph(
             glyph_name=glyph_name,
             accessor=accessor,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             advance=_UPEM,
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
@@ -1078,7 +1152,7 @@ class PaintRotate(TestCategory):
             glyph_name=glyph_name,
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             colr=colr,
             description=f"Tests {description}.",
             axes_effect="`ROTA`: changes rotation angle, `ROTX` shifts pivot point x, `ROTY` shifts pivot point y.",
@@ -1187,7 +1261,7 @@ class PaintSkew(TestCategory):
             glyph_name=glyph_name,
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             colr=colr,
             description=f"Tests {description} for x angle {x_skew_angle}, y angle {y_skew_angle}, x center {center_x}, y center {center_y}.",
             axes_effect="`SKXA`, `SKYA` affect skew x and y angle respectively, `SKCX` and `SKCY` affect pivot point x and y coordinate respectively.",
@@ -1270,7 +1344,7 @@ class PaintTransform(TestCategory):
             glyph_name=glyph_name,
             advance=_UPEM,
             accessor=accessor,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             colr=colr,
             description="Tests `Paint(Var)Transform`.",
             axes_effect="`TRXX`, `TRXY`, `TRYX`, `TRYY`, `TRDX`, `TRDY` affect the individual transformation matrix coordinates.",
@@ -1355,7 +1429,7 @@ class PaintTranslate(TestCategory):
             glyph_name=glyph_name,
             advance=_UPEM,
             accessor=accessor,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             colr=colr,
             description="Tests `Paint(Var)Translate`.",
             axes_effect="`TLDX`, `TLDY` affect the x and y translation value of PaintVarTranslate.",
@@ -1453,7 +1527,7 @@ class ClipBox(TestCategory):
         return SampleGlyph(
             glyph_name="inset_clipped_radial_reflect",
             accessor=accessor,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             advance=_UPEM,
             clip_box=(offset, offset, _UPEM - offset, _UPEM - offset),
             description="Inner helper glyph for clip box tests.",
@@ -1525,7 +1599,7 @@ class ClipBox(TestCategory):
             glyph_name=f"clip_box_{clip_corner}",
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             clip_box=clip_box_coordinates,
             colr=colr,
             description="Tests `(Var)ClipBox`.",
@@ -1598,7 +1672,7 @@ class Composite(TestCategory):
             glyph_name=f"composite_{composite_mode.name}",
             accessor=accessor,
             advance=_UPEM,
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             clip_box=(0, 0, _UPEM, _UPEM),
             colr=colr,
             description=f"Tests `PaintComposite` for mode {composite_mode.name}.",
@@ -1673,7 +1747,7 @@ class ForegroundColor(TestCategory):
 
         glyph_name = f"foreground_color_{fill_type}_alpha_{foreground_alpha}"
 
-        pen = _upem_box_pen()
+        pen = _get_shape_pen("upem_box")
 
         colr = {
             "Format": ot.PaintFormat.PaintGlyph,
@@ -1703,7 +1777,7 @@ class PaintColrGlyphCycle(TestCategory):
 
         glyph_name = f"paintcolrglyph_cycle_{glyph_order}"
 
-        pen = _upem_box_pen()
+        pen = _get_shape_pen("upem_box")
 
         glyph_reference = "second" if glyph_order == "first" else "first"
         colr = {
@@ -1767,7 +1841,7 @@ class AdjacentPaintColrGlyphs(TestCategory):
             advance=_UPEM,
             accessor=accessor,
             clip_box=(0, 0, _UPEM, _UPEM),
-            glyph=_upem_box_pen().glyph(),
+            glyph=_get_shape_pen("upem_box").glyph(),
             colr=colr,
             description="Tests cycle detection in implementations to check that paints are correctly removed from a visited set when they are neighbors.",
         )
@@ -1785,7 +1859,7 @@ class PaletteCircles(TestCategory):
         palette_test_colors = _reserve_circle_colors()
 
         if version == "colrv0":
-            pen = _upem_box_pen()
+            pen = _get_shape_pen("upem_box")
             glyph_name = "colored_circles_v0"
             color_iter = iter(palette_test_colors)
 
@@ -1809,7 +1883,7 @@ class PaletteCircles(TestCategory):
             )
 
         if version == "colrv1":
-            pen = _upem_box_pen()
+            pen = _get_shape_pen("upem_box")
             glyph_name = "colored_circles_v1"
 
             def circle_reference(size, color_index):
