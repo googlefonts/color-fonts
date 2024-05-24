@@ -2197,7 +2197,7 @@ def _get_glyph_definitions(position):
     return list(TestDefinitions().make_all_glyphs(position))
 
 
-def _build_font(names, position):
+def _build_font(names, position, no_cliplist):
     glyphs = _get_glyph_definitions(position)
     fb = fontBuilder.FontBuilder(_UPEM)
     fb.setupGlyphOrder([g.glyph_name for g in glyphs])
@@ -2232,9 +2232,12 @@ def _build_font(names, position):
 
     colr_v0_glyphs = {g.glyph_name: g.colrv0 for g in glyphs if g.colrv0}
     colr_v1_glyphs = {g.glyph_name: g.colr for g in glyphs if g.colr}
+    clipboxes = None
+    if not no_cliplist:
+        clipboxes = {g.glyph_name: g.clip_box for g in glyphs if g.clip_box}
     fb.font["COLR"] = colorBuilder.buildCOLR(
         {**colr_v0_glyphs, **colr_v1_glyphs},
-        clipBoxes={g.glyph_name: g.clip_box for g in glyphs if g.clip_box},
+        clipBoxes=clipboxes,
     )
     fb.font["CPAL"] = colorBuilder.buildCPAL(**_prepare_palette())
     return fb
@@ -2337,72 +2340,80 @@ def main(args=None):
 
     logger.info(f"Output directory: {build_dir}")
 
-    generate_descriptions = options.generate_descriptions
+    for no_cliplist in [True, False]:
+        generate_descriptions = options.generate_descriptions
 
-    designspace = designspaceLib.DesignSpaceDocument()
+        designspace = designspaceLib.DesignSpaceDocument()
 
-    axis_defs = TestDefinitions().get_all_axis_definitions()
+        axis_defs = TestDefinitions().get_all_axis_definitions()
 
-    logger.debug(json.dumps(axis_defs))
+        logger.debug(json.dumps(axis_defs))
 
-    # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
-    all_default_positions = {}
-    all_default_locations = {}
-    for axis_def in axis_defs:
-        designspace.addAxisDescriptor(**axis_def)
-        all_default_positions[axis_def["tag"]] = axis_def["default"]
-        all_default_locations[axis_def["name"]] = axis_def["default"]
+        logger.info(f"Building with{ 'out' if no_cliplist else '' } cliplist")
+        # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
+        all_default_positions = {}
+        all_default_locations = {}
+        for axis_def in axis_defs:
+            designspace.addAxisDescriptor(**axis_def)
+            all_default_positions[axis_def["tag"]] = axis_def["default"]
+            all_default_locations[axis_def["name"]] = axis_def["default"]
 
-    # Start with the master of all default positions.
-    variation_positions = [all_default_positions]
+        # Start with the master of all default positions.
+        variation_positions = [all_default_positions]
 
-    static_font_builder = _build_font(_make_names("Static"), all_default_positions)
+        static_font_builder = _build_font(
+            _make_names("Static"), all_default_positions, no_cliplist
+        )
 
-    if generate_descriptions:
-        logger.info("Building descriptions.")
-        build_descriptions_(static_font_builder.font)
+        if generate_descriptions:
+            logger.info("Building descriptions.")
+            build_descriptions_(static_font_builder.font)
 
-    script_name = Path(__file__).name
-    variable_name = PurePath(__file__).stem + "_variable"
-    static_out_file = (build_dir / script_name).with_suffix(".ttf")
-    variable_out_file = (build_dir / variable_name).with_suffix(".ttf")
+        script_name = PurePath(__file__).stem
+        if no_cliplist:
+            script_name += "_no_cliplist"
+        variable_name = script_name + "_variable"
+        static_out_file = (build_dir / script_name).with_suffix(".ttf")
+        variable_out_file = (build_dir / variable_name).with_suffix(".ttf")
 
-    static_font_builder.save(static_out_file)
-    logger.info(f"Static font {static_out_file} written.")
+        static_font_builder.save(static_out_file)
+        logger.info(f"Static font {static_out_file} written.")
 
-    variable_names = _make_names("Variable")
-    default_variable_builder = _build_font(variable_names, all_default_positions)
+        variable_names = _make_names("Variable")
+        default_variable_builder = _build_font(
+            variable_names, all_default_positions, no_cliplist
+        )
 
-    designspace.addSourceDescriptor(
-        name="All Default",
-        location=all_default_locations,
-        font=default_variable_builder.font,
-    )
+        designspace.addSourceDescriptor(
+            name="All Default",
+            location=all_default_locations,
+            font=default_variable_builder.font,
+        )
 
-    # Append the minimum and maximum for each axis as masters, if differing from default.
-    for change_axis in axis_defs:
-        for change_key in ["minimum", "maximum"]:
-            axis_value = change_axis[change_key]
-            if axis_value == change_axis["default"]:
-                continue
-            position_dict = all_default_positions.copy()
-            position_dict[change_axis["tag"]] = axis_value
-            location_dict = all_default_locations.copy()
-            location_dict[change_axis["name"]] = axis_value
-            master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
-            designspace.addSourceDescriptor(
-                name=master_name,
-                location=location_dict,
-                font=_build_font(variable_names, position_dict).font,
-            )
+        # Append the minimum and maximum for each axis as masters, if differing from default.
+        for change_axis in axis_defs:
+            for change_key in ["minimum", "maximum"]:
+                axis_value = change_axis[change_key]
+                if axis_value == change_axis["default"]:
+                    continue
+                position_dict = all_default_positions.copy()
+                position_dict[change_axis["tag"]] = axis_value
+                location_dict = all_default_locations.copy()
+                location_dict[change_axis["name"]] = axis_value
+                master_name = f'Master {change_axis["name"]} {change_key.capitalize()}'
+                designspace.addSourceDescriptor(
+                    name=master_name,
+                    location=location_dict,
+                    font=_build_font(variable_names, position_dict, no_cliplist).font,
+                )
 
-    # Build the variable font.
-    # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
-    vf = varLib.build(
-        designspace,
-    )[0]
-    vf.save(variable_out_file)
-    logger.info(f"Variable font {variable_out_file} written.")
+        # Build the variable font.
+        # varLib.build returns a (vf, model, master_ttfs) tuple but I only care about the first.
+        vf = varLib.build(
+            designspace,
+        )[0]
+        vf.save(variable_out_file)
+        logger.info(f"Variable font {variable_out_file} written.")
 
 
 if __name__ == "__main__":
