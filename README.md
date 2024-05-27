@@ -54,6 +54,10 @@ The fonts [`fonts/test_glyphs-glyf_colr_1.ttf`](fonts/test_glyphs-glyf_colr_1.tt
 [`fonts/test_glyphs-glyf_colr_1_variable.ttf`](fonts/test_glyphs-glyf_colr_1_variable.ttf) "COLRv1 Variable Test Glyphs"
 in this repository provide a set of glyphs testing the static and variable aspects of COLRv1.
 
+For testing, additional versions of these font exist with the suffix
+`_no_cliplist` in which COLRv1 ClipLists are removed from the fonts and thus no
+glyphs have any clipboxes, see below for download links.
+
 ### Glyph List & Coverage Descriptions
 
 For a list of which glyphs provide test coverage of which specific COLRv1 features, please see the [individual glyph
@@ -64,6 +68,10 @@ descriptions here](glyph_descriptions.md).
 Binaries of the static and variable COLRv1 test font is available in the following files:
 * Static: [`fonts/test_glyphs-glyf_colr_1.ttf`](fonts/test_glyphs-glyf_colr_1.ttf)
 * Variable: [`fonts/test_glyphs-glyf_colr_1_variable.ttf`](fonts/test_glyphs-glyf_colr_1_variable.ttf)
+* Static, without ClipList:
+  [`fonts/test_glyphs-glyf_colr_1_no_cliplist.ttf`](fonts/test_glyphs-glyf_colr_1_no_cliplist.ttf)
+* Variable, without ClipList:
+  [`fonts/test_glyphs-glyf_colr_1_variable_no_cliplist.ttf`](fonts/test_glyphs-glyf_colr_1_variable_no_cliplist.ttf)
 
 ### Build the COLRv1 test font
 
