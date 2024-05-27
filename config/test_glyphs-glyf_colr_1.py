@@ -2197,7 +2197,7 @@ def _get_glyph_definitions(position):
     return list(TestDefinitions().make_all_glyphs(position))
 
 
-def _build_font(names, position, no_cliplist):
+def _build_font(names, position, output_cliplist):
     glyphs = _get_glyph_definitions(position)
     fb = fontBuilder.FontBuilder(_UPEM)
     fb.setupGlyphOrder([g.glyph_name for g in glyphs])
@@ -2233,7 +2233,7 @@ def _build_font(names, position, no_cliplist):
     colr_v0_glyphs = {g.glyph_name: g.colrv0 for g in glyphs if g.colrv0}
     colr_v1_glyphs = {g.glyph_name: g.colr for g in glyphs if g.colr}
     clipboxes = None
-    if not no_cliplist:
+    if output_cliplist:
         clipboxes = {g.glyph_name: g.clip_box for g in glyphs if g.clip_box}
     fb.font["COLR"] = colorBuilder.buildCOLR(
         {**colr_v0_glyphs, **colr_v1_glyphs},
@@ -2340,7 +2340,7 @@ def main(args=None):
 
     logger.info(f"Output directory: {build_dir}")
 
-    for no_cliplist in [True, False]:
+    for output_cliplist in [True, False]:
         generate_descriptions = options.generate_descriptions
 
         designspace = designspaceLib.DesignSpaceDocument()
@@ -2349,7 +2349,7 @@ def main(args=None):
 
         logger.debug(json.dumps(axis_defs))
 
-        logger.info(f"Building with{ 'out' if no_cliplist else '' } cliplist")
+        logger.info(f"Output with{ 'out' if not output_cliplist else '' } ClipList.")
         # For each axis, if differing from default, add the minimum and maximum axis positions as one master.
         all_default_positions = {}
         all_default_locations = {}
@@ -2362,7 +2362,7 @@ def main(args=None):
         variation_positions = [all_default_positions]
 
         static_font_builder = _build_font(
-            _make_names("Static"), all_default_positions, no_cliplist
+            _make_names("Static"), all_default_positions, output_cliplist
         )
 
         if generate_descriptions:
@@ -2370,9 +2370,10 @@ def main(args=None):
             build_descriptions_(static_font_builder.font)
 
         script_name = PurePath(__file__).stem
-        if no_cliplist:
-            script_name += "_no_cliplist"
         variable_name = script_name + "_variable"
+        if not output_cliplist:
+            script_name += "_no_cliplist"
+            variable_name += "_no_cliplist"
         static_out_file = (build_dir / script_name).with_suffix(".ttf")
         variable_out_file = (build_dir / variable_name).with_suffix(".ttf")
 
@@ -2381,7 +2382,7 @@ def main(args=None):
 
         variable_names = _make_names("Variable")
         default_variable_builder = _build_font(
-            variable_names, all_default_positions, no_cliplist
+            variable_names, all_default_positions, output_cliplist
         )
 
         designspace.addSourceDescriptor(
@@ -2404,7 +2405,7 @@ def main(args=None):
                 designspace.addSourceDescriptor(
                     name=master_name,
                     location=location_dict,
-                    font=_build_font(variable_names, position_dict, no_cliplist).font,
+                    font=_build_font(variable_names, position_dict, output_cliplist).font,
                 )
 
         # Build the variable font.
