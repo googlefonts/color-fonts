@@ -28,6 +28,7 @@ _COLOR_FORMATS = (
     "cff2_colr_1",
     "picosvg",
     "picosvgz",
+    "sbix",
     "untouchedsvg",
     "untouchedsvgz",
 )
