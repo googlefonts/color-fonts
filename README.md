@@ -34,10 +34,11 @@ The following color font and glyph definition formats exist:
 | Format short name | Description |
 | -- | -- |
 | `cff2_colr_1` | COLRv1 font with `CFF2` table contour definitions |
-| `cff_colr_1` | COLRv1 fotn with `CFF ` table contour definitions |
-| `glyf_colr_1` | COLRv1 fotn with `glyf ` table contour definitions (TrueType contours) |
+| `cff_colr_1` | COLRv1 font with `CFF ` table contour definitions |
+| `glyf_colr_1` | COLRv1 font with `glyf ` table contour definitions (TrueType contours) |
 | `picosvg` | OT-SVG font with SVG sources processed through picosvg |
 | `picosvgz` | OT-SVG font with SVG sources processed through picosvg and gzip compressed |
+| `sbix` | Color bitmap font using Apple's `sbix` table for images |
 | `untouchedsvg` | OT-SVG font with SVG source images embeddded as-is |
 | `untouchedsvgz` | OT-SVG font with SVG source images embeddded as-is and gzip compressed |
 
